@@ -1,0 +1,19 @@
+# Ignore node modules
+node_modules/
+
+# Ignore build directories
+build/
+dist/
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.swo
+
+# Ignore logs
+logs/
+*.log
+
+# Ignore Expo related files (if not needed)
+.expo/
+.expo-shared/

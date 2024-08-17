@@ -1,0 +1,45 @@
+{
+  "expo": {
+    "name": "akiba-app",
+    "slug": "akiba-app",
+    "version": "1.0.1",
+    "orientation": "portrait",
+    "icon": "./assets/icons/logo/sqlogo.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/icons/logo/logoname.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#00E394"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icons/logo/sqlogo.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.iamdanielklassic.akibaapp"
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "static",
+      "favicon": "./assets/icons/logo/sqlogo.png"
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "c5f847e9-becd-4f99-b2b8-ec481f34ec16"
+      }
+    }
+  }
+}
