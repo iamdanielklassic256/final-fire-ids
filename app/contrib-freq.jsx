@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, FlatList, TextInput, Modal } from 'react-
 import { LinearGradient } from 'expo-linear-gradient';
 import { Svg, Path } from 'react-native-svg';
 import { styled } from 'nativewind';
+import Loader from '../components/Loader'
 
 const StyledView = styled(View)
 const StyledText = styled(Text)
@@ -23,31 +24,62 @@ const PlusIcon = (props) => (
 );
 
 const ContributionFreq = () => {
-	const [cycles, setCycles] = useState([]);
+	const [contributions, setContributions] = useState([]);
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
 	const [modalVisible, setModalVisible] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState(null);
 
 	useEffect(() => {
-		setCycles([
-			{ id: '1', name: 'Dream Vacation', description: 'Save $200 monthly for a tropical getaway', progress: 65 },
-			{ id: '2', name: 'Emergency Fund', description: 'Build a safety net of $5000', progress: 40 },
-			{ id: '3', name: 'New Gadget', description: 'Save for the latest tech release', progress: 85 },
-		]);
+		fetchCycles();
 	}, []);
 
-	const handleCreateCycle = () => {
+	const fetchCycles = async () => {
+		try {
+			setIsLoading(true);
+			const response = await fetch('http://localhost:3000/contribution-frequency');
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+			const data = await response.json();
+			console.log('data ----', data)
+			setContributions(data.data);
+		} catch (error) {
+			setError('Failed to fetch cycles. Please try again later.');
+			console.error('Error fetching cycles:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	console.log('================================Content-Type================================', contributions)
+
+	const handleCreateCycle = async () => {
 		if (name && description) {
 			const newCycle = {
-				id: Date.now().toString(),
 				name,
-				description,
-				progress: 0,
+				description
 			};
-			setCycles([...cycles, newCycle]);
-			setName('');
-			setDescription('');
-			setModalVisible(false);
+			try {
+				const response = await fetch('http://localhost:3000/contribution-frequency', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(newCycle),
+				});
+				if (!response.ok) {
+					throw new Error('Failed to create cycle');
+				}
+				fetchCycles(); // Refresh the list after creating a new cycle
+				setName('');
+				setDescription('');
+				setModalVisible(false);
+			} catch (error) {
+				console.error('Error creating cycle:', error);
+				// You might want to show an error message to the user here
+			}
 		}
 	};
 
@@ -59,25 +91,28 @@ const ContributionFreq = () => {
 			className="rounded-xl p-4 mb-4"
 		>
 			<StyledText className="text-lg font-bold text-white mb-1">{item.name}</StyledText>
-			<StyledText className="text-white mb-2">{item.description}</StyledText>
-			<StyledView className="bg-white bg-opacity-30 h-2 rounded-full overflow-hidden">
-				<StyledView className="bg-white h-full rounded-full" style={{ width: `${item.progress}%` }} />
-			</StyledView>
-			<StyledText className="text-white text-right mt-1">{item.progress}%</StyledText>
+			<StyledText className="text-white ">{item.description}</StyledText>
 		</LinearGradient>
 	);
 
+	if (isLoading) {
+		<Loader isLoading={isLoading} />
+	}
+
+	if (error) {
+		return (
+			<StyledView className="flex-1 justify-center items-center">
+				<StyledText>{error}</StyledText>
+			</StyledView>
+		);
+	}
+
 	return (
 		<StyledView className="flex-1 bg-blue-50">
-			{/* <StyledView className="flex-row items-center justify-center p-4 bg-white border-b border-gray-200">
-        <PiggyBankIcon className="text-blue-500 mr-2" />
-        <StyledText className="text-2xl font-bold text-gray-800">Saving Cycles</StyledText>
-      </StyledView> */}
-
 			<FlatList
-				data={cycles}
+				data={contributions}
 				renderItem={renderCycleItem}
-				keyExtractor={(item) => item.id}
+				keyExtractor={(item) => item.id.toString()}
 				contentContainerStyle={{ padding: 16 }}
 			/>
 
