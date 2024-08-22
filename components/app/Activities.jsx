@@ -9,6 +9,8 @@ const getIconName = (item) => {
     case 'Loans': return 'cash';
     case 'Wallets': return 'wallet';
     case 'Meetings': return 'calendar-clock';
+    case 'Saving Cycle': return 'refresh';
+    case 'Contribution Frequency': return 'calendar-clock-outline';
     default: return 'help-circle';
   }
 };
@@ -27,10 +29,12 @@ const ActivityDashboard = () => {
   const router = useRouter();
 
   const activities = [
-    { name: 'Saving Groups', route: '/saving-groups' },
+    { name: 'Saving Groups', route: '/saving-group' },
     { name: 'Loans', route: '/loan-management' },
     { name: 'Wallets', route: '/digital-wallets' },
-    { name: 'Meetings', route: '/meeting-scheduler' }
+    { name: 'Meetings', route: '/meeting-scheduler' },
+    { name: 'Saving Cycle', route: '/saving-cycle' },
+    { name: 'Contribution Frequency', route: '/contrib-freq' },
   ];
 
   return (

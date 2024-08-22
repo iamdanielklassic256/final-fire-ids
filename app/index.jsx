@@ -26,7 +26,7 @@ const Welcome = () => {
             resizeMode="contain"
           />
           <Text className="text-white text-3xl font-bold mt-5">
-            Welcome to LwaziSave
+            Welcome to Akiba
           </Text>
           <Text className="text-[#E0E0E0] text-base text-center mt-2.5">
             Your pathway to financial growth and security

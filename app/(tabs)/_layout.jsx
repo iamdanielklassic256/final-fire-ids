@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { StatusBar } from "expo-status-bar";
-import { Redirect, Tabs } from "expo-router";
+import { Redirect, router, Tabs } from "expo-router";
 import { View, TouchableOpacity, Dimensions, Animated, Text } from "react-native";
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -146,7 +146,7 @@ const TabLayout = () => {
               if (route.name === 'app') {
                 iconName = 'home';
                 name = 'Home';
-              } else if (route.name === 'group') {
+              } else if (route.name === 'saving-group') {
                 iconName = 'people';
                 name = 'Savings';
                 notifications = 2; // Example: 2 new savings opportunities
@@ -194,10 +194,49 @@ const TabLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="group"
+          name="saving-group"
           options={{
-            title: "Savings",
-            headerShown: false,
+            headerTitle: "Saving Groups",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerRight: () => (
+              <Ionicons
+                name="add-circle-outline"
+                size={24}
+                color="#007AFF"
+                style={{ marginRight: 15 }}
+                onPress={() => {
+                  // Add logic to create a new saving group
+                  router.push('/add-group')
+                  console.log("Create new saving group");
+                }}
+              />
+            ),
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#007AFF"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  // Add navigation logic to go back
+                  router.navigate('/app')
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#F5F5F5',
+            },
+            headerTintColor: '#333',
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
           }}
         />
         <Tabs.Screen

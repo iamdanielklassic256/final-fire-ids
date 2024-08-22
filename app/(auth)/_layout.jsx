@@ -21,6 +21,7 @@ const AuthLayout = () => {
             headerShown: false,
           }}
         />
+          <Stack.Screen name="contact" options={{ headerShown: false, presentation: "fullScreenModal" }}  />
       </Stack>
 
       <Loader/>

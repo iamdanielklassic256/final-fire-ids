@@ -1,8 +1,9 @@
+import 'react-native-reanimated';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import 'react-native-reanimated';
+import { Ionicons } from '@expo/vector-icons';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -35,11 +36,110 @@ export default function RootLayout() {
 
   return (
     <>
+      {/* <Provider store={store}> */}
       <Stack>
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="saving-cycle"
+          options={{
+            headerTitle: "Saving Cycles",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+        <Stack.Screen
+          name="contrib-freq"
+          options={{
+            headerTitle: "Contribution Frequency",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+        <Stack.Screen
+          name="add-group"
+          options={{
+            headerTitle: "Create New Saving Group",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+
       </Stack>
+      {/* </Provider> */}
     </>
   );
 }

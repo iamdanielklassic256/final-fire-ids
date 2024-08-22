@@ -18,6 +18,10 @@ const Login = () => {
 
 
 	
+
+
+
+	
 	const handleLogin = async () => {
 		console.log('Login with:', { phoneNumber, pinCode });
 		try {
@@ -48,7 +52,7 @@ const Login = () => {
 				}
 	
 				// setIsLogged(true);
-				console.log('Login Success', userData?.full_name);
+				console.log('Login Success', userData);
 	
 				Alert.alert("Login Success!");
 				router.push("/app");
@@ -87,8 +91,8 @@ const Login = () => {
 						<Text className="text-white text-3xl font-bold">
 							Welcome Back
 						</Text>
-						<Text className="text-[#E0E0E0] text-base text-center mt-2.5">
-							Login to your LwaziSave account
+						<Text className="text-[#250048] text-base font-bold text-center mt-2.5">
+							Login to your account
 						</Text>
 					</View>
 
