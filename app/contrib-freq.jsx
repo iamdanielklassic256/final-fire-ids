@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, FlatList, TextInput, Modal } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Svg, Path } from 'react-native-svg';
+import { Svg, Path, err } from 'react-native-svg';
 import { styled } from 'nativewind';
 import Loader from '../components/Loader'
+import { contrib_freq_url, member_contrib_freq_url } from '../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const StyledView = styled(View)
 const StyledText = styled(Text)
@@ -31,23 +33,54 @@ const ContributionFreq = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 
+
+	const [member, setMember] = useState("");
+
+	useEffect(() => {
+		const fetchMemberData = async () => {
+			try {
+				const memberData = await AsyncStorage.getItem("member");
+				if (memberData) {
+					const member = JSON.parse(memberData);
+					setMember(member);
+				}
+			} catch (error) {
+				console.error("Error fetching member data:", error);
+			}
+		};
+
+		fetchMemberData();
+	}, []);
+
+
+
+
+	const memberId = member.id;
+	console.log(memberId);
+
 	useEffect(() => {
 		fetchCycles();
-	}, []);
+	}, [memberId]);
 
 	const fetchCycles = async () => {
 		try {
 			setIsLoading(true);
-			const response = await fetch('http://localhost:3000/contribution-frequency');
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
+			const response = await fetch(`${member_contrib_freq_url}/${memberId}`);
+			if (response.status === 200) {
+				const data = await response.json();
+				// if(data.length !== )
+				console.log('data ----', data)
+				setContributions(data);
+				setIsLoading(false);
 			}
-			const data = await response.json();
-			console.log('data ----', data)
-			setContributions(data.data);
+			else{
+				console.log(err)
+			}
+
 		} catch (error) {
 			setError('Failed to fetch cycles. Please try again later.');
 			console.error('Error fetching cycles:', error);
+			setIsLoading(false);
 		} finally {
 			setIsLoading(false);
 		}
@@ -55,14 +88,18 @@ const ContributionFreq = () => {
 
 	console.log('================================Content-Type================================', contributions)
 
+
+
+
 	const handleCreateCycle = async () => {
 		if (name && description) {
 			const newCycle = {
+				memberId: memberId,
 				name,
 				description
 			};
 			try {
-				const response = await fetch('http://localhost:3000/contribution-frequency', {
+				const response = await fetch(contrib_freq_url, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -109,12 +146,14 @@ const ContributionFreq = () => {
 
 	return (
 		<StyledView className="flex-1 bg-blue-50">
-			<FlatList
-				data={contributions}
-				renderItem={renderCycleItem}
-				keyExtractor={(item) => item.id.toString()}
-				contentContainerStyle={{ padding: 16 }}
-			/>
+			{isLoading ? <Loader isLoading={isLoading} /> : (
+				<FlatList
+					data={contributions}
+					renderItem={renderCycleItem}
+					keyExtractor={(item) => item.id.toString()}
+					contentContainerStyle={{ padding: 16 }}
+				/>
+			)}
 
 			<StyledTouchableOpacity
 				className="absolute right-4 bottom-4 w-14 h-14 rounded-full bg-blue-500 items-center justify-center"
@@ -133,7 +172,7 @@ const ContributionFreq = () => {
 						<StyledText className="text-2xl font-bold text-gray-800 mb-4 text-center">New Contribution Frequency</StyledText>
 						<StyledTextInput
 							className="bg-gray-100 p-4 rounded-lg mb-4"
-							placeholder="Cycle Name"
+							placeholder="Name"
 							value={name}
 							onChangeText={setName}
 						/>

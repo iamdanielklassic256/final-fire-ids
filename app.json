@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "akiba-app",
-    "slug": "akiba-app",
+    "name": "akiba",
+    "slug": "akiba",
     "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/icons/logo/sqlogo.png",

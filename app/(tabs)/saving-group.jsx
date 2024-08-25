@@ -1,52 +1,77 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import SavingsWheel from '../../components/savings/SavingsWheel';
 import GroupCard from '../../components/savings/GroupCard';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { member_saving_group_url } from '../../api/api';
 
 export default function SavingGroup() {
-  const [groups, setGroups] = useState([
-    { 
-      id: 1, 
-      name: 'Dream Vacation Fund', 
-      share_value: 100000, 
-      group_currency: 'UGX',
-      cycle: 'Monthly',
-      frequency: 'Every 1st'
-    },
-    { 
-      id: 2, 
-      name: 'Tech Gadgets Savings', 
-      share_value: 50000, 
-      group_currency: 'UGX',
-      cycle: 'Weekly',
-      frequency: 'Every Friday'
-    },
-    { 
-      id: 3, 
-      name: 'Emergency Fund', 
-      share_value: 2000000, 
-      group_currency: 'UGX',
-      cycle: 'Bi-weekly',
-      frequency: 'Every 2nd and 4th Monday'
-    },
-    { 
-      id: 4, 
-      name: 'Home Down Payment',
-      cycle: 'Monthly',
-      frequency: 'Every 15th'
-    },
-  ]);
+  const [isLoading, setIsLoading] = useState(false)
+  const [groups, setGroups] = useState([]);
+  const [error, setError] = useState(null);
+
+  const [member, setMember] = useState("");
+
+	useEffect(() => {
+		const fetchMemberData = async () => {
+			try {
+				const memberData = await AsyncStorage.getItem("member");
+				if (memberData) {
+					const memberId = JSON.parse(memberData);
+					setMember(memberId);
+				}
+			} catch (error) {
+				console.error("Error fetching member data:", error);
+			}
+		};
+
+		fetchMemberData();
+	}, []);
+
+  useEffect(() => {
+		fetchAllSavingGroups();
+	}, [memberId]);
+
+  const memberId = member.id
+  console.log('Member Id', memberId)
+
+  const fetchAllSavingGroups = async () => {
+		try {
+			setIsLoading(true);
+			const response = await fetch(`${member_saving_group_url}/${memberId}`);
+			if (response.status === 200) {
+				const data = await response.json();
+				// if(data.length !== )
+				console.log('data ----', data)
+				setGroups(data);
+				setIsLoading(false);
+			}
+			setIsLoading(false);
+	
+
+		} catch (error) {
+			setError('Failed to fetch cycles. Please try again later.');
+			console.error('Error fetching cycles:', error);
+			setIsLoading(false);
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
   const handleCreateGroup = () => {
     router.push('/add-group');
   };
 
   const handleGroupPress = (group) => {
+	router.push(`/${group.id}`)
     console.log('Navigate to group details', group);
   };
+
+
+  console.log('saving group details', groups);
 
   return (
     <ScrollView style={styles.container}>

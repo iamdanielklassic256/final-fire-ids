@@ -10,20 +10,20 @@ const GroupCard = ({ group, onPress }) => {
         colors={['#4c669f', '#3b5998', '#192f6a']}
         style={styles.groupCard}
       >
-        <Text style={styles.groupName}>{group.name}</Text>
+        <Text style={styles.groupName} className="text-center">{group.name}</Text>
         <View style={styles.groupInfo}>
           <Ionicons name="cash-outline" size={16} color="#FFF" />
           <Text style={styles.groupInfoText}>
-            {group.share_value ? `${group.group_currency} ${group.share_value}` : 'N/A'}
+            {group.share_value ? `Share Value: ${group.group_curency} ${group.share_value}` : 'N/A'}
           </Text>
         </View>
         <View style={styles.groupInfo}>
           <Ionicons name="time-outline" size={16} color="#FFF" />
-          <Text style={styles.groupInfoText}>{group.cycle}</Text>
+          <Text style={styles.groupInfoText}>Saving Cycle: {group.saving_cycles?.name}</Text>
         </View>
         <View style={styles.groupInfo}>
           <Ionicons name="calendar-outline" size={16} color="#FFF" />
-          <Text style={styles.groupInfoText}>{group.frequency}</Text>
+          <Text style={styles.groupInfoText}>Contribution Freq:{group.contribution_frequencies?.name}</Text>
         </View>
       </LinearGradient>
     </TouchableOpacity>

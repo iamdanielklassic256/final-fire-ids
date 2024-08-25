@@ -1,7 +1,33 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { saving_group_url } from '../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const AddSavingGroup = () => {
+  const [member, setMember] = useState("");
+
+	useEffect(() => {
+		const fetchMemberData = async () => {
+			try {
+				const memberData = await AsyncStorage.getItem("member");
+				if (memberData) {
+					const member = JSON.parse(memberData);
+					setMember(member);
+				}
+			} catch (error) {
+				console.error("Error fetching member data:", error);
+			}
+		};
+
+		fetchMemberData();
+	}, []);
+
+
+
+
+  const memberId = member.id
+
+  console.log("AddSavingGroup", memberId)
   const [formData, setFormData] = useState({
     name: '',
     saving_cycle_id: '',
@@ -13,16 +39,44 @@ const AddSavingGroup = () => {
     max_social_fund_contrib: '',
     saving_delay_fine: '',
     social_fund_delay_time: '',
-    created_by: '',
   });
+  const [isLoading, setIsLoading] = useState(true);
+	const [error, setError] = useState(null);
+
 
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     console.log('Submitting form data:', formData);
     // Add your API call or state management logic here
+    const dataInput = {
+      created_by,
+      ...formData,
+    }
+    try {
+      setIsLoading(true);
+      const response = await fetch(saving_group_url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dataInput),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create cycle');
+      }
+      // fetch(); // Refresh the list after creating a new cycle
+     setFormData("")
+     setIsLoading(false)
+     console.log('++++++data content++++++', response.data)
+     Alert.alert('Group Created Successfully')
+    } catch (error) {
+      console.error('Error creating cycle:', error);
+      setIsLoading(false)
+      // You might want to show an error message to the user here
+    }
   };
 
   const renderInput = (key) => (

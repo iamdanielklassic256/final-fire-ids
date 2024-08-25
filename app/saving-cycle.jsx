@@ -4,6 +4,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Svg, Path } from 'react-native-svg';
 import { styled } from 'nativewind';
 import Loader from '../components/Loader'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { member_saving_cycle_url, saving_cycle_url } from '../api/api';
 
 const StyledView = styled(View)
 const StyledText = styled(Text)
@@ -31,20 +33,41 @@ const SavingCycle = () => {
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState(null);
 
+
+	const [member, setMember] = useState("");
+
 	useEffect(() => {
-		fetchCycles();
+		const fetchMemberData = async () => {
+			try {
+				const memberData = await AsyncStorage.getItem("member");
+				if (memberData) {
+					const member = JSON.parse(memberData);
+					setMember(member);
+				}
+			} catch (error) {
+				console.error("Error fetching member data:", error);
+			}
+		};
+
+		fetchMemberData();
 	}, []);
 
-	const fetchCycles = async () => {
+
+	const memberId = member.id;
+	useEffect(() => {
+		fetchSavingCycles();
+	}, [memberId]);
+
+	const fetchSavingCycles = async () => {
 		try {
 			setIsLoading(true);
-			const response = await fetch('http://localhost:3000/saving_cycles');
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
+			const response = await fetch(`${member_saving_cycle_url}/${memberId}`);
+			if (response.status === 200) {
+				const data = await response.json();
+				console.log('data ----', data)
+				setCycles(data);
 			}
-			const data = await response.json();
-			console.log('data ----', data)
-			setCycles(data.data);
+
 		} catch (error) {
 			setError('Failed to fetch cycles. Please try again later.');
 			console.error('Error fetching cycles:', error);
@@ -56,13 +79,14 @@ const SavingCycle = () => {
 	console.log('================================Content-Type================================', cycles)
 
 	const handleCreateCycle = async () => {
-		if (name && description) {
+		if (memberId && name && description) {
 			const newCycle = {
+				memberId,
 				name,
 				description
 			};
 			try {
-				const response = await fetch('http://localhost:3000/saving_cycles', {
+				const response = await fetch(saving_cycle_url, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -72,7 +96,7 @@ const SavingCycle = () => {
 				if (!response.ok) {
 					throw new Error('Failed to create cycle');
 				}
-				fetchCycles(); // Refresh the list after creating a new cycle
+				fetchSavingCycles(); // Refresh the list after creating a new cycle
 				setName('');
 				setDescription('');
 				setModalVisible(false);
