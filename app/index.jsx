@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from 'expo-linear-gradient';
@@ -8,12 +8,17 @@ import { router } from "expo-router";
 import logo from '../assets/icons/logo/logoname.png';
 
 const Welcome = () => {
+  const [isLoading, setIsLoading] =useState(false)
+
+  setTimeout(() => {
+    setIsLoading(false)
+  }, 3000)
 
 
   return (
     <SafeAreaView className="flex-1 h-full">
       <StatusBar style="light" />
-      <Loader />
+      <Loader isLoading={isLoading}/>
 
       <LinearGradient
         colors={['#028758', '#00E394', '#028758']}

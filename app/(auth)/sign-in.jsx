@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from "expo-status-bar";
@@ -14,58 +14,59 @@ import { login_url } from '../../api/api';
 const Login = () => {
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [pinCode, setPinCode] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
 
 
-
-	
-
-
-
-	
 	const handleLogin = async () => {
 		console.log('Login with:', { phoneNumber, pinCode });
-		try {
-			console.log('Processing...');
-			const response = await axios.post(login_url, {
-				contact_one: phoneNumber,
-				personal_identification_number: pinCode
-			});
-	
-			if (response.status === 201 && response.data && response.data.data) {
-				const userData = response.data.data;
-				const accessToken = response.data.accessToken;
+		if (phoneNumber && pinCode) {
+			try {
+				setIsLoading(true);
+				console.log('Processing...');
+				const response = await axios.post(login_url, {
+					contact_one: phoneNumber,
+					personal_identification_number: pinCode
+				});
 
+				if (response.status === 201 && response.data && response.data.data) {
+					const userData = response.data.data;
+					const accessToken = response.data.accessToken;
 
-				console.log('Hello....', userData)
-				console.log('Hello 2 ....', accessToken)
-	
-				if (accessToken) {
-					await AsyncStorage.setItem("accessToken", accessToken);
-				  } else {
-					console.warn('Access token is undefined');
-					return; // Exit early to avoid further processing
-				  }
-				if (userData) {
-					await AsyncStorage.setItem("member", JSON.stringify(userData));
+					if (accessToken) {
+						await AsyncStorage.setItem("accessToken", accessToken);
+					} else {
+						console.warn('Access token is undefined');
+						return;
+					}
+					if (userData) {
+						await AsyncStorage.setItem("member", JSON.stringify(userData));
+					} else {
+						console.warn('User data is undefined');
+					}
+
+					Alert.alert("Login Success!");
+					router.push("/app");
 				} else {
-					console.warn('User data is undefined');
+					console.error('Unexpected response:', response.data);
+					Alert.alert('Login Failed', 'Unexpected response from server. Please try again.');
 				}
-	
-				// setIsLogged(true);
-				console.log('Login Success', userData);
-	
-				Alert.alert("Login Success!");
-				router.push("/app");
-			} else if (response.status === 406) {
-				Alert.alert("Wrong PIN Code!");
-				console.log('Wrong PIN Code!');
-			} else {
-				console.error('Login failed:', response.data);
-				Alert.alert('Login Failed', 'Please try again');
+			} catch (err) {
+				if (err.response && err.response.status === 406) {
+					console.log('Wrong PIN Code');
+					Alert.alert("Login Failed", "Incorrect Contact or PIN code.");
+				} else {
+					console.error('Login error:', err.response ? err.response.data : err.message);
+					Alert.alert('Error', 'An error occurred while logging in. Please try again.');
+				}
+			} finally {
+				setIsLoading(false);
 			}
-		} catch (err) {
-			console.error('Login error:', err);
-			Alert.alert('Error', 'An error occurred while logging in. Please try again.');
+		}
+		else if (!phoneNumber){
+			Alert.alert("Enter your phone number");
+		}
+		else{
+			Alert.alert('Enter your pin code')
 		}
 	};
 
@@ -123,13 +124,31 @@ const Login = () => {
 						</View>
 					</View>
 
-					<TouchableOpacity
+					{/* <TouchableOpacity
 						onPress={handleLogin}
 						className="bg-[#250048] mt-8 p-4 rounded-full"
 					>
 						<Text className="text-[#ffffff] text-center text-lg font-bold">
 							LOGIN
 						</Text>
+					</TouchableOpacity> */}
+					<TouchableOpacity
+						onPress={handleLogin}
+						disabled={isLoading}
+						className={`mt-8 p-4 rounded-full ${isLoading ? 'bg-[#4a008f]' : 'bg-[#250048]'}`}
+					>
+						{isLoading ? (
+							<View className="flex-row justify-center items-center">
+								<ActivityIndicator size="small" color="#ffffff" />
+								<Text className="text-[#ffffff] text-center text-lg font-bold ml-2">
+									processing ...
+								</Text>
+							</View>
+						) : (
+							<Text className="text-[#ffffff] text-center text-lg font-bold">
+								LOGIN
+							</Text>
+						)}
 					</TouchableOpacity>
 
 					{/* <TouchableOpacity className="mt-4">

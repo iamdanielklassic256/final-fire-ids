@@ -138,9 +138,8 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="single-group"
+          name="group/[id]"
           options={{
-            headerTitle: "Single Group",
             headerShown: true,
             headerTitleStyle: {
               fontFamily: 'Poppins-SemiBold',

@@ -16,7 +16,7 @@ const Home = () => {
         const memberData = await AsyncStorage.getItem("member");
         if (memberData) {
           const member = JSON.parse(memberData);
-          const fullName = `${member.first_name} ${member.last_name}`;
+          const fullName = `${member.first_name} ${member.last_name}${member.other_name ? ` ${member.other_name}` : ''}`.trim();
           setMemberName(fullName);
         }
       } catch (error) {
@@ -70,7 +70,7 @@ const Home = () => {
 
         <Activities />
 
-       
+
       </ScrollView>
     </View>
   );

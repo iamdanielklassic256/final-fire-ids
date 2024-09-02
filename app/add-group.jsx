@@ -1,33 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { saving_group_url } from '../api/api';
+import { saving_group_url, member_saving_cycle_url, member_contrib_freq_url } from '../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Picker } from '@react-native-picker/picker';
+import { router } from 'expo-router';
+import { Loader } from '../components';
 
 const AddSavingGroup = () => {
   const [member, setMember] = useState("");
-
-	useEffect(() => {
-		const fetchMemberData = async () => {
-			try {
-				const memberData = await AsyncStorage.getItem("member");
-				if (memberData) {
-					const member = JSON.parse(memberData);
-					setMember(member);
-				}
-			} catch (error) {
-				console.error("Error fetching member data:", error);
-			}
-		};
-
-		fetchMemberData();
-	}, []);
-
-
-
-
-  const memberId = member.id
-
-  console.log("AddSavingGroup", memberId)
+  const [savingCycles, setSavingCycles] = useState([]);
+  const [contribFreqs, setContribFreqs] = useState([]);
   const [formData, setFormData] = useState({
     name: '',
     saving_cycle_id: '',
@@ -41,20 +23,58 @@ const AddSavingGroup = () => {
     social_fund_delay_time: '',
   });
   const [isLoading, setIsLoading] = useState(true);
-	const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const memberData = await AsyncStorage.getItem("member");
+        if (memberData) {
+          const member = JSON.parse(memberData);
+          setMember(member);
+
+          // Fetch saving cycles
+          const cyclesResponse = await fetch(`${member_saving_cycle_url}/${member.id}`);
+          const cyclesText = await cyclesResponse.text();
+          if (cyclesText) {
+            const cyclesData = JSON.parse(cyclesText);
+            setSavingCycles(Array.isArray(cyclesData) ? cyclesData : []);
+          } else {
+            setSavingCycles([]);
+          }
+
+          // Fetch contribution frequencies
+          const freqsResponse = await fetch(`${member_contrib_freq_url}/${member.id}`);
+          const freqsText = await freqsResponse.text();
+          if (freqsText) {
+            const freqsData = JSON.parse(freqsText);
+            setContribFreqs(Array.isArray(freqsData) ? freqsData : []);
+          } else {
+            setContribFreqs([]);
+          }
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setError(error.message);
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleInputChange = (field, value) => {
     setFormData({ ...formData, [field]: value });
   };
 
-  const handleSubmit = async() => {
-    console.log('Submitting form data:', formData);
-    // Add your API call or state management logic here
+  const handleSubmit = async () => {
     const dataInput = {
-      created_by,
       ...formData,
-    }
+      created_by: member.id,
+    };
+
     try {
       setIsLoading(true);
       const response = await fetch(saving_group_url, {
@@ -64,18 +84,29 @@ const AddSavingGroup = () => {
         },
         body: JSON.stringify(dataInput),
       });
-      if (!response.ok) {
-        throw new Error('Failed to create cycle');
+      if (response.ok) {
+        setFormData({
+          name: '',
+          saving_cycle_id: '',
+          contrib_freq_id: '',
+          group_curency: '',
+          share_value: '',
+          interate_rate: '',
+          min_social_fund_contrib: '',
+          max_social_fund_contrib: '',
+          saving_delay_fine: '',
+          social_fund_delay_time: '',
+        });
+        setIsLoading(false);
+        Alert.alert('Group Created Successfully');
+        router.push('/saving-group');
+      } else {
+        throw new Error('Failed to create group');
       }
-      // fetch(); // Refresh the list after creating a new cycle
-     setFormData("")
-     setIsLoading(false)
-     console.log('++++++data content++++++', response.data)
-     Alert.alert('Group Created Successfully')
     } catch (error) {
-      console.error('Error creating cycle:', error);
-      setIsLoading(false)
-      // You might want to show an error message to the user here
+      console.error('Error creating group:', error);
+      setIsLoading(false);
+      Alert.alert('Error', 'Failed to create group');
     }
   };
 
@@ -92,22 +123,53 @@ const AddSavingGroup = () => {
     </View>
   );
 
+  const renderPicker = (key, items) => (
+    <View key={key} style={styles.inputContainer}>
+      <Text style={styles.label}>{key.replace(/_/g, ' ').toUpperCase()}</Text>
+      <Picker
+        selectedValue={formData[key]}
+        onValueChange={(itemValue) => handleInputChange(key, itemValue)}
+        style={styles.picker}
+      >
+        <Picker.Item label="Select an option" value="" />
+        {items.map((item) => (
+          <Picker.Item key={item.id} label={item.name} value={item.id} />
+        ))}
+      </Picker>
+    </View>
+  );
+
+  if (isLoading) {
+    return <Loader isLoading={isLoading} />;
+  }
+
+  if (error) {
+    return <Text>Error: {error}</Text>;
+  }
+
   return (
-    <KeyboardAvoidingView 
+    <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        
-        {Object.keys(formData).map(key => renderInput(key))}
+        {renderInput('name')}
+        {renderPicker('saving_cycle_id', savingCycles)}
+        {renderPicker('contrib_freq_id', contribFreqs)}
+        {Object.keys(formData).filter(key => !['name', 'saving_cycle_id', 'contrib_freq_id'].includes(key)).map(key => renderInput(key))}
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>Create Saving Group</Text>
+          {isLoading ? (
+            <Loader isLoading={isLoading} />
+          ) : (
+            <Text style={styles.buttonText}>Create</Text>
+          )}
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
