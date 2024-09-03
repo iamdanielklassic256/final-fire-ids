@@ -229,7 +229,9 @@ const SavingCycle = () => {
   return (
     <StyledView className="flex-1 bg-blue-50">
       <StyledView className="bg-blue-600 p-6 rounded-b-3xl shadow-lg">
-        <StyledText className="text-white text-opacity-80">Manage your saving cycles</StyledText>
+        <StyledText className="text-white text-opacity-80">
+        This is the specific time frame during which the group will contribute savings. This period includes both a defined start date, when the savings begin, and an end date, when the savings period concludes. The group needs to decide on this duration, ensuring it aligns with their financial goals and commitments.
+        </StyledText>
       </StyledView>
 
       <AnimatedFlatList

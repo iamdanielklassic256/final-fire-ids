@@ -222,7 +222,9 @@ const ContributionFreq = () => {
     <StyledView className="flex-1 bg-blue-50">
       <StyledView className="bg-blue-600 p-6 rounded-b-3xl shadow-lg">
         {/* <StyledText className="text-3xl font-bold text-white mb-2">Contribution Cycles</StyledText> */}
-        <StyledText className="text-white text-opacity-80">Manage your contribution frequencies</StyledText>
+        <StyledText className="text-white text-opacity-80">
+        Contribution Frequency allows you to define how often you contribute towards your goals. Whether it's daily, weekly, or monthly, customize your commitment to stay on track and achieve your aspirations seamlessly.
+        </StyledText>
       </StyledView>
 
       <AnimatedFlatList
