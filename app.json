@@ -28,7 +28,8 @@
       "favicon": "./assets/icons/logo/sqlogo.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true

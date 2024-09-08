@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { View, Text, ScrollView, ActivityIndicator, TouchableOpacity, TextInput, Alert, Animated, Pressable } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { saving_group_url } from '../../api/api';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-
-
-
+import * as Haptics from 'expo-haptics';
+import Confetti from 'react-native-confetti';
+import GroupMembersSection from '../../components/savings/members';
 
 const SingleGroup = () => {
 	const { id } = useLocalSearchParams();
@@ -16,10 +16,13 @@ const SingleGroup = () => {
 	const [error, setError] = useState(null);
 	const [editMode, setEditMode] = useState(false);
 	const [editedGroup, setEditedGroup] = useState(null);
-	const [currentUserId, setCurrentUserId] = useState(null);
-	const navigation = useNavigation();
-
 	const [currentMember, setCurrentMember] = useState("");
+	const navigation = useNavigation();
+	const [expandedSection, setExpandedSection] = useState(null);
+	const [animatedValue] = useState(new Animated.Value(0));
+	const [groupLevel, setGroupLevel] = useState(1);
+	const [xp, setXp] = useState(0);
+	const [confetti, setConfetti] = useState(null);
 
 	useEffect(() => {
 		const fetchMemberData = async () => {
@@ -36,31 +39,9 @@ const SingleGroup = () => {
 
 		fetchMemberData();
 		fetchGroupDetails();
-	}, [id]);
+	}, [id,]);
 
-
-
-	// useEffect(() => {
-	// 	const fetchUserAndGroupDetails = async () => {
-	// 		await getCurrentUser();
-	// 		await fetchGroupDetails();
-	// 	};
-	// 	fetchUserAndGroupDetails();
-	// }, [id]);
-
-	// const getCurrentUser = async () => {
-	// 	try {
-	// 		const userId = await AsyncStorage.getItem('userId');
-	// 		console.log('Retrieved userId from AsyncStorage:', userId);
-	// 		if (userId) {
-	// 			setCurrentUserId(userId);
-	// 		} else {
-	// 			console.log('No userId found in AsyncStorage');
-	// 		}
-	// 	} catch (error) {
-	// 		console.error('Error fetching current user:', error);
-	// 	}
-	// };
+	
 
 	const fetchGroupDetails = async () => {
 		try {
@@ -82,6 +63,8 @@ const SingleGroup = () => {
 		}
 	};
 
+	
+
 	const handleEdit = () => {
 		setEditMode(true);
 	};
@@ -89,7 +72,6 @@ const SingleGroup = () => {
 	const handleSave = async () => {
 		try {
 			setLoading(true);
-			// const token = await AsyncStorage.getItem('userToken');
 			const response = await fetch(`${saving_group_url}/${id}`, {
 				method: 'PATCH',
 				headers: {
@@ -124,8 +106,12 @@ const SingleGroup = () => {
 	};
 
 
+
 	const canEdit = currentMember.id === group?.created_by;
-	console.log('canEdit:', canEdit, 'currentUserId:', currentMember.id, 'group?.created_by:', group?.created_by);
+
+	const getMemberCount = (group) => {
+		return group.members ? group.members.length : 0;
+	};
 
 	if (loading) {
 		return (
@@ -143,17 +129,23 @@ const SingleGroup = () => {
 		);
 	}
 
+
+
+
 	return (
 		<ScrollView className="flex-1 bg-purple-50">
+			{confetti && <Confetti ref={(node) => setConfetti(node)} />}
 			{group ? (
 				<View className="p-6">
 					<LinearGradient
 						colors={['#8b5cf6', '#6b46c1']}
 						className="rounded-xl shadow-md p-6 mb-6"
 					>
-						<Text className="text-2xl font-bold text-white mb-4">{group.name}</Text>
-						<Text className="text-gray-200 mb-2">Group ID: {group.id}</Text>
+						<Text className="text-3xl font-bold text-white mb-2 uppercase">{group.name}</Text>
+						<Text className="text-gray-200 mb-2">Group Members: {getMemberCount(group)}</Text>
 						<Text className="text-gray-200 mb-2">Created: {new Date(group.createdAt).toLocaleDateString()}</Text>
+						<Text className="text-gray-200 mb-2">Saving Cycle: {group.saving_cycles?.name || 'N/A'}</Text>
+						<Text className="text-gray-200">Contribution Frequency: {group.contribution_frequencies?.name || 'N/A'}</Text>
 					</LinearGradient>
 
 					<View className="bg-white rounded-xl shadow-md p-6 mb-6">
@@ -216,6 +208,9 @@ const SingleGroup = () => {
 							onChangeText={(value) => handleChange('saving_delay_fine', value)}
 						/>
 					</View>
+					
+
+					{/* <GroupMembersSection members={group.members || []} /> */}
 
 					{canEdit && (
 						<View className="flex-row justify-around mt-4">
@@ -235,6 +230,8 @@ const SingleGroup = () => {
 							)}
 						</View>
 					)}
+
+
 				</View>
 			) : (
 				<Text className="text-red-500 text-lg text-center mt-10">No group data available</Text>
@@ -243,22 +240,32 @@ const SingleGroup = () => {
 	);
 };
 
+
+
+
 const EditableInfoItem = ({ icon, label, value, isEditing, onChangeText }) => (
-	<View className="flex-row items-center mb-3">
-		<MaterialCommunityIcons name={icon} size={24} color="#6b46c1" className="mr-3" />
+	<View className="flex-row items-center mb-4 bg-purple-50 p-4 rounded-lg shadow-sm">
+		<View className="bg-purple-100 p-2 rounded-full mr-4">
+			<MaterialCommunityIcons name={icon} size={24} color="#6b46c1" />
+		</View>
 		<View className="flex-1">
-			<Text className="text-gray-600 font-medium">{label}</Text>
+			<Text className="text-purple-700 font-semibold mb-1">{label}</Text>
 			{isEditing ? (
 				<TextInput
 					value={value}
 					onChangeText={onChangeText}
-					className="border-b border-purple-300 py-1"
+					className="bg-white border border-purple-200 rounded-md py-2 px-3 text-gray-800"
 				/>
 			) : (
-				<Text className="text-black">{value || 'Not set'}</Text>
+				<Text className="text-gray-800 font-medium">
+					{value || 'Not set'}
+				</Text>
 			)}
 		</View>
+
 	</View>
 );
+
+
 
 export default SingleGroup;

@@ -4,6 +4,9 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 
 const GroupCard = ({ group, onPress }) => {
+
+  // console.log('Group', onPress)
+ 
   return (
     <TouchableOpacity onPress={onPress}>
       <LinearGradient

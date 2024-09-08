@@ -68,17 +68,25 @@ export default function SavingGroup() {
     router.push('/add-group');
   };
 
+  const handleAddNewMember = () => {
+    router.push('/add-member');
+  };
+
   const handleGroupPress = (group) => {
     router.push(`/group/${group.id}`);
     console.log('Navigate to group details', group);
   };
 
 
-  // console.log('saving group details', groups.length);
+  // console.log('saving group details', groups);
 
   return (
     <ScrollView style={styles.container}>
-      <SavingsWheel groups={groups} onCreateGroup={handleCreateGroup} />
+      <SavingsWheel
+        groups={groups}
+        onCreateGroup={handleCreateGroup}
+        onCreateMember={handleAddNewMember}
+      />
       {isLoading ? (
         <Loader isLoading={isLoading} />
       ) : (

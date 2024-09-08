@@ -105,25 +105,21 @@ const SignUp = () => {
   //   return ninRegex.test(nin);
   // };
   const validateUgandanNIN = (nin) => {
-    // New regex pattern for the updated NIN format
-    const ninRegex = /^(CM|CF)[A-Z0-9]{11}[0-9]$/;
-
+    // Regex pattern: starts with "CM" or "CF", followed by 12 characters (letters or numbers)
+    const ninRegex = /^(CM|CF)[A-Z0-9]{12}$/;
+  
     if (!ninRegex.test(nin)) {
       return false;
     }
-
-    // Additional checks
-    if (nin.length !== 14) {
-      return false;
-    }
-
-    // Check if all letters are uppercase
+  
+    // Ensure all characters are uppercase (optional if regex handles this)
     if (nin !== nin.toUpperCase()) {
       return false;
     }
-
+  
     return true;
   };
+  
 
   const validateForm = () => {
     if (!formData.first_name.trim()) {
@@ -190,6 +186,7 @@ const SignUp = () => {
       } else {
         Alert.alert("Error", errorMessage);
       }
+      
     } finally {
       setLoading(false);
     }

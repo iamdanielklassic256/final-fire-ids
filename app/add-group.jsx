@@ -14,7 +14,7 @@ const AddSavingGroup = () => {
     name: '',
     saving_cycle_id: '',
     contrib_freq_id: '',
-    group_curency: '',
+    group_curency: 'UGX',
     share_value: '',
     interate_rate: '',
     min_social_fund_contrib: '',
@@ -89,7 +89,7 @@ const AddSavingGroup = () => {
           name: '',
           saving_cycle_id: '',
           contrib_freq_id: '',
-          group_curency: '',
+          group_curency: 'UGX',
           share_value: '',
           interate_rate: '',
           min_social_fund_contrib: '',
@@ -99,7 +99,7 @@ const AddSavingGroup = () => {
         });
         setIsLoading(false);
         Alert.alert('Group Created Successfully');
-        router.push('/saving-group');
+        router.back();
       } else {
         throw new Error('Failed to create group');
       }
@@ -109,6 +109,8 @@ const AddSavingGroup = () => {
       Alert.alert('Error', 'Failed to create group');
     }
   };
+
+  
 
   const renderInput = (key) => (
     <View key={key} style={styles.inputContainer}>
