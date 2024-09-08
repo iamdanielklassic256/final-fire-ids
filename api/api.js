@@ -1,5 +1,5 @@
-const akiba_api_url = 'http://localhost:3000'
-// const akiba_api_url = 'https://akiba-sacco-api.onrender.com'
+// const akiba_api_url = 'http://localhost:3000'
+const akiba_api_url = 'https://akiba-sacco-api.onrender.com'
 
 
 //MEMBERS API ONLY
@@ -7,6 +7,9 @@ export const login_url = `${akiba_api_url}/auth/login`
 export const sign_up_url = `${akiba_api_url}/auth/signup` 
 export const all_members_url = `${akiba_api_url}/members`
 
+
+//ROLES
+export const role_url = `${akiba_api_url}/roles`
 
 
 //GROUP SAVING CYCLE API
@@ -22,9 +25,11 @@ export const member_contrib_freq_url = `${akiba_api_url}/contribution-frequency/
 //SAVING GROUP API
 export const saving_group_url = `${akiba_api_url}/saving_groups`
 export const member_saving_group_url = `${akiba_api_url}/saving_groups/member`
+export const all_savings_groups_by_member_id = `${akiba_api_url}/saving_groups/all-groups-by-member`
 
 //SAVIG GROUP MEMBERS
 export const saving_group_members_url = `${akiba_api_url}/saving_group_members`
+export const all_members_in_a_group = `${akiba_api_url}/saving_group_members/group`
 
 
 

@@ -210,7 +210,7 @@ const SingleGroup = () => {
 					</View>
 					
 
-					{/* <GroupMembersSection members={group.members || []} /> */}
+					<GroupMembersSection groupId={group.id} />
 
 					{canEdit && (
 						<View className="flex-row justify-around mt-4">

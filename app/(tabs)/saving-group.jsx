@@ -1,19 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import SavingsWheel from '../../components/savings/SavingsWheel';
 import GroupCard from '../../components/savings/GroupCard';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { member_saving_group_url } from '../../api/api';
+import { all_savings_groups_by_member_id } from '../../api/api';
 import Loader from '../../components/Loader'
 
 export default function SavingGroup() {
   const [isLoading, setIsLoading] = useState(false)
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState(null);
-
   const [member, setMember] = useState("");
 
   useEffect(() => {
@@ -36,29 +33,19 @@ export default function SavingGroup() {
     if (member && member.id) {
       fetchAllSavingGroups();
     }
-  }, [member, groups]);
-
-  const memberId = member.id
-  // console.log('Member Id', memberId)
+  }, [member]);
 
   const fetchAllSavingGroups = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch(`${member_saving_group_url}/${memberId}`);
+      const response = await fetch(`${all_savings_groups_by_member_id}/${member.id}`);
       if (response.status === 200) {
         const data = await response.json();
-        // if(data.length !== )
-        // console.log('data ----', data)
         setGroups(data);
-        setIsLoading(false);
       }
-      setIsLoading(false);
-
-
     } catch (error) {
       setError('Failed to fetch cycles. Please try again later.');
       console.error('Error fetching cycles:', error);
-      setIsLoading(false);
     } finally {
       setIsLoading(false);
     }
@@ -73,12 +60,11 @@ export default function SavingGroup() {
   };
 
   const handleGroupPress = (group) => {
-    router.push(`/group/${group.id}`);
-    console.log('Navigate to group details', group);
+    router.push({
+      pathname: `/group/${group.id}`,
+      params: { groupId: group.id }
+    });
   };
-
-
-  // console.log('saving group details', groups);
 
   return (
     <ScrollView style={styles.container}>
@@ -100,7 +86,6 @@ export default function SavingGroup() {
           ))}
         </View>
       )}
-
     </ScrollView>
   );
 }

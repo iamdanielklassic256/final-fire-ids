@@ -5,7 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 
 const GroupCard = ({ group, onPress }) => {
 
-  // console.log('Group', onPress)
+  // console.log('Group', group)
+
+  const getMemberCount = (group) => {
+		return group.members ? group.members.length : 0;
+	};
  
   return (
     <TouchableOpacity onPress={onPress}>
@@ -27,6 +31,10 @@ const GroupCard = ({ group, onPress }) => {
         <View style={styles.groupInfo}>
           <Ionicons name="calendar-outline" size={16} color="#FFF" />
           <Text style={styles.groupInfoText}>Contribution Freq:{group.contribution_frequencies?.name}</Text>
+        </View>
+        <View style={styles.groupInfo}>
+          <Ionicons name="calendar-outline" size={16} color="#FFF" />
+          <Text style={styles.groupInfoText}>Group Members:  {getMemberCount(group)}</Text>
         </View>
       </LinearGradient>
     </TouchableOpacity>

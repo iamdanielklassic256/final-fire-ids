@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
-import { all_members_url, member_saving_group_url, saving_group_members_url } from '../api/api';
+import { all_members_url, all_savings_groups_by_member_id, role_url, saving_group_members_url } from '../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Picker } from '@react-native-picker/picker';
 import { router } from 'expo-router';
@@ -43,7 +43,7 @@ const AddSavingGroup = () => {
           }
 
           // Fetch groups relating to the current member
-          const groupResponse = await fetch(`${member_saving_group_url}/${member.id}`);
+          const groupResponse = await fetch(`${all_savings_groups_by_member_id}/${member.id}`);
           const groupData = await groupResponse.json();
           if (groupData && Array.isArray(groupData)) {
             setGroups(groupData);
@@ -77,7 +77,7 @@ const AddSavingGroup = () => {
       setIsLoading(true);
 
       // First, create the new role
-      const roleResponse = await fetch('http://localhost:3000/roles', {
+      const roleResponse = await fetch(role_url, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,8 +110,13 @@ const AddSavingGroup = () => {
       });
 
       if (!savingGroupMemberResponse.ok) {
-        throw new Error('Failed to create saving group member');
+        const errorData = await savingGroupMemberResponse.json();
+        console.error('Saving group member creation failed:', errorData);
+        throw new Error(errorData.message || 'Failed to create saving group member');
       }
+
+      const newSavingGroupMember = await savingGroupMemberResponse.json();
+      console.log('New saving group member:', newSavingGroupMember);
 
       setFormData({
         memberId: '',
@@ -147,7 +152,7 @@ const AddSavingGroup = () => {
 
   const renderPicker = (key, items, labelFunction, valueKey) => (
     <View key={key} style={styles.inputContainer}>
-      <Text style={styles.label}>{key.replace(/_/g, ' ').toUpperCase()}</Text>
+      <Text style={styles.label}>{key.toUpperCase()}</Text>
       <Picker
         selectedValue={formData[key]}
         onValueChange={(itemValue) => handleInputChange(key, itemValue)}
@@ -183,7 +188,7 @@ const AddSavingGroup = () => {
         <Text style={styles.title}>Create New Role and Saving Group Member</Text>
 
         {/* Role inputs */}
-        {renderInput('name', roleData, handleRoleInputChange)}
+        {renderInput('role name', roleData, handleRoleInputChange)}
         {renderInput('description', roleData, handleRoleInputChange)}
 
         {/* Saving Group Member inputs */}
@@ -215,7 +220,7 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   title: {
-    fontSize: 28,
+    fontSize: 20,
     fontWeight: 'bold',
     color: '#2C3E50',
     textAlign: 'center',
