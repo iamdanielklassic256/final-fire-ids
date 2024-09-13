@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 const getIconName = (item) => {
   switch (item.name) {
     case 'Saving Groups': return 'account-group';
-    case 'Loans': return 'cash';
+    case 'Accounts': return 'cash';
     case 'Wallets': return 'wallet';
     case 'Meetings': return 'calendar-clock';
     case 'Saving Cycle': return 'refresh';
@@ -29,9 +29,9 @@ const ActivityDashboard = () => {
   const router = useRouter();
 
   const activities = [
+    { name: 'Accounts', route: '/account' },
     { name: 'Saving Groups', route: '/saving-group' },
-    { name: 'Loans', route: '/loan-management' },
-    { name: 'Wallets', route: '/digital-wallets' },
+    { name: 'Wallets', route: '/group-wallet' },
     { name: 'Meetings', route: '/meeting-scheduler' },
     { name: 'Saving Cycle', route: '/saving-cycle' },
     { name: 'Contribution Frequency', route: '/contrib-freq' },

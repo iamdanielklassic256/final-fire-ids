@@ -31,6 +31,19 @@ export const all_savings_groups_by_member_id = `${akiba_api_url}/saving_groups/a
 export const saving_group_members_url = `${akiba_api_url}/saving_group_members`
 export const all_members_in_a_group = `${akiba_api_url}/saving_group_members/group`
 
+//GROUP WALLET API
+export const group_wallet_url = `${akiba_api_url}/group-wallet`
+export const member_group_wallet_url = `${akiba_api_url}/group-wallet/member`
+
+//GROUP WALLET TYPE API
+export const group_wallet_type_url = `${akiba_api_url}/wallet_type`
+export const member_group_wallet_type_url = `${akiba_api_url}/wallet_type/member`
+
+
+//GROUP TRANSACTIONS
+export const group_transaction_url = `${akiba_api_url}/group-transactions`
+export const member_transaction_url = `${akiba_api_url}/group-transactions/member`
+
 
 
 

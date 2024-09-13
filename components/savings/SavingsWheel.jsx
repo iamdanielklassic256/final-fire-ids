@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Animated, Dimensions } from '
 import Svg, { Circle, Path, G } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
+import ActionButton from '../../utils/ActionButton';
 
 const { width } = Dimensions.get('window');
 const WHEEL_SIZE = width * 0.8;
@@ -75,12 +76,7 @@ const SavingsWheel = ({ groups, onCreateGroup, onCreateMember }) => {
   );
 };
 
-const ActionButton = ({ icon, label, onPress }) => (
-  <TouchableOpacity style={styles.actionButton} onPress={onPress}>
-    <Ionicons name={icon} size={24} color="#00E394" />
-    <Text style={styles.actionButtonText}>{label}</Text>
-  </TouchableOpacity>
-);
+
 
 const styles = StyleSheet.create({
   container: {

@@ -150,9 +150,9 @@ const TabLayout = () => {
                 iconName = 'people';
                 name = 'Savings';
                 notifications = 2; // Example: 2 new savings opportunities
-              } else if (route.name === 'loan') {
+              } else if (route.name === 'account') {
                 iconName = 'cash';
-                name = 'Loan';
+                name = 'Account';
               } else if (route.name === 'profile') {
                 iconName = 'settings';
                 name = 'Settings';
@@ -240,9 +240,9 @@ const TabLayout = () => {
           }}
         />
         <Tabs.Screen
-          name="loan"
+          name="account"
           options={{
-            title: "Loan",
+            title: "Account",
             headerShown: false,
           }}
         />
