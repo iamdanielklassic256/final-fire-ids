@@ -5,7 +5,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import Loader from '../../components/Loader';
 import { Picker } from '@react-native-picker/picker';
-import { group_transaction_url, member_group_wallet_url, member_transaction_url } from '../../api/api';
+import { group_money_request_url, group_transaction_url, member_group_wallet_url, member_transaction_url } from '../../api/api';
+import NoTransaction from '../../components/account/NoTransaction';
+import MoneyRequestModal from '../../components/account/MoneyRequestModal';
 
 
 const AccountScreen = () => {
@@ -15,7 +17,6 @@ const AccountScreen = () => {
 	const [wallets, setWallets] = useState([]);
 	const [error, setError] = useState(null);
 	const [refreshing, setRefreshing] = useState(false);
-	const [balance, setBalance] = useState(0);
 	const [isDepositModalVisible, setIsDepositModalVisible] = useState(false);
 	const [depositAmount, setDepositAmount] = useState('');
 	const [depositReason, setDepositReason] = useState('');
@@ -23,6 +24,43 @@ const AccountScreen = () => {
 	const [isWithdrawModalVisible, setIsWithdrawModalVisible] = useState(false);
 	const [withdrawAmount, setWithdrawAmount] = useState('');
 	const [withdrawReason, setWithdrawReason] = useState('');
+	const [activeTab, setActiveTab] = useState('transactions');
+	const [moneyRequests, setMoneyRequests] = useState([]);
+
+
+	const [isMoneyRequestModalVisible, setIsMoneyRequestModalVisible] = useState(false);
+	const [groups, setGroups] = useState([]); // You'll need to fetch these
+	const [requestTypes, setRequestTypes] = useState([]); // You'll need to fetch these
+
+
+
+
+	const handleMoneyRequest = () => {
+		setIsMoneyRequestModalVisible(true);
+	};
+
+	const submitMoneyRequest = async (requestData) => {
+		try {
+			console.log('account side:', requestData)
+			setIsLoading(true);
+			// Make API call to submit the money request
+			// If successful:
+			const response = await fetch(group_money_request_url, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify(requestData),
+			});
+			if (!response.ok) throw new Error('Failed to request for money');
+			setIsMoneyRequestModalVisible(false);
+			Alert.alert('Success', 'Money request submitted successfully');
+		} catch (error) {
+			console.error('Error submitting money request:', error);
+			Alert.alert('Error', 'Failed to submit money request. Please try again.');
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
 
 
 	useEffect(() => {
@@ -33,6 +71,7 @@ const AccountScreen = () => {
 		if (member && member.id) {
 			fetchMemberTransactions(member.id);
 			fetchAllGroupWallets();
+			fetchGroupMoneyRequests()
 		}
 	}, [member]);
 
@@ -46,6 +85,25 @@ const AccountScreen = () => {
 		} catch (error) {
 			console.error("Error fetching member data:", error);
 			setError("Failed to fetch member data. Please try again.");
+		}
+	};
+
+	const fetchGroupMoneyRequests = async (memberId) => {
+		try {
+			setIsLoading(true);
+			const response = await fetch(`${group_money_request_url}`);
+			if (response.ok) {
+				const data = await response.json();
+				setMoneyRequests(data.data || []);
+				console.log('Group Money Requests:', data.data); // Console log the fetched data
+			} else {
+				throw new Error('Failed to fetch group money requests');
+			}
+		} catch (error) {
+			setError('Failed to fetch group money requests. Please try again later.');
+			console.error('Error fetching group money requests:', error);
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -86,11 +144,12 @@ const AccountScreen = () => {
 	};
 
 	const renderTransactionItem = ({ item }) => {
-		const isDeposit = parseFloat(item.amount) > 0;
+		const isDeposit = item.transType === 'deposit';
 		return (
 			<LinearGradient
 				colors={isDeposit ? ['#00E394', '#00B377'] : ['#FF6B6B', '#FF3E3E']}
 				style={[styles.transactionItem, styles.transactionShadow]}
+				className="mx-4"
 			>
 				<View style={styles.transactionHeader}>
 					<Text style={styles.transactionAmount}>
@@ -136,14 +195,6 @@ const AccountScreen = () => {
 		setIsDepositModalVisible(true);
 	};
 
-	const handleWithdraw = () => {
-		if (wallets.length === 0) {
-			Alert.alert('Error', 'No wallets available. Please create a wallet first.');
-			return;
-		}
-		setSelectedWalletId(wallets.id);
-		setIsWithdrawModalVisible(true);
-	};
 
 
 
@@ -188,45 +239,7 @@ const AccountScreen = () => {
 		}
 	};
 
-	const submitWithdraw = async () => {
-		if (!withdrawAmount || !withdrawReason || !selectedWalletId) {
-			Alert.alert('Error', 'Please fill in all fields');
-			return;
-		}
 
-		try {
-			setIsLoading(true);
-			const response = await fetch(group_transaction_url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					walletId: selectedWalletId,
-					transType: 'withdraw',
-					createdBy: member.id,
-					amount: withdrawAmount,
-					reason: withdrawReason,
-				}),
-			});
-
-			if (response.ok) {
-				Alert.alert('Success', 'Withdrawal successful');
-				setIsWithdrawModalVisible(false);
-				setWithdrawAmount('');
-				setWithdrawReason('');
-				setSelectedWalletId('');
-				fetchMemberTransactions(member.id);
-			} else {
-				throw new Error('Withdrawal failed');
-			}
-		} catch (error) {
-			console.error('Error making withdrawal:', error);
-			Alert.alert('Error', 'Failed to make withdrawal. Please try again.');
-		} finally {
-			setIsLoading(false);
-		}
-	};
 
 
 	const renderDepositModal = () => (
@@ -284,53 +297,6 @@ const AccountScreen = () => {
 		</Modal>
 	);
 
-	const renderWithdrawModal = () => (
-		<Modal
-			animationType="slide"
-			transparent={true}
-			visible={isWithdrawModalVisible}
-			onRequestClose={() => setIsWithdrawModalVisible(false)}
-		>
-			<View style={styles.modalContainer}>
-				<View style={styles.modalContent}>
-					<Text style={styles.modalTitle}>Make a Withdrawal</Text>
-					<Picker
-						selectedValue={selectedWalletId}
-						style={styles.picker}
-						onValueChange={(itemValue) => setSelectedWalletId(itemValue)}
-					>
-						{wallets.map((wallet) => (
-							<Picker.Item key={wallet.id} label={wallet?.group.name} value={wallet.id} />
-						))}
-					</Picker>
-					<TextInput
-						style={styles.input}
-						placeholder="Amount"
-						keyboardType="numeric"
-						value={withdrawAmount}
-						onChangeText={setWithdrawAmount}
-					/>
-					<TextInput
-						style={styles.input}
-						placeholder="Reason"
-						value={withdrawReason}
-						onChangeText={setWithdrawReason}
-					/>
-					<TouchableOpacity
-						style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
-						onPress={submitWithdraw}
-						disabled={isLoading}
-					>
-						{isLoading ? (
-							<ActivityIndicator size="small" color="#ffffff" />
-						) : (
-							<Text style={styles.submitButtonText}>Submit Withdrawal</Text>
-						)}
-					</TouchableOpacity>
-				</View>
-			</View>
-		</Modal>
-	);
 
 
 
@@ -343,65 +309,136 @@ const AccountScreen = () => {
 		);
 	}
 
+
+
+
+	const renderMoneyRequestItem = ({ item }) => {
+		const statusColors = {
+			pending: '#FFA500',
+			approved: '#4CAF50',
+			rejected: '#F44336',
+		};
+
+		return (
+			<LinearGradient
+				colors={['#F0F0F0', '#E0E0E0']}
+				style={[styles.moneyRequestItem, styles.transactionShadow]}
+			>
+				<View style={styles.moneyRequestHeader}>
+					<Text style={styles.moneyRequestAmount}>
+						<Text style={styles.currencySymbol}>UGX </Text>
+						{item.amount_requested}
+					</Text>
+					<View style={[styles.statusBadge, { backgroundColor: statusColors[item.status] }]}>
+						<Text style={styles.statusText}>{item.status}</Text>
+					</View>
+				</View>
+				<Text style={styles.requesterName}>{`${item.requested_by.first_name} ${item.requested_by.last_name}`}</Text>
+				<Text style={styles.groupName}>{item.group.name}</Text>
+				<Text style={styles.moneyRequestDate}>
+					{new Date(item.createdAt).toLocaleDateString()}
+				</Text>
+			</LinearGradient>
+		);
+	};
+
+	const renderTabs = () => (
+		<View style={styles.tabContainer} className="mx-4">
+			<TouchableOpacity
+				style={[styles.tab, activeTab === 'transactions' && styles.activeTab]}
+				onPress={() => setActiveTab('transactions')}
+			>
+				<Text style={[styles.tabText, activeTab === 'transactions' && styles.activeTabText]}>Transactions</Text>
+			</TouchableOpacity>
+			<TouchableOpacity
+				style={[styles.tab, activeTab === 'moneyRequests' && styles.activeTab]}
+				onPress={() => setActiveTab('moneyRequests')}
+			>
+				<Text style={[styles.tabText, activeTab === 'moneyRequests' && styles.activeTabText]}>Money Requests</Text>
+			</TouchableOpacity>
+		</View>
+	);
+
+	const renderHeader = () => (
+		<>
+			<LinearGradient
+				colors={['#00E394', '#00B377']}
+				style={styles.header}
+			>
+				<View>
+					<Text style={styles.balanceTitle}>Account Balance</Text>
+					<Text style={styles.balanceAmount}>UGX 1,000,000</Text>
+				</View>
+			</LinearGradient>
+
+			<View style={styles.cardContainer}>
+				<LinearGradient
+					colors={['#4c669f', '#3b5998', '#192f6a']}
+					style={styles.card}
+				>
+					<View style={styles.cardContent}>
+						<TouchableOpacity style={styles.actionButton} onPress={handleDeposit}>
+							<Ionicons name="arrow-up-circle-outline" size={24} color="#00B377" />
+							<Text style={styles.actionText}>Deposit</Text>
+						</TouchableOpacity>
+						<TouchableOpacity style={styles.actionButton} onPress={handleMoneyRequest}>
+							<Ionicons name="arrow-down-circle-outline" size={24} color="#FF3E3E" />
+							<Text style={styles.actionText}>Make  Request</Text>
+						</TouchableOpacity>
+					</View>
+				</LinearGradient>
+			</View>
+			{renderTabs()}
+		</>
+	);
+
+	const renderContent = () => {
+		if (activeTab === 'transactions') {
+			return (
+				<FlatList
+					data={transactions}
+					renderItem={renderTransactionItem}
+					keyExtractor={(item) => item.id.toString()}
+					contentContainerStyle={styles.listContent}
+					ListEmptyComponent={<Text style={styles.noDataText}>No transactions found.</Text>}
+					refreshControl={
+						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+					}
+					ListHeaderComponent={renderHeader}
+				/>
+			);
+		} else {
+			return (
+				<FlatList
+					data={moneyRequests}
+					renderItem={renderMoneyRequestItem}
+					keyExtractor={(item) => item.id.toString()}
+					contentContainerStyle={styles.listContent}
+					ListEmptyComponent={<NoTransaction />}
+					refreshControl={
+						<RefreshControl
+							refreshing={refreshing}
+							onRefresh={onRefresh}
+						/>
+					}
+					ListHeaderComponent={renderHeader}
+				/>
+			);
+		}
+	};
+
 	return (
 		<SafeAreaView style={styles.container}>
 			<Loader isLoading={isLoading} />
-			<ScrollView
-				refreshControl={
-					<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-				}
-				className="mb-16"
-			>
-				<LinearGradient
-					colors={['#00E394', '#00B377']}
-					style={styles.header}
-				>
-					<View>
-						<Text>Account Balance</Text>
-					</View>
-
-				</LinearGradient>
-
-				<View style={styles.cardContainer}>
-
-
-					<LinearGradient
-						colors={['#4c669f', '#3b5998', '#192f6a']}
-						style={styles.card}
-					>
-						<View style={styles.cardContent}>
-							<TouchableOpacity style={styles.actionButton} onPress={handleDeposit}>
-								<Ionicons name="arrow-up-circle-outline" size={24} color="#00B377" />
-								<Text style={styles.actionText}>Deposit</Text>
-							</TouchableOpacity>
-							<TouchableOpacity style={styles.actionButton} onPress={handleWithdraw}>
-								<Ionicons name="arrow-down-circle-outline" size={24} color="#FF3E3E" />
-								<Text style={styles.actionText}>Withdraw</Text>
-							</TouchableOpacity>
-						</View>
-					</LinearGradient>
-					{/* </View> */}
-
-					<View className="mt-10">
-						<Text style={styles.sectionTitle}>Recent Transactions</Text>
-						{transactions.length > 0 ? (
-							<FlatList
-								data={transactions}
-								renderItem={renderTransactionItem}
-								keyExtractor={(item) => item.id.toString()}
-								contentContainerStyle={styles.transactionList}
-							/>
-						) : (
-							<Text style={styles.noTransactionsText}>No transactions found.</Text>
-						)}
-					</View>
-				</View>
-
-
-			</ScrollView>
+			{renderContent()}
 			{renderDepositModal()}
-			{renderWithdrawModal()}
-
+			{/* {renderWithdrawModal()} */}
+			<MoneyRequestModal
+				isVisible={isMoneyRequestModalVisible}
+				onClose={() => setIsMoneyRequestModalVisible(false)}
+				onSubmit={submitMoneyRequest}
+				isLoading={isLoading}
+			/>
 		</SafeAreaView>
 	);
 };
@@ -561,6 +598,110 @@ const styles = StyleSheet.create({
 	submitButtonDisabled: {
 		backgroundColor: '#7FE9C5',
 	},
+	tabContainer: {
+		flexDirection: 'row',
+		marginBottom: 15,
+		borderRadius: 10,
+		overflow: 'hidden',
+		backgroundColor: '#E0E0E0',
+	},
+	tab: {
+		flex: 1,
+		paddingVertical: 10,
+		alignItems: 'center',
+	},
+	activeTab: {
+		backgroundColor: '#00B377',
+	},
+	tabText: {
+		fontSize: 16,
+		fontWeight: '600',
+		color: '#333',
+	},
+	activeTabText: {
+		color: '#FFF',
+	},
+	moneyRequestItem: {
+		borderRadius: 10,
+		padding: 15,
+		marginBottom: 10,
+	},
+	moneyRequestHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginBottom: 5,
+	},
+	moneyRequestAmount: {
+		fontSize: 18,
+		fontWeight: 'bold',
+	},
+	requesterName: {
+		fontSize: 16,
+		marginBottom: 5,
+	},
+	moneyRequestDate: {
+		color: '#888',
+	},
+	statusBadge: {
+		paddingHorizontal: 8,
+		paddingVertical: 4,
+		borderRadius: 12,
+	},
+	statusText: {
+		color: '#FFF',
+		fontSize: 12,
+		fontWeight: 'bold',
+	},
+	listContainer: {
+		padding: 16,
+	  },
+	  moneyRequestItem: {
+		padding: 16,
+		borderRadius: 8,
+		marginBottom: 16,
+	  },
+	  transactionShadow: {
+		shadowColor: "#000",
+		shadowOffset: {
+		  width: 0,
+		  height: 2,
+		},
+		shadowOpacity: 0.23,
+		shadowRadius: 2.62,
+		elevation: 4,
+	  },
+	  moneyRequestHeader: {
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+		marginBottom: 8,
+	  },
+	  moneyRequestAmount: {
+		fontSize: 18,
+		fontWeight: 'bold',
+	  },
+	  currencySymbol: {
+		fontSize: 14,
+	  },
+	  statusBadge: {
+		paddingHorizontal: 8,
+		paddingVertical: 4,
+		borderRadius: 4,
+	  },
+	  statusText: {
+		color: 'white',
+		fontSize: 12,
+		fontWeight: 'bold',
+	  },
+	  requesterName: {
+		fontSize: 16,
+		marginBottom: 4,
+	  },
+	  moneyRequestDate: {
+		fontSize: 14,
+		color: '#666',
+	  },
 });
 
 export default AccountScreen;

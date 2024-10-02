@@ -180,28 +180,6 @@ const GroupMembersSection = ({ groupId }) => {
 
   return (
     <View className="bg-white rounded-xl shadow-md p-6 mb-6">
-      <View className="flex-row justify-between items-center mb-4">
-        <View className="flex-row items-center">
-          <MaterialCommunityIcons name="account-group" size={24} color="#6b46c1" />
-          <Text className="text-xl font-semibold text-purple-800 ml-2">
-            Group Members ({getMemberCount(members)})
-          </Text>
-        </View>
-        <TouchableOpacity 
-          onPress={() => setShowAllMembers(!showAllMembers)}
-          className="bg-purple-100 px-4 py-2 rounded-full flex-row items-center"
-        >
-          <Text className="text-purple-800 font-medium mr-1">
-            {showAllMembers ? 'Show Less' : 'Show All'}
-          </Text>
-          <MaterialCommunityIcons 
-            name={showAllMembers ? "chevron-up" : "chevron-down"} 
-            size={20} 
-            color="#6b46c1" 
-          />
-        </TouchableOpacity>
-      </View>
-      
       <FlatList
         data={displayedMembers}
         renderItem={renderMemberItem}

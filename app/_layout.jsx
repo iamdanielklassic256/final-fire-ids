@@ -297,7 +297,38 @@ export default function RootLayout() {
             },
           }}
         />
-        
+         <Stack.Screen
+          name="meetings/meetings"
+          options={{
+            headerTitle: "Meetings",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'simple_push',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
 
       </Stack>
       {/* </Provider> */}
