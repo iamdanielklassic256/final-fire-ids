@@ -160,7 +160,7 @@ const GroupInvitation = ({ groupId }) => {
 	};
 
 	const renderInvitationsList = () => {
-		const pendingInvitations = invitations.filter(invitation => invitation.status === 'pending');
+		const pendingInvitations = invitations.filter(invitation => invitation.status === 'pending' || 'rejected');
 		return (
 			<FlatList
 				data={pendingInvitations}

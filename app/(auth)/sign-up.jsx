@@ -107,19 +107,25 @@ const SignUp = () => {
   const validateUgandanNIN = (nin) => {
     // Regex pattern: starts with "CM" or "CF", followed by 12 characters (letters or numbers)
     const ninRegex = /^(CM|CF)[A-Z0-9]{12}$/;
-  
+
+    if (!nin) {
+      return "NIN is required";
+    }
+
+    if (nin.length !== 14) {
+      return "NIN must be exactly 14 characters long";
+    }
+
+    if (!nin.startsWith("CM") && !nin.startsWith("CF")) {
+      return "NIN must start with either 'CM' or 'CF'";
+    }
+
     if (!ninRegex.test(nin)) {
-      return false;
+      return "NIN must consist of 'CM' or 'CF' followed by 12 uppercase letters or numbers";
     }
-  
-    // Ensure all characters are uppercase (optional if regex handles this)
-    if (nin !== nin.toUpperCase()) {
-      return false;
-    }
-  
-    return true;
+
+    return true; // NIN is valid
   };
-  
 
   const validateForm = () => {
     if (!formData.first_name.trim()) {
@@ -134,8 +140,9 @@ const SignUp = () => {
       Alert.alert("Error", "Phone number is required");
       return false;
     }
-    if (!validateUgandanNIN(formData.national_identification_number)) {
-      Alert.alert("Invalid National ID");
+    const ninValidationResult = validateUgandanNIN(formData.national_identification_number);
+    if (ninValidationResult !== true) {
+      Alert.alert("Invalid National ID", ninValidationResult);
       return false;
     }
     const pinRegex = /^[0-9]{4}$/;
@@ -186,7 +193,7 @@ const SignUp = () => {
       } else {
         Alert.alert("Error", errorMessage);
       }
-      
+
     } finally {
       setLoading(false);
     }

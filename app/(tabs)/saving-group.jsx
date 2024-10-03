@@ -66,12 +66,17 @@ export default function SavingGroup() {
     });
   };
 
+  const handleFetchGroupInvitation = () => {
+    router.push('/group/invitation');
+  }
+
   return (
     <ScrollView style={styles.container}>
       <SavingsWheel
         groups={groups}
         onCreateGroup={handleCreateGroup}
         onCreateMember={handleAddNewMember}
+        onFetchGroupInvitation={handleFetchGroupInvitation}
       />
       {isLoading ? (
         <Loader isLoading={isLoading} />

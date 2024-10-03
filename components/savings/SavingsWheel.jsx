@@ -12,7 +12,7 @@ const CENTER_SIZE = WHEEL_SIZE * 0.3;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const AnimatedG = Animated.createAnimatedComponent(G);
 
-const SavingsWheel = ({ groups, onCreateGroup, onCreateMember }) => {
+const SavingsWheel = ({ groups, onCreateGroup, onCreateMember, onFetchGroupInvitation }) => {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const animatedValue = React.useRef(new Animated.Value(0)).current;
 
@@ -70,7 +70,7 @@ const SavingsWheel = ({ groups, onCreateGroup, onCreateMember }) => {
       <View style={styles.actionsContainer}>
         <ActionButton icon="add-circle-outline" label="New Group" onPress={onCreateGroup} />
         <ActionButton icon="person-outline" label="New Member" onPress={onCreateMember} />
-        <ActionButton icon="people-outline" label="Invitations" onPress={() => { }} />
+        <ActionButton icon="people-outline" label="Invitations" onPress={onFetchGroupInvitation} />
       </View>
     </View>
   );
