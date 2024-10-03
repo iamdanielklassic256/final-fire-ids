@@ -109,7 +109,7 @@ export default function RootLayout() {
         <Stack.Screen
           name="group/invitation"
           options={{
-            headerTitle: "Group Invitations",
+            headerTitle: "Group Invitation & Join Request",
             headerShown: true,
             headerTitleStyle: {
               fontFamily: 'Poppins-SemiBold',

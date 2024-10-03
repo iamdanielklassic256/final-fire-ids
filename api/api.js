@@ -30,10 +30,15 @@ export const all_savings_groups_by_member_id = `${akiba_api_url}/saving_groups/a
 //SAVIG GROUP MEMBERS
 export const saving_group_members_url = `${akiba_api_url}/saving_group_members`
 export const all_members_in_a_group = `${akiba_api_url}/saving_group_members/group`
+export const saving_group_members_not_in_group = `${akiba_api_url}/saving_group_members/not-in-group`
 
 
 //SAVING GROUP INVITATION
 export const group_invitation_url = `${akiba_api_url}/invitations`
+
+
+//JOIN GROUP REQUEST
+export const join_request_url = `${akiba_api_url}/group_join_requests`
 
 //GROUP WALLET API
 export const group_wallet_url = `${akiba_api_url}/group-wallet`
