@@ -10,6 +10,7 @@ import { AnimatedCircularProgress } from 'react-native-circular-progress';
 import GroupMembersSection from '../../components/savings/members';
 import GroupPaymentDurationSection from '../../components/savings/GroupPaymentDurationSection';
 import GroupInvitation from '../../components/savings/GroupInvitation';
+import GroupJoinRequests from '../../components/savings/GroupJoinRequests';
 
 const { width } = Dimensions.get('window');
 
@@ -142,7 +143,7 @@ const SingleGroup = () => {
       </LinearGradient>
 
       <View className="flex-row justify-around mb-4">
-        {['financial', 'social', 'penalties', 'members', 'durations'].map((tab) => (
+        {['financial', 'social', 'penalties', 'members', 'durations', 'requests'].map((tab) => (
           <TouchableOpacity
             key={tab}
             onPress={() => setActiveTab(tab)}
@@ -244,11 +245,13 @@ const SingleGroup = () => {
         );
       case 'members':
         return <View>
-            <GroupInvitation groupId={group.id}/>
+          <GroupInvitation groupId={group.id} />
           {/* <GroupMembersSection groupId={group.id} /> */}
         </View>;
       case 'durations':
         return <GroupPaymentDurationSection groupId={group.id} />;
+      case 'requests':
+        return <GroupJoinRequests groupId={group.id} group={group} />;
       default:
         return null;
     }

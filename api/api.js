@@ -39,6 +39,7 @@ export const group_invitation_url = `${akiba_api_url}/invitations`
 
 //JOIN GROUP REQUEST
 export const join_request_url = `${akiba_api_url}/group_join_requests`
+export const group_join_request_url = `${akiba_api_url}/group_join_requests/group`
 
 //GROUP WALLET API
 export const group_wallet_url = `${akiba_api_url}/group-wallet`
