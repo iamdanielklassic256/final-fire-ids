@@ -1,9 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated, ActivityIndicator } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const AttendanceData = ({ attendance, onDelete, loading }) => {
+const AttendanceData = ({ attendance, onDelete, loading, GroupCreator }) => {
 	const [deleteAnim] = useState(new Animated.Value(1));
+	const [member, setMember] = useState(null);
+
+
+	useEffect(() => {
+		const fetchMemberData = async () => {
+			try {
+				const memberData = await AsyncStorage.getItem("member");
+				if (memberData) {
+					const memberId = JSON.parse(memberData);
+					setMember(memberId);
+				}
+			} catch (error) {
+				console.error("Error fetching member data:", error);
+			}
+		};
+
+		fetchMemberData(); // Fetch invitations on component load
+	}, []);
+
+
+	const currentMemberId = member?.id;
+
+	console.log(currentMemberId)
 
 	const formatMemberName = (member) => {
 		const names = [member.first_name, member.last_name, member.other_name].filter(Boolean);
@@ -15,11 +39,15 @@ const AttendanceData = ({ attendance, onDelete, loading }) => {
 		return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 	};
 
-	const getStatusColor = (time) => {
-		const arrivalHour = new Date(time).getHours();
-		if (arrivalHour < 9) return '#4CAF50'; // Early: Green
-		if (arrivalHour === 9) return '#FFC107'; // On time: Yellow
-		return '#F44336'; // Late: Red
+	const getStatusInfo = (time) => {
+		const arrivalTime = new Date(time);
+		const expectedTime = new Date(time);
+		expectedTime.setHours(9, 0, 0, 0);
+		const timeDifference = (arrivalTime - expectedTime) / (1000 * 60); // difference in minutes
+
+		if (timeDifference < 0) return { color: '#4CAF50', text: 'Early', icon: 'check-circle' };
+		if (timeDifference <= 30) return { color: '#FFC107', text: 'On Time', icon: 'schedule' };
+		return { color: '#F44336', text: 'Late', icon: 'warning' };
 	};
 
 	const handleDelete = () => {
@@ -27,42 +55,41 @@ const AttendanceData = ({ attendance, onDelete, loading }) => {
 		onDelete(attendance.id);
 	};
 
-	const getStatusIcon = (time) => {
-		const arrivalHour = new Date(time).getHours();
-		if (arrivalHour < 9) return <MaterialIcons name="check-circle" size={24} color="#4CAF50" />;
-		if (arrivalHour === 9) return <MaterialIcons name="schedule" size={24} color="#FFC107" />;
-		return <MaterialIcons name="warning" size={24} color="#F44336" />;
-	};
+	const statusInfo = getStatusInfo(attendance.arrival_time);
 
 	return (
 		<Animated.View style={[styles.container, { opacity: deleteAnim }]}>
 			<View style={styles.card}>
 				<View style={styles.header}>
-					{getStatusIcon(attendance.arrival_time)}
+					<MaterialIcons name={statusInfo.icon} size={24} color={statusInfo.color} />
 					<Text style={styles.headerText}>{formatMemberName(attendance.presentMember)}</Text>
 				</View>
 				<View style={styles.content} className="flex flex-row justify-between items-center">
-					<Text style={styles.label}>Arrival Time:</Text>
+					<View style={styles.statusContainer}>
+						<Text style={styles.label}>Status:</Text>
+						<Text style={[styles.value, { color: statusInfo.color }]}>{statusInfo.text}</Text>
+					</View>
 					<View style={styles.timeContainer}>
-						<MaterialIcons name="access-time" size={18} color={getStatusColor(attendance.arrival_time)} />
-						<Text style={[styles.value, { color: getStatusColor(attendance.arrival_time) }]}>
+						<MaterialIcons name="access-time" size={18} color={statusInfo.color} />
+						<Text style={[styles.value, { color: statusInfo.color }]}>
 							{formatTime(attendance.arrival_time)}
 						</Text>
 					</View>
-					<TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-					<MaterialIcons name="delete" size={20} color="#ffffff" />
-					{loading ? (
-						<View>
-							<ActivityIndicator size="small" color="#0000ff" />
-							<Text>Deleting...</Text>
-						</View>
-					) : (
-						<Text style={styles.deleteButtonText}></Text>
+					{currentMemberId === GroupCreator && (
+						<TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+							<MaterialIcons name="delete" size={20} color="#ffffff" />
+							{loading ? (
+								<View>
+									<ActivityIndicator size="small" color="#0000ff" />
+									<Text>Deleting...</Text>
+								</View>
+							) : (
+								<Text style={styles.deleteButtonText}></Text>
+							)}
+						</TouchableOpacity>
 					)}
 
-				</TouchableOpacity>
 				</View>
-				
 			</View>
 		</Animated.View>
 	);
@@ -96,17 +123,22 @@ const styles = StyleSheet.create({
 	},
 	content: {
 		marginBottom: 12,
+		flexDirection: 'row',
+		justifyContent: 'space-between',
+		alignItems: 'center',
+	},
+	statusContainer: {
+		flexDirection: 'row',
+		alignItems: 'center',
 	},
 	label: {
 		fontSize: 14,
 		color: '#7f8c8d',
-		marginBottom: 4,
+		marginRight: 4,
 	},
 	value: {
 		fontSize: 16,
-		color: '#2c3e50',
 		fontWeight: '500',
-		marginLeft: 4,
 	},
 	timeContainer: {
 		flexDirection: 'row',
@@ -119,7 +151,6 @@ const styles = StyleSheet.create({
 		justifyContent: 'center',
 		padding: 2,
 		borderRadius: 4,
-		marginTop: 8,
 	},
 	deleteButtonText: {
 		color: '#ffffff',

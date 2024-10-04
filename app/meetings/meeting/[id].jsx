@@ -156,6 +156,7 @@ const MeetingItemDetail = () => {
 								attendance={attendance}
 								onDelete={handleDelete}
 								loading={loading}
+								GroupCreator={GroupCreator}
 							/>
 						))
 					) : (
