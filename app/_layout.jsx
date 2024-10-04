@@ -105,7 +105,7 @@ export default function RootLayout() {
             },
           }}
         />
-        
+
         <Stack.Screen
           name="group/invitation"
           options={{
@@ -329,7 +329,71 @@ export default function RootLayout() {
             },
           }}
         />
-         <Stack.Screen
+        <Stack.Screen
+          name="meetings/[id]"
+          options={{
+            headerShown: true,
+            headerTitle: "GroupMeetings",
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+        <Stack.Screen
+          name="meetings/meeting/[id]"
+          options={{
+            headerTitle: "Meetings",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'simple_push',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+        <Stack.Screen
           name="meetings/meetings"
           options={{
             headerTitle: "Meetings",

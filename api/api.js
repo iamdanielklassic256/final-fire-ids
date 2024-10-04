@@ -75,4 +75,11 @@ export const group_meeting_url = `${akiba_api_url}/group_meetings`
 
 
 
+//GROU MEETING ATTENDANCE
+export const meeting_attendance_url = `${akiba_api_url}/group_meetings_attendance`
+export const group_meetings_attendance_url = `${akiba_api_url}/group_meetings_attendance/meeting`
+
+
+
+
 
