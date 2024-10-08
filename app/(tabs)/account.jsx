@@ -8,6 +8,7 @@ import { Picker } from '@react-native-picker/picker';
 import { group_money_request_url, group_transaction_url, member_group_wallet_url, member_transaction_url } from '../../api/api';
 import NoTransaction from '../../components/account/NoTransaction';
 import MoneyRequestModal from '../../components/account/MoneyRequestModal';
+import DepositModal from '../../components/account/DepositModal';
 
 
 const AccountScreen = () => {
@@ -125,6 +126,8 @@ const AccountScreen = () => {
 		}
 	};
 
+	// console.log(wallets)
+
 	const fetchMemberTransactions = async (memberId) => {
 		try {
 			setIsLoading(true);
@@ -186,12 +189,12 @@ const AccountScreen = () => {
 		});
 	}, [member]);
 
+
 	const handleDeposit = () => {
 		if (wallets.length === 0) {
 			Alert.alert('Error', 'No wallets available. Please create a wallet first.');
 			return;
 		}
-		setSelectedWalletId(wallets.id);
 		setIsDepositModalVisible(true);
 	};
 
@@ -199,12 +202,7 @@ const AccountScreen = () => {
 
 
 
-	const submitDeposit = async () => {
-		if (!depositAmount || !depositReason || !selectedWalletId) {
-			Alert.alert('Error', 'Please fill in all fields');
-			return;
-		}
-
+	const submitDeposit = async (depositData) => {
 		try {
 			setIsLoading(true);
 			const response = await fetch(group_transaction_url, {
@@ -213,20 +211,17 @@ const AccountScreen = () => {
 					'Content-Type': 'application/json',
 				},
 				body: JSON.stringify({
-					walletId: selectedWalletId,
+					walletId: depositData.walletId,
 					transType: 'deposit',
 					createdBy: member.id,
-					amount: depositAmount,
-					reason: depositReason,
+					amount: depositData.amount,
+					reason: depositData.reason,
 				}),
 			});
 
 			if (response.ok) {
 				Alert.alert('Success', 'Deposit successful');
 				setIsDepositModalVisible(false);
-				setDepositAmount('');
-				setDepositReason('');
-				setSelectedWalletId('');
 				fetchMemberTransactions(member.id);
 			} else {
 				throw new Error('Deposit failed');
@@ -431,7 +426,13 @@ const AccountScreen = () => {
 		<SafeAreaView style={styles.container}>
 			<Loader isLoading={isLoading} />
 			{renderContent()}
-			{renderDepositModal()}
+			<DepositModal
+				isVisible={isDepositModalVisible}
+				onClose={() => setIsDepositModalVisible(false)}
+				onSubmit={submitDeposit}
+				wallets={wallets}
+				isLoading={isLoading}
+			/>
 			{/* {renderWithdrawModal()} */}
 			<MoneyRequestModal
 				isVisible={isMoneyRequestModalVisible}
@@ -655,53 +656,53 @@ const styles = StyleSheet.create({
 	},
 	listContainer: {
 		padding: 16,
-	  },
-	  moneyRequestItem: {
+	},
+	moneyRequestItem: {
 		padding: 16,
 		borderRadius: 8,
 		marginBottom: 16,
-	  },
-	  transactionShadow: {
+	},
+	transactionShadow: {
 		shadowColor: "#000",
 		shadowOffset: {
-		  width: 0,
-		  height: 2,
+			width: 0,
+			height: 2,
 		},
 		shadowOpacity: 0.23,
 		shadowRadius: 2.62,
 		elevation: 4,
-	  },
-	  moneyRequestHeader: {
+	},
+	moneyRequestHeader: {
 		flexDirection: 'row',
 		justifyContent: 'space-between',
 		alignItems: 'center',
 		marginBottom: 8,
-	  },
-	  moneyRequestAmount: {
+	},
+	moneyRequestAmount: {
 		fontSize: 18,
 		fontWeight: 'bold',
-	  },
-	  currencySymbol: {
+	},
+	currencySymbol: {
 		fontSize: 14,
-	  },
-	  statusBadge: {
+	},
+	statusBadge: {
 		paddingHorizontal: 8,
 		paddingVertical: 4,
 		borderRadius: 4,
-	  },
-	  statusText: {
+	},
+	statusText: {
 		color: 'white',
 		fontSize: 12,
 		fontWeight: 'bold',
-	  },
-	  requesterName: {
+	},
+	requesterName: {
 		fontSize: 16,
 		marginBottom: 4,
-	  },
-	  moneyRequestDate: {
+	},
+	moneyRequestDate: {
 		fontSize: 14,
 		color: '#666',
-	  },
+	},
 });
 
 export default AccountScreen;
