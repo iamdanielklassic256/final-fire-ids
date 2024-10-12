@@ -33,8 +33,6 @@ const ActivityDashboard = () => {
     { name: 'Saving Groups', route: '/saving-group' },
     { name: 'Wallets', route: '/group-wallet' },
     { name: 'Meetings', route: '/meetings/meetings' },
-    { name: 'Saving Cycle', route: '/saving-cycle' },
-    { name: 'Contribution Frequency', route: '/contrib-freq' },
   ];
 
   return (

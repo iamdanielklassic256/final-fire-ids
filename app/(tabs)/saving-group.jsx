@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, ScrollView, StyleSheet, RefreshControl } from 'react-native';
 import SavingsWheel from '../../components/savings/SavingsWheel';
-import GroupCard from '../../components/savings/GroupCard';
+import GroupCard from '../../components/saving-groups/GroupCard';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { all_savings_groups_by_member_id } from '../../api/api';
 import Loader from '../../components/Loader'
 
 export default function SavingGroup() {
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const [groups, setGroups] = useState([]);
   const [error, setError] = useState(null);
   const [member, setMember] = useState("");
@@ -51,6 +52,11 @@ export default function SavingGroup() {
     }
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchAllSavingGroups().then(() => setRefreshing(false));
+  }, [member]);
+
   const handleCreateGroup = () => {
     router.push('/add-group');
   };
@@ -71,7 +77,12 @@ export default function SavingGroup() {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      style={styles.container}
+      refreshControl={
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+      }
+    >
       <SavingsWheel
         groups={groups}
         onCreateGroup={handleCreateGroup}
