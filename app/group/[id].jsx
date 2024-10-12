@@ -11,6 +11,9 @@ import GroupMembersSection from '../../components/savings/members';
 import GroupPaymentDurationSection from '../../components/savings/GroupPaymentDurationSection';
 import GroupInvitation from '../../components/savings/GroupInvitation';
 import GroupJoinRequests from '../../components/savings/GroupJoinRequests';
+import TabBar from '../../components/saving-groups/TabBar';
+import EditableInfoItem from '../../components/saving-groups/EditableInfoItem';
+import FinancialCard from '../../components/saving-groups/FinancialCard';
 
 const { width } = Dimensions.get('window');
 
@@ -25,6 +28,9 @@ const SingleGroup = () => {
   const [activeTab, setActiveTab] = useState('financial');
   const navigation = useNavigation();
   const [confetti, setConfetti] = useState(null);
+
+
+  
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -138,23 +144,11 @@ const SingleGroup = () => {
         <Text className="text-3xl font-bold text-white mb-2 uppercase">{group.name}</Text>
         <Text className="text-gray-200 mb-2">Group Members: {getMemberCount(group)}</Text>
         <Text className="text-gray-200 mb-2">Created: {new Date(group.createdAt).toLocaleDateString()}</Text>
-        <Text className="text-gray-200 mb-2">Saving Cycle: {group.saving_cycles?.name || 'N/A'}</Text>
-        <Text className="text-gray-200">Contribution Frequency: {group.contribution_frequencies?.name || 'N/A'}</Text>
+        <Text className="text-gray-200 mb-2">Saving Cycle: {group.start_date} to {group.end_date}</Text>
+        <Text className="text-gray-200">Contribution Frequency: {group.contribution_frequency}</Text>
       </LinearGradient>
 
-      <View className="flex-row justify-around mb-4">
-        {['financial', 'social', 'penalties', 'members', 'durations', 'requests'].map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            onPress={() => setActiveTab(tab)}
-            className={`px-3 py-2 rounded-full ${activeTab === tab ? 'bg-purple-500' : 'bg-gray-300'}`}
-          >
-            <Text className={`${activeTab === tab ? 'text-white' : 'text-gray-700'} font-semibold`}>
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+      <TabBar activeTab={activeTab} onTabPress={setActiveTab} />
     </>
   ), [group, activeTab]);
 
@@ -162,46 +156,7 @@ const SingleGroup = () => {
     switch (activeTab) {
       case 'financial':
         return (
-          <View className="bg-white rounded-xl shadow-md p-6 mb-6">
-            <Text className="text-xl font-semibold text-purple-800 mb-4">Financial Details</Text>
-            <EditableInfoItem
-              icon="currency-usd"
-              label="Currency"
-              value={editedGroup.group_curency}
-              isEditing={editMode}
-              onChangeText={(value) => handleChange('group_curency', value)}
-            />
-            <EditableInfoItem
-              icon="cash-multiple"
-              label="Share Value"
-              value={editedGroup.share_value}
-              isEditing={editMode}
-              onChangeText={(value) => handleChange('share_value', value)}
-            />
-            <EditableInfoItem
-              icon="percent"
-              label="Interest Rate"
-              value={editedGroup.interate_rate}
-              isEditing={editMode}
-              onChangeText={(value) => handleChange('interate_rate', value)}
-            />
-            <AnimatedCircularProgress
-              size={120}
-              width={15}
-              fill={75}
-              tintColor="#8b5cf6"
-              backgroundColor="#e0e7ff"
-              rotation={0}
-              lineCap="round"
-            >
-              {(fill) => (
-                <Text className="text-purple-800 font-bold text-lg">
-                  {`${Math.round(fill)}%`}
-                </Text>
-              )}
-            </AnimatedCircularProgress>
-            <Text className="text-center mt-2 text-purple-600">Financial Health</Text>
-          </View>
+          <FinancialCard editMode={editMode} editedGroup={editedGroup} handleChange={handleChange} />
         );
       case 'social':
         return (
@@ -297,6 +252,7 @@ const SingleGroup = () => {
   return (
     <View className="flex-1 bg-purple-50">
       {confetti && <Confetti ref={(node) => setConfetti(node)} />}
+      
       <FlatList
         data={[{ key: 'content' }]}
         renderItem={() => renderTabContent()}
@@ -308,26 +264,6 @@ const SingleGroup = () => {
   );
 };
 
-const EditableInfoItem = ({ icon, label, value, isEditing, onChangeText }) => (
-  <View className="flex-row items-center mb-4 bg-purple-50 p-4 rounded-lg shadow-sm">
-    <View className="bg-purple-100 p-2 rounded-full mr-4">
-      <MaterialCommunityIcons name={icon} size={24} color="#6b46c1" />
-    </View>
-    <View className="flex-1">
-      <Text className="text-purple-700 font-semibold mb-1">{label}</Text>
-      {isEditing ? (
-        <TextInput
-          value={value}
-          onChangeText={onChangeText}
-          className="bg-white border border-purple-200 rounded-md py-2 px-3 text-gray-800"
-        />
-      ) : (
-        <Text className="text-gray-800 font-medium">
-          {value || 'Not set'}
-        </Text>
-      )}
-    </View>
-  </View>
-);
+
 
 export default SingleGroup;
