@@ -5,10 +5,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { all_members_url, group_invitation_url } from '../../api/api';
 import Loader from '../Loader';
-import GroupMembersSection from './members';
-import InviteMemberModal from './InviteMemberModal';
+import GroupMembersSection from '../savings/members';
+import InviteMemberModal from '../savings/InviteMemberModal';
 
-const GroupInvitation = ({ groupId }) => {
+const GroupInvitation = ({ groupId, canEdit }) => {
 	const [member, setMember] = useState(null);
 	const [allMembers, setAllMembers] = useState([]);
 	const [invitations, setInvitations] = useState([]); // State for group invitations
@@ -125,7 +125,7 @@ const GroupInvitation = ({ groupId }) => {
 
 			Alert.alert("Success", "Invitation sent successfully!");
 			resetForm();
-			
+
 		} catch (error) {
 			console.error("Error sending invitation:", error);
 			let errorMessage = "Failed to send invitation. Please try again.";
@@ -150,9 +150,27 @@ const GroupInvitation = ({ groupId }) => {
 		return searchName.includes(query);
 	});
 
+
+	const renderTabButton = (tabName, icon) => (
+		<TouchableOpacity
+			onPress={() => setActiveTab(tabName)}
+			className={`flex-1 items-center justify-center py-3 ${activeTab === tabName ? 'bg-purple-100' : ''}`}
+		>
+			<MaterialCommunityIcons
+				name={icon}
+				size={24}
+				color={activeTab === tabName ? '#8B5CF6' : '#6B7280'}
+			/>
+			<Text className={`mt-1 ${activeTab === tabName ? 'text-purple-600' : 'text-gray-600'} font-medium`}>
+				{tabName.charAt(0).toUpperCase() + tabName.slice(1)}
+			</Text>
+		</TouchableOpacity>
+	);
+
 	const renderMemberList = () => (
 		<GroupMembersSection groupId={groupId} />
 	);
+
 
 	const formatInvitedMemberName = (member) => {
 		const names = [member?.first_name, member?.last_name, member?.other_name].filter(Boolean);
@@ -186,13 +204,23 @@ const GroupInvitation = ({ groupId }) => {
 	};
 
 
+
+
+
 	return (
-		<View className="flex-1 bg-gray-100">
-			<View>
-				<TouchableOpacity onPress={openInviteModal} className="p-4 bg-purple-500 rounded-md">
-					<Text className="text-center text-white font-bold">Invite Members</Text>
-				</TouchableOpacity>
-			</View>
+		<View className="flex-1 bg-white">
+			{canEdit && (
+				<View>
+					<TouchableOpacity
+						onPress={openInviteModal}
+						className="bg-[#250048] mt-5  py-3 px-14 mx-4 mb-5 rounded-lg flex-row items-center justify-center"
+					>
+						<MaterialCommunityIcons name="account-plus" size={24} color="#ffffff" />
+						<Text className="ml-2 text-white font-semibold">Invite New Member</Text>
+					</TouchableOpacity>
+				</View>
+			)}
+
 
 			<View className="flex flex-row justify-around items-center p-4 bg-white rounded-t-md shadow-md">
 				<TouchableOpacity

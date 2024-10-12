@@ -1,21 +1,21 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, TextInput, Alert, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, TextInput, Alert, Dimensions, RefreshControl } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { saving_group_url } from '../../api/api';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Confetti from 'react-native-confetti';
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
-import GroupMembersSection from '../../components/savings/members';
 import GroupPaymentDurationSection from '../../components/savings/GroupPaymentDurationSection';
-import GroupInvitation from '../../components/savings/GroupInvitation';
+import GroupInvitation from '../../components/saving-groups/GroupInvitation';
 import GroupJoinRequests from '../../components/savings/GroupJoinRequests';
 import TabBar from '../../components/saving-groups/TabBar';
 import EditableInfoItem from '../../components/saving-groups/EditableInfoItem';
 import FinancialCard from '../../components/saving-groups/FinancialCard';
+import GroupHeader from '../../components/saving-groups/GroupHeader';
+import SocialCard from '../../components/saving-groups/SocialCard';
+import PenaltyCard from '../../components/saving-groups/PenaltyCard';
+import GroupFooter from '../../components/saving-groups/GroupFooter';
 
-const { width } = Dimensions.get('window');
 
 const SingleGroup = () => {
   const { id } = useLocalSearchParams();
@@ -28,9 +28,10 @@ const SingleGroup = () => {
   const [activeTab, setActiveTab] = useState('financial');
   const navigation = useNavigation();
   const [confetti, setConfetti] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
 
-  
+
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -131,25 +132,21 @@ const SingleGroup = () => {
 
   const canEdit = currentMember.id === group?.created_by;
 
-  const getMemberCount = (group) => {
-    return group.members ? group.members.length : 0;
-  };
+
+
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await fetchGroupDetails();
+    await fetchMemberData();
+    setRefreshing(false);
+  }, [id]);
 
   const renderHeader = useCallback(() => (
-    <>
-      <LinearGradient
-        colors={['#8b5cf6', '#6b46c1']}
-        className="rounded-xl shadow-md p-6 mb-6"
-      >
-        <Text className="text-3xl font-bold text-white mb-2 uppercase">{group.name}</Text>
-        <Text className="text-gray-200 mb-2">Group Members: {getMemberCount(group)}</Text>
-        <Text className="text-gray-200 mb-2">Created: {new Date(group.createdAt).toLocaleDateString()}</Text>
-        <Text className="text-gray-200 mb-2">Saving Cycle: {group.start_date} to {group.end_date}</Text>
-        <Text className="text-gray-200">Contribution Frequency: {group.contribution_frequency}</Text>
-      </LinearGradient>
-
-      <TabBar activeTab={activeTab} onTabPress={setActiveTab} />
-    </>
+    <GroupHeader
+      group={group}
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+    />
   ), [group, activeTab]);
 
   const renderTabContent = useCallback(() => {
@@ -160,48 +157,15 @@ const SingleGroup = () => {
         );
       case 'social':
         return (
-          <View className="bg-white rounded-xl shadow-md p-6 mb-6">
-            <Text className="text-xl font-semibold text-purple-800 mb-4">Social Fund</Text>
-            <EditableInfoItem
-              icon="cash-minus"
-              label="Min Contribution"
-              value={editedGroup.min_social_fund_contrib}
-              isEditing={editMode}
-              onChangeText={(value) => handleChange('min_social_fund_contrib', value)}
-            />
-            <EditableInfoItem
-              icon="cash-plus"
-              label="Max Contribution"
-              value={editedGroup.max_social_fund_contrib}
-              isEditing={editMode}
-              onChangeText={(value) => handleChange('max_social_fund_contrib', value)}
-            />
-            <EditableInfoItem
-              icon="clock-alert"
-              label="Delay Time"
-              value={editedGroup.social_fund_delay_time}
-              isEditing={editMode}
-              onChangeText={(value) => handleChange('social_fund_delay_time', value)}
-            />
-          </View>
+          <SocialCard editMode={editMode} editedGroup={editedGroup} handleChange={handleChange} />
         );
       case 'penalties':
         return (
-          <View className="bg-white rounded-xl shadow-md p-6 mb-6">
-            <Text className="text-xl font-semibold text-purple-800 mb-4">Penalties</Text>
-            <EditableInfoItem
-              icon="cash-remove"
-              label="Saving Delay Fine"
-              value={editedGroup.saving_delay_fine}
-              isEditing={editMode}
-              onChangeText={(value) => handleChange('saving_delay_fine', value)}
-            />
-          </View>
+          <PenaltyCard editMode={editMode} editedGroup={editedGroup} handleChange={handleChange} />
         );
       case 'members':
         return <View>
-          <GroupInvitation groupId={group.id} />
-          {/* <GroupMembersSection groupId={group.id} /> */}
+          <GroupInvitation groupId={group.id} canEdit={canEdit}/>
         </View>;
       case 'durations':
         return <GroupPaymentDurationSection groupId={group.id} />;
@@ -212,28 +176,22 @@ const SingleGroup = () => {
     }
   }, [activeTab, editedGroup, editMode, group]);
 
-  const renderFooter = useCallback(() => (
-    canEdit && (
-      <View className="flex-row justify-around mt-4 mb-6">
-        {editMode ? (
-          <>
-            <TouchableOpacity onPress={handleSave} className="bg-green-500 px-6 py-2 rounded-full">
-              <Text className="text-white font-bold">Save</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={handleCancel} className="bg-red-500 px-6 py-2 rounded-full">
-              <Text className="text-white font-bold">Cancel</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <TouchableOpacity onPress={handleEdit} className="bg-purple-500 px-6 py-2 rounded-full">
-            <Text className="text-white font-bold">Edit</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    )
-  ), [canEdit, editMode]);
+  const renderFooter = useCallback(() => {
+    const editableTabs = ['financial', 'social', 'penalties'];
+    if (canEdit && editableTabs.includes(activeTab)) {
+      return (
+        <GroupFooter
+          editMode={editMode}
+          handleEdit={handleEdit}
+          handleSave={handleSave}
+          handleCancel={handleCancel}
+        />
+      );
+    }
+    return null;
+  }, [canEdit, editMode, activeTab]);
 
-  if (loading) {
+  if (loading && !refreshing) {
     return (
       <View className="flex-1 justify-center items-center bg-purple-50">
         <ActivityIndicator size="large" color="#250048" />
@@ -241,24 +199,34 @@ const SingleGroup = () => {
     );
   }
 
-  if (error) {
+  if (error && !refreshing) {
     return (
       <View className="flex-1 justify-center items-center bg-purple-50">
-        <Text className="text-red-500 text-lg">{error}</Text>
+        <Text className="text-red-500 text-lg mb-4">{error}</Text>
+        <TouchableOpacity onPress={onRefresh} className="bg-purple-500 px-4 py-2 rounded-md">
+          <Text className="text-white font-semibold">Try Again</Text>
+        </TouchableOpacity>
       </View>
     );
   }
-
   return (
     <View className="flex-1 bg-purple-50">
       {confetti && <Confetti ref={(node) => setConfetti(node)} />}
-      
+
       <FlatList
         data={[{ key: 'content' }]}
         renderItem={() => renderTabContent()}
         ListHeaderComponent={renderHeader}
         ListFooterComponent={renderFooter}
         keyExtractor={(item) => item.key}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            colors={["#250048"]}
+            tintColor="#250048"
+          />
+        }
       />
     </View>
   );
