@@ -11,6 +11,7 @@ const tabData = [
   { key: 'members', icon: 'account-multiple', color: '#9C27B0' },
   { key: 'durations', icon: 'clock-outline', color: '#00BCD4' },
   { key: 'requests', icon: 'inbox-arrow-down', color: '#F44336' },
+  { key: 'loans', icon: 'cash', color: '#c38b06' },
 ];
 
 const TabBar = ({ activeTab, onTabPress }) => {

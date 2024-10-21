@@ -37,9 +37,9 @@ const StatItem = ({ title, value, icon, color, onPress }) => {
 		</View>
 		<View className="flex-1">
 		  <Text className="text-white text-sm">{title}</Text>
-		  <Text className="text-white text-lg font-bold">{value}</Text>
+		  <Text className="text-white text-lg font-bold">UGX {value}</Text>
 		</View>
-		<Icon name="chevron-right" size={24} color="white" />
+		{/* <Icon name="chevron-right" size={24} color="white" /> */}
 	  </AnimatedTouchableOpacity>
 	);
   };

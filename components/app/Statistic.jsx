@@ -1,41 +1,76 @@
-import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, Animated, Easing, ScrollView } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View,  ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { BarChart, LineChart } from 'react-native-chart-kit';
 import StatItem from './StatItem';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { account_info_url, loan_url } from '../../api/api';
 
 
 
 
 const Statistic = () => {
-  const [showDetails, setShowDetails] = useState(false);
+  const [member, setMember] = useState("");
+  const [account, setAccount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [loans, setLoans] = useState("");
 
-  const savingsData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        data: [3000, 3500, 4200, 4800, 5000, 5500]
+
+  useEffect(() => {
+    const fetchMemberData = async () => {
+      try {
+        const memberData = await AsyncStorage.getItem("member");
+        if (memberData) {
+          const memberId = JSON.parse(memberData);
+          setMember(memberId);
+        }
+      } catch (error) {
+        console.error("Error fetching member data:", error);
       }
-    ]
-  };
+    };
 
-  const loanData = {
-    labels: ["Personal", "Business", "Education", "Home"],
-    datasets: [
-      {
-        data: [700, 300, 200, 0]
+    fetchMemberData();
+  }, []);
+
+
+  useEffect(() => {
+    if (member && member.id) {
+      fetchAccountData();
+      fetchLoanData();
+    }
+  }, [member]);
+
+  const fetchAccountData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${account_info_url}/${member.id}`);
+      if (response.status === 200) {
+        const data = await response.json();
+        setAccount(data);
       }
-    ]
+    } catch (error) {
+      setError('Failed to fetch account data. Please try again later.');
+      console.error('Error fetching account data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const chartConfig = {
-    backgroundGradientFrom: "#fff",
-    backgroundGradientTo: "#fff",
-    color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
-    strokeWidth: 2,
+  const fetchLoanData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${loan_url}/${member.id}`);
+      if (response.status === 200) {
+        const data = await response.json();
+        setLoans(data);
+      }
+    } catch (error) {
+      setError('Failed to fetch account data. Please try again later.');
+      console.error('Error fetching account data:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+// console.log('Account Data::', account)
 
   return (
     <ScrollView>
@@ -44,62 +79,21 @@ const Statistic = () => {
         className="rounded-xl shadow-lg p-5 mb-4"
       >
         <View className="flex-row justify-between items-center mb-4">
-          {/* <Text className="text-xl font-bold text-blue-800"> Summary</Text> */}
-          {/* <TouchableOpacity onPress={() => setShowDetails(!showDetails)}>
-            <Icon name={showDetails ? "chevron-up" : "chevron-down"} size={24} color="#1e40af" />
-          </TouchableOpacity> */}
         </View>
-
         <StatItem 
           title="Total Savings" 
-          value="$5,500" 
+          value={account[0]?.account_balance}
           icon="piggy-bank" 
           color="bg-green-500"
           onPress={() => console.log('Navigate to Savings Detail')}
         />
         <StatItem 
           title="Outstanding Loans" 
-          value="$1,200" 
+          value={loans[0]?.loan_balance}
           icon="cash-multiple" 
           color="bg-red-500"
           onPress={() => console.log('Navigate to Loans Detail')}
         />
-        {/* <StatItem 
-          title="Available Credit" 
-          value="$4,300" 
-          icon="credit-card-outline" 
-          color="bg-blue-500"
-          onPress={() => console.log('Navigate to Credit Detail')}
-        /> */}
-
-        {/* {showDetails && (
-          <View className="mt-4">
-            <Text className="text-lg font-bold text-blue-800 mb-2">Savings Growth</Text>
-            <LineChart
-              data={savingsData}
-              width={300}
-              height={200}
-              chartConfig={chartConfig}
-              bezier
-            />
-            
-            <Text className="text-lg font-bold text-blue-800 mt-4 mb-2">Loan Distribution</Text>
-            <BarChart
-              data={loanData}
-              width={300}
-              height={200}
-              chartConfig={chartConfig}
-              verticalLabelRotation={30}
-            />
-          </View>
-        )} */}
-
-        {/* <TouchableOpacity 
-          className="bg-blue-600 rounded-lg py-3 mt-4"
-          onPress={() => console.log('Navigate to Detailed Report')}
-        >
-          <Text className="text-white text-center font-semibold">View Detailed Report</Text>
-        </TouchableOpacity> */}
       </LinearGradient>
     </ScrollView>
   );

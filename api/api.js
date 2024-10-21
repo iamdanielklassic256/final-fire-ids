@@ -8,6 +8,14 @@ export const sign_up_url = `${akiba_api_url}/auth/signup`
 export const all_members_url = `${akiba_api_url}/members`
 
 
+
+//ACCOUNT INFO
+export const account_info_url = `${akiba_api_url}/accounts/member`
+
+//LOAN
+export const x = `${akiba_api_url}/loans/member`
+
+
 //ROLES
 export const role_url = `${akiba_api_url}/roles`
 
@@ -66,6 +74,14 @@ export const group_request_type_url = `${akiba_api_url}/money_request_type`
 
 //GROUP MONEY REQUEST
 export const group_money_request_url = `${akiba_api_url}/group_money_request`
+
+
+//GROUO MONEY REQUEST APPROVAL 
+export const group_money_request_approval_url = `${akiba_api_url}/money_request_approval`
+
+
+
+//GROUP MONEY REQUEST REJECTED
 
 
 

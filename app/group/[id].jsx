@@ -15,6 +15,7 @@ import GroupHeader from '../../components/saving-groups/GroupHeader';
 import SocialCard from '../../components/saving-groups/SocialCard';
 import PenaltyCard from '../../components/saving-groups/PenaltyCard';
 import GroupFooter from '../../components/saving-groups/GroupFooter';
+import GroupLoans from '../../components/loans/GroupLoans';
 
 
 const SingleGroup = () => {
@@ -171,6 +172,8 @@ const SingleGroup = () => {
         return <GroupPaymentDurationSection groupId={group.id} />;
       case 'requests':
         return <GroupJoinRequests groupId={group.id} group={group} />;
+      case 'loans':
+        return <GroupLoans groupId={group.id} group={group} />;
       default:
         return null;
     }
