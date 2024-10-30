@@ -40,6 +40,7 @@ const SignUp = () => {
     date_of_birth: new Date(),
     gender: EntityGenderEnum.MALE,
     pin_needs_reset: true,
+    contact_verified: false
   });
 
   const [birthDay, setBirthDay] = useState('');

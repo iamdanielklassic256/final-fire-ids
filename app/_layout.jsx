@@ -41,6 +41,72 @@ export default function RootLayout() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        <Stack.Screen
+          name="verify-phone"
+          options={{
+            headerTitle: "Phone Verification",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
+
+        <Stack.Screen
+          name="verify-otp"
+          options={{
+            headerTitle: "Verify Code",
+            headerShown: true,
+            headerTitleStyle: {
+              fontFamily: 'Poppins-SemiBold',
+              fontSize: 20,
+            },
+            headerLeft: () => (
+              <Ionicons
+                name="arrow-back"
+                size={24}
+                color="#ffffff"
+                style={{ marginLeft: 15 }}
+                onPress={() => {
+                  router.back();
+                  console.log("Go back");
+                }}
+              />
+            ),
+            headerStyle: {
+              backgroundColor: '#250048',
+            },
+            headerTintColor: '#ffffff',
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#FFFFFF',
+            },
+          }}
+        />
         <Stack.Screen
           name="group/invitation"
           options={{

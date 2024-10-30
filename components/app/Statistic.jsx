@@ -6,8 +6,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { account_info_url, loan_url } from '../../api/api';
 
 
-
-
 const Statistic = () => {
   const [member, setMember] = useState("");
   const [account, setAccount] = useState("");
@@ -70,7 +68,7 @@ const Statistic = () => {
       setIsLoading(false);
     }
   };
-// console.log('Account Data::', account)
+console.log('Account Data::', loans)
 
   return (
     <ScrollView>

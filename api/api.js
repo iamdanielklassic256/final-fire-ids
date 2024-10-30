@@ -5,6 +5,8 @@ const akiba_api_url = 'https://akiba-sacco-api.onrender.com'
 //MEMBERS API ONLY
 export const login_url = `${akiba_api_url}/auth/login`
 export const sign_up_url = `${akiba_api_url}/auth/signup` 
+export const send_phone_verification_url = `${akiba_api_url}/auth/send-verification` 
+export const verify_phone_url = `${akiba_api_url}/auth/verify-otp` 
 export const all_members_url = `${akiba_api_url}/members`
 
 
@@ -13,7 +15,7 @@ export const all_members_url = `${akiba_api_url}/members`
 export const account_info_url = `${akiba_api_url}/accounts/member`
 
 //LOAN
-export const x = `${akiba_api_url}/loans/member`
+export const loan_url = `${akiba_api_url}/loans/member`
 
 
 //ROLES
@@ -87,6 +89,8 @@ export const group_money_request_approval_url = `${akiba_api_url}/money_request_
 
 //GROUP MEETING
 export const group_meeting_url = `${akiba_api_url}/group_meetings`
+
+
 
 
 
