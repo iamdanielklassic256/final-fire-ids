@@ -99,7 +99,7 @@ const VerifyOTP = () => {
   return (
     <View className="flex-1 bg-white p-4">
       <View className="items-center mb-8">
-        <Icon name="cellphone-message" size={64} color="#4F46E5" />
+        <Icon name="cellphone-message" size={64} color="#028758" />
         <Text className="text-2xl font-bold mt-4 text-gray-900">
           Enter Verification Code
         </Text>
@@ -142,9 +142,9 @@ const VerifyOTP = () => {
           className="flex-row items-center justify-center py-2"
         >
           {resendLoading ? (
-            <ActivityIndicator color="#4F46E5" />
+            <ActivityIndicator color="#028758" />
           ) : (
-            <Text className="text-indigo-600 font-medium">
+            <Text className="text-[#028758] font-medium">
               Didn't receive code? Send again
             </Text>
           )}

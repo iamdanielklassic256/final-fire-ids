@@ -1,5 +1,17 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform, Image, Alert, ActivityIndicator } from "react-native";
+import React, { useState, useRef } from 'react';
+import {
+	View,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	KeyboardAvoidingView,
+	Platform,
+	Image,
+	Alert,
+	ActivityIndicator,
+	Animated,
+	Dimensions
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from 'expo-linear-gradient';
 import { StatusBar } from "expo-status-bar";
@@ -11,10 +23,35 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import logo from '../../assets/icons/logo/logoname.png';
 import { login_url } from '../../api/api';
 
+const { width } = Dimensions.get('window');
+
 const Login = () => {
 	const [phoneNumber, setPhoneNumber] = useState("");
 	const [pinCode, setPinCode] = useState("");
 	const [isLoading, setIsLoading] = useState(false);
+	const [showForgotPin, setShowForgotPin] = useState(false);
+
+
+
+	const formatPhoneNumber = (number) => {
+		// Remove any non-digit characters
+		let cleaned = number.replace(/\D/g, '');
+
+		// Handle numbers starting with '07'
+		if (cleaned.startsWith('07')) {
+			cleaned = '256' + cleaned.substring(1);
+		}
+		// Handle other cases as before
+		else if (!cleaned.startsWith('256')) {
+			// Remove leading 0 if present
+			if (cleaned.startsWith('0')) {
+				cleaned = cleaned.substring(1);
+			}
+			cleaned = '256' + cleaned;
+		}
+
+		return '+' + cleaned;
+	};
 
 
 	const handleLogin = async () => {
@@ -22,9 +59,11 @@ const Login = () => {
 		if (phoneNumber && pinCode) {
 			try {
 				setIsLoading(true);
+				const formattedPhoneNumber = formatPhoneNumber(phoneNumber);
+				console.log('Formatted phone number:', formattedPhoneNumber, phoneNumber);
 				console.log('Processing...');
 				const response = await axios.post(login_url, {
-					contact_one: phoneNumber,
+					contact_one: formattedPhoneNumber,
 					personal_identification_number: pinCode
 				});
 
@@ -54,6 +93,7 @@ const Login = () => {
 				if (err.response && err.response.status === 406) {
 					console.log('Wrong PIN Code');
 					Alert.alert("Login Failed", "Incorrect Contact or PIN code.");
+					animateForgotPin(); // Show forgot PIN option after failed attempt
 				} else {
 					console.error('Login error:', err.response ? err.response.data : err.message);
 					Alert.alert('Error', 'An error occurred while logging in. Please try again.');
@@ -62,10 +102,10 @@ const Login = () => {
 				setIsLoading(false);
 			}
 		}
-		else if (!phoneNumber){
+		else if (!phoneNumber) {
 			Alert.alert("Enter your phone number");
 		}
-		else{
+		else {
 			Alert.alert('Enter your pin code')
 		}
 	};
@@ -83,7 +123,10 @@ const Login = () => {
 					behavior={Platform.OS === "ios" ? "padding" : "height"}
 					className="flex-1 justify-center"
 				>
-					<View className="items-center mb-10">
+					<Animated.View
+
+						className="items-center mb-10"
+					>
 						<Image
 							source={logo}
 							className="w-32 h-32 rounded-full mb-6"
@@ -95,7 +138,7 @@ const Login = () => {
 						<Text className="text-[#250048] text-base font-bold text-center mt-2.5">
 							Login to your account
 						</Text>
-					</View>
+					</Animated.View>
 
 					<View className="space-y-4">
 						<View className="bg-white rounded-lg p-3 flex-row items-center">
@@ -124,14 +167,6 @@ const Login = () => {
 						</View>
 					</View>
 
-					{/* <TouchableOpacity
-						onPress={handleLogin}
-						className="bg-[#250048] mt-8 p-4 rounded-full"
-					>
-						<Text className="text-[#ffffff] text-center text-lg font-bold">
-							LOGIN
-						</Text>
-					</TouchableOpacity> */}
 					<TouchableOpacity
 						onPress={handleLogin}
 						disabled={isLoading}
@@ -151,19 +186,33 @@ const Login = () => {
 						)}
 					</TouchableOpacity>
 
-					{/* <TouchableOpacity className="mt-4">
-						<Text className="text-white text-center text-base">
-							Forgot PIN?
-						</Text>
-					</TouchableOpacity> */}
+					{showForgotPin && <ResetPinCard />}
 
-					<TouchableOpacity
-						onPress={() => router.push("/sign-up")}
-						className="mt-6 flex-row justify-center items-center"
-					>
-						<Text className="text-white text-base mr-1">Don't have an account?</Text>
-						<Text className="text-white text-base font-bold">Sign Up</Text>
-					</TouchableOpacity>
+					<View className="mt-6 space-y-4">
+						<TouchableOpacity
+							onPress={() => router.push("/forgot-password")}
+							className="flex-row justify-center items-center"
+						>
+							<Ionicons name="help-circle-outline" size={20} color="white" />
+							<Text className="text-white text-center text-base ml-2">
+								Forgot PIN?
+							</Text>
+						</TouchableOpacity>
+
+						<View className="flex-row justify-center items-center space-x-2">
+							<View className="h-[1px] bg-white opacity-30 flex-1" />
+							<Text className="text-white opacity-70">OR</Text>
+							<View className="h-[1px] bg-white opacity-30 flex-1" />
+						</View>
+
+						<TouchableOpacity
+							onPress={() => router.push("/sign-up")}
+							className="flex-row justify-center items-center bg-white/20 p-4 rounded-full"
+						>
+							<Ionicons name="person-add-outline" size={20} color="white" />
+							<Text className="text-white text-base ml-2">Create New Account</Text>
+						</TouchableOpacity>
+					</View>
 				</KeyboardAvoidingView>
 			</LinearGradient>
 		</SafeAreaView>

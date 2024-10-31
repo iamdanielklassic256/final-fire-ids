@@ -73,6 +73,26 @@ const SignUp = () => {
   //   setFormData({ ...formData, [field]: value });
   // };
 
+  const formatPhoneNumber = (number) => {
+    // Remove any non-digit characters
+    let cleaned = number.replace(/\D/g, '');
+
+    // Handle numbers starting with '07'
+    if (cleaned.startsWith('07')) {
+      cleaned = '256' + cleaned.substring(1);
+    }
+    // Handle other cases as before
+    else if (!cleaned.startsWith('256')) {
+      // Remove leading 0 if present
+      if (cleaned.startsWith('0')) {
+        cleaned = cleaned.substring(1);
+      }
+      cleaned = '256' + cleaned;
+    }
+
+    return '+' + cleaned;
+  };
+
   const handleInputChange = (field, value) => {
     if (field === 'email') {
       setFormData({ ...formData, [field]: value.toLowerCase() });
@@ -162,11 +182,13 @@ const SignUp = () => {
     if (!validateForm() || !validateDateOfBirth()) return;
 
     setLoading(true);
+    const formattedPhoneNumber = formatPhoneNumber(formData.contact_one);
     try {
       const requestData = {
         ...formData,
         date_of_birth: formData.date_of_birth.toISOString().split('T')[0],
         pin_needs_reset: false,
+        contact_one: formattedPhoneNumber
       };
 
       if (!requestData.other_name?.trim()) delete requestData.other_name;

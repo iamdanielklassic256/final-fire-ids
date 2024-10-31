@@ -93,7 +93,7 @@ const VerifyPhone = () => {
 
 	return (
 		<View className="flex-1 bg-gray-100">
-			<View className="bg-[#250048] h-36 rounded-b-3xl">
+			<View className="bg-[#028758] h-36 rounded-b-3xl">
 				<View className="pt-16 px-4">
 					<Text className="text-white text-2xl font-bold font-[Poppins-SemiBold]">
 						Verify Phone Number
@@ -108,7 +108,7 @@ const VerifyPhone = () => {
 					
 
 					<TouchableOpacity
-						className={`bg-[#250048] py-4 rounded-xl ${loading ? 'opacity-70' : ''}`}
+						className={`bg-[#028758] py-4 rounded-xl ${loading ? 'opacity-70' : ''}`}
 						onPress={handleVerify}
 						disabled={loading}
 					>
