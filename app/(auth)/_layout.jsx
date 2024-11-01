@@ -45,6 +45,12 @@ const AuthLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="details"
+          options={{
+            headerShown: false,
+          }}
+        />
           <Stack.Screen name="contact" options={{ headerShown: false, presentation: "fullScreenModal" }}  />
       </Stack>
 
