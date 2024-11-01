@@ -5,6 +5,7 @@ import { router } from "expo-router";
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Statistic from "../../components/app/Statistic";
 import Activities from "../../components/app/Activities";
+import Logout from "../../components/app/Logout";
 
 const Home = () => {
   const [greeting, setGreeting] = useState("");
@@ -125,9 +126,7 @@ const Home = () => {
               {memberName}
             </Text>
           </View>
-          <TouchableOpacity className="items-center" onPress={handleLogOut}>
-            <Icon name="logout" size={28} color="white" />
-          </TouchableOpacity>
+         <Logout />
         </View>
       </View>
 
