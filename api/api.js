@@ -8,6 +8,9 @@ export const sign_up_url = `${akiba_api_url}/auth/signup`
 export const send_phone_verification_url = `${akiba_api_url}/auth/send-verification` 
 export const verify_phone_url = `${akiba_api_url}/auth/verify-otp` 
 
+
+export const update_pin_url = `${akiba_api_url}/auth/update-pincode` 
+
 export const forgot_password_url = `${akiba_api_url}/auth/request-pin-reset` 
 export const reset_password_url = `${akiba_api_url}/auth/reset-pin` 
 export const all_members_url = `${akiba_api_url}/members`

@@ -33,6 +33,18 @@ const AuthLayout = () => {
             headerShown: false,
           }}
         />
+        <Stack.Screen
+          name="pin"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="verification"
+          options={{
+            headerShown: false,
+          }}
+        />
           <Stack.Screen name="contact" options={{ headerShown: false, presentation: "fullScreenModal" }}  />
       </Stack>
 

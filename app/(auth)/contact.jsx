@@ -7,6 +7,7 @@ import axios from 'axios';
 import { router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import InputField from '../../components/profile/InputField';
+import LoadingContact from '../../utils/LoadingContact';
 
 const formatPhoneNumber = (number) => {
 	if (!number) return '';
@@ -132,10 +133,7 @@ const ContactScreen = () => {
 
 	if (loading) {
 		return (
-			<SafeAreaView style={{ flex: 1, backgroundColor: '#F9FAFB', justifyContent: 'center', alignItems: 'center' }}>
-				<ActivityIndicator size="large" color="#028758" />
-				<Text style={{ marginTop: 16, color: '#6B7280' }}>Loading your information...</Text>
-			</SafeAreaView>
+			<LoadingContact />
 		);
 	}
 
