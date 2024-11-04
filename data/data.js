@@ -23,10 +23,5 @@ export const settingsData = [
       subtitle: "Name, date of birth, and more",
       route: "/details"
     },
-    {
-      title: "National ID Information",
-      icon: "card-outline",
-      subtitle: "Update your identification documents",
-      route: "/national-id"
-    }
+   
   ];
