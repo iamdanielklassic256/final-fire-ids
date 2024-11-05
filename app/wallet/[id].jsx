@@ -5,6 +5,8 @@ import { ProgressBar } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import WalletTransactions from '../../components/account/WalletTransactions';
 import AddDepositModal from '../../components/account/AddDepositModal';
+import EnhancedLoader from '../../utils/EnhancedLoader';
+import WalletHeader from '../../components/wallets/WalletHeader';
 
 const SingleWallet = () => {
 	const { id } = useLocalSearchParams();
@@ -12,11 +14,21 @@ const SingleWallet = () => {
 	const [loading, setLoading] = useState(true);
 
 	const [isDepositModalVisible, setIsDepositModalVisible] = useState(false);
+	const [loadingMessage, setLoadingMessage] = useState("Loading your group wallet...");
+
+	const loadingMessages = [
+		"Loading wallet information...",
+		"Wallet information",
+		"Loading wallet transactions..."
+	];
+
 
 	useEffect(() => {
 		// Simulating API call to fetch wallet data
 		const fetchWallet = async () => {
 			try {
+				setLoading(true);
+				setLoadingMessage(loadingMessages[0]);
 				// Replace this with actual API call using the id
 				const response = await fetch(`https://akiba-sacco-api.onrender.com/group-wallet/${id}`);
 				const data = await response.json();
@@ -31,13 +43,21 @@ const SingleWallet = () => {
 		fetchWallet();
 	}, [id]);
 
-	if (loading) {
-		return (
-			<View style={styles.loadingContainer}>
-				<Text>Loading wallet information...</Text>
-			</View>
-		);
-	}
+	useEffect(() => {
+		let messageInterval;
+		if (loading) {
+			messageInterval = setInterval(() => {
+				setLoadingMessage(prev => {
+					const currentIndex = loadingMessages.indexOf(prev);
+					const nextIndex = (currentIndex + 1) % loadingMessages.length;
+					return loadingMessages[nextIndex];
+				});
+			}, 2000); // Change message every 2 seconds
+		}
+		return () => clearInterval(messageInterval);
+	}, [loading]);
+
+
 
 	if (!wallet) {
 		return (
@@ -55,7 +75,7 @@ const SingleWallet = () => {
 	const renderHeader = () => (
 		<>
 			<View style={styles.header}>
-				<Text style={styles.title}>{wallet.WalletType?.name} Wallet</Text>
+				<Text style={styles.title}>{wallet.name} Wallet</Text>
 				<Text style={styles.groupName}>{wallet.group?.name}</Text>
 			</View>
 
@@ -103,9 +123,12 @@ const SingleWallet = () => {
 	return (
 		<View style={styles.container}>
 			<WalletTransactions
-				walletId={id}
-				ListHeaderComponent={renderHeader}
+				walletId={wallet.id}
+				ListHeaderComponent={<WalletHeader wallet={wallet} />}
 			/>
+
+
+			<EnhancedLoader isLoading={loading} message={loadingMessage} />
 		</View>
 	);
 };

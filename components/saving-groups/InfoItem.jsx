@@ -2,12 +2,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
 import { Text, View } from "react-native";
 
-const InfoItem = ({ icon, text, subtext }) => (
+const InfoItem = ({ icon, text, subtext, iconColor }) => (
 	<View style={styles.infoItem}>
-	  <Ionicons name={icon} size={24} color="#FFF" style={styles.infoIcon} />
+	  <Ionicons name={icon} size={24} color={iconColor} style={styles.infoIcon} />
 	  <View className="flex flex-row items-center">
 		<Text style={styles.infoText}>{subtext}: </Text>
-		<Text style={styles.infoText} className="capitalize">{text}</Text>
+		<Text style={styles.infoText} className="uppercase">{text}</Text>
 	  </View>
 	</View>
   );

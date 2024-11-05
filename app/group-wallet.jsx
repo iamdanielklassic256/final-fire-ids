@@ -62,7 +62,7 @@ const Wallet = () => {
 			onPress={() => router.push(`/wallet/${item.id}`)}
 		>
 			<Text style={styles.walletName}>{item.group.name}</Text>
-			<Text style={styles.walletType}>{item.WalletType.name}</Text>
+			<Text style={styles.walletType}>{item.name}</Text>
 			<Text style={styles.walletBalance}>Balance: {item.total_balance} {item.group.group_curency}</Text>
 			<Text style={styles.walletGoal}>Goal: {item.goal}</Text>
 		</TouchableOpacity>
@@ -88,11 +88,7 @@ const Wallet = () => {
 					label="New Wallet"
 					onPress={onCreateNewWallet}
 				/>
-				<ActionButton
-					icon="wallet-outline"
-					label="Wallet Types"
-					onPress={() => router.push('/wallet/wallet_type')}
-				/>
+				
 			</View>
 
 			<FlatList

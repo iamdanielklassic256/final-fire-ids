@@ -46,7 +46,7 @@ export default function RootLayout() {
           name="verify-phone"
           options={{
             headerTitle: "Phone Verification",
-            headerShown: true,
+            headerShown: false,
             headerTitleStyle: {
               fontFamily: 'Poppins-SemiBold',
               fontSize: 20,
@@ -238,8 +238,7 @@ export default function RootLayout() {
         <Stack.Screen
           name="add-group"
           options={{
-            headerTitle: "Create New Saving Group",
-            headerShown: true,
+            headerShown: false,
             headerTitleStyle: {
               fontFamily: 'Poppins-SemiBold',
               fontSize: 20,
@@ -256,14 +255,11 @@ export default function RootLayout() {
                 }}
               />
             ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
+            // headerTintColor: '#ffffff',
+            presentation: 'fullScreenModal',
             animation: 'slide_from_bottom',
             contentStyle: {
-              backgroundColor: '#FFFFFF',
+              // backgroundColor: '#FFFFFF',
             },
           }}
         />
