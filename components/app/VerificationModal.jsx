@@ -1,8 +1,9 @@
 import { Text, View } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { Modal } from "react-native";
 import { Icon } from "react-native-paper";
 
-const VerificationModal = () => {
+const VerificationModal = ({setShowVerificationModal, showVerificationModal, handleVerifyNow}) => {
 	return (
 		<Modal
 			animationType="fade"
@@ -46,3 +47,6 @@ const VerificationModal = () => {
 		</Modal>
 	)
 };
+
+
+export default VerificationModal;
