@@ -16,6 +16,12 @@ const AuthLayout = () => {
           }}
         />
         <Stack.Screen
+          name="group-login"
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
           name="sign-up"
           options={{
             headerShown: false,

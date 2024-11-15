@@ -1,18 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, Alert, Modal, ActivityIndicator, Image } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { Picker } from '@react-native-picker/picker';
-import { Loader } from "../../components";
 import { router } from "expo-router";
 import { LinearGradient } from 'expo-linear-gradient';
-import Animated, { FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated';
 import axios from 'axios';
 import { sign_up_url } from '../../api/api';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import logo from '../../assets/icons/logo/logoname.png';
-
 
 const EntityGenderEnum = {
   MALE: 'male',
@@ -24,8 +22,30 @@ const ExceptionEnum = {
   phoneNumberTaken: 'Phone Number Taken Already',
   emailTaken: 'Email Already Exist',
   NinTaken: 'NIN Already Exists',
-  // Add other exception types as needed
 };
+
+const steps = [
+  {
+    title: "Personal Information",
+    subtitle: "Let's start with your basic details",
+    icon: "person-outline"
+  },
+  {
+    title: "Contact Details",
+    subtitle: "How can we reach you?",
+    icon: "mail-outline"
+  },
+  {
+    title: "Identity Verification",
+    subtitle: "Help us verify your identity",
+    icon: "shield-outline"
+  },
+  {
+    title: "Security Setup",
+    subtitle: "Set up your account security",
+    icon: "lock-closed-outline"
+  }
+];
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
@@ -43,55 +63,10 @@ const SignUp = () => {
     contact_verified: false
   });
 
-  const [birthDay, setBirthDay] = useState('');
-  const [birthMonth, setBirthMonth] = useState('');
-  const [birthYear, setBirthYear] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
-
   const [showIOSDatePicker, setShowIOSDatePicker] = useState(false);
-
-  const handleIOSDateChange = (event, selectedDate) => {
-    setShowIOSDatePicker(false);
-    if (selectedDate) {
-      setFormData({ ...formData, date_of_birth: selectedDate });
-      setBirthDay(selectedDate.getDate().toString());
-      setBirthMonth(months[selectedDate.getMonth()]);
-      setBirthYear(selectedDate.getFullYear().toString());
-    }
-  };
-
-  const months = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
-
-  const currentYear = new Date().getFullYear();
-  const years = Array.from({ length: 300 }, (_, i) => currentYear - i);
-
-  // const handleInputChange = (field, value) => {
-  //   setFormData({ ...formData, [field]: value });
-  // };
-
-  const formatPhoneNumber = (number) => {
-    // Remove any non-digit characters
-    let cleaned = number.replace(/\D/g, '');
-
-    // Handle numbers starting with '07'
-    if (cleaned.startsWith('07')) {
-      cleaned = '256' + cleaned.substring(1);
-    }
-    // Handle other cases as before
-    else if (!cleaned.startsWith('256')) {
-      // Remove leading 0 if present
-      if (cleaned.startsWith('0')) {
-        cleaned = cleaned.substring(1);
-      }
-      cleaned = '256' + cleaned;
-    }
-
-    return '+' + cleaned;
-  };
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (field, value) => {
     if (field === 'email') {
@@ -101,370 +76,223 @@ const SignUp = () => {
     }
   };
 
-  const validateDateOfBirth = () => {
-    const day = parseInt(birthDay, 10);
-    const month = months.indexOf(birthMonth);
-    const year = parseInt(birthYear, 10);
-
-    if (isNaN(day) || isNaN(month) || isNaN(year)) {
-      Alert.alert("Invalid Date", "Please enter a valid date of birth");
-      return false;
+  const formatPhoneNumber = (number) => {
+    let cleaned = number.replace(/\D/g, '');
+    if (cleaned.startsWith('07')) {
+      cleaned = '256' + cleaned.substring(1);
+    } else if (!cleaned.startsWith('256')) {
+      if (cleaned.startsWith('0')) {
+        cleaned = cleaned.substring(1);
+      }
+      cleaned = '256' + cleaned;
     }
-
-    const date = new Date(year, month, day);
-    if (date.getFullYear() !== year || date.getMonth() !== month || date.getDate() !== day) {
-      Alert.alert("Invalid Date", "Please enter a valid date of birth");
-      return false;
-    }
-
-    setFormData({ ...formData, date_of_birth: date });
-    return true;
-  };
-
-  // const validateUgandanNIN = (nin) => {
-  //   const ninRegex = /^[A-Z]{2}\d{7}[A-Z]{3}\d[A-Z]$/;
-  //   return ninRegex.test(nin);
-  // };
-  const validateUgandanNIN = (nin) => {
-    // Regex pattern: starts with "CM" or "CF", followed by 12 characters (letters or numbers)
-    const ninRegex = /^(CM|CF)[A-Z0-9]{12}$/;
-
-    if (!nin) {
-      return "NIN is required";
-    }
-
-    if (nin.length !== 14) {
-      return "NIN must be exactly 14 characters long";
-    }
-
-    if (!nin.startsWith("CM") && !nin.startsWith("CF")) {
-      return "NIN must start with either 'CM' or 'CF'";
-    }
-
-    if (!ninRegex.test(nin)) {
-      return "NIN must consist of 'CM' or 'CF' followed by 12 uppercase letters or numbers";
-    }
-
-    return true; // NIN is valid
+    return '+' + cleaned;
   };
 
   const validateForm = () => {
-    if (!formData.first_name.trim()) {
-      Alert.alert("Error", "First name is required");
+    const currentStepFields = getStepFields(step);
+    let isValid = true;
+    let errorMessage = '';
+
+    currentStepFields.forEach(field => {
+      if (!formData[field] && field !== 'other_name' && field !== 'contact_two') {
+        isValid = false;
+        errorMessage = `Please fill in all required fields`;
+      }
+    });
+
+    if (!isValid) {
+      Alert.alert("Validation Error", errorMessage);
       return false;
     }
-    if (!formData.last_name.trim()) {
-      Alert.alert("Error", "Last name is required");
-      return false;
+
+    if (step === 4) {
+      const ninValidationResult = validateUgandanNIN(formData.national_identification_number);
+      if (ninValidationResult !== true) {
+        Alert.alert("Invalid National ID", ninValidationResult);
+        return false;
+      }
+
+      const pinRegex = /^[0-9]{4}$/;
+      if (!pinRegex.test(formData.personal_identification_number)) {
+        Alert.alert("Invalid PIN", "PIN must be 4 digits");
+        return false;
+      }
     }
-    if (!formData.contact_one.trim()) {
-      Alert.alert("Error", "Phone number is required");
-      return false;
+
+    return true;
+  };
+
+  const validateUgandanNIN = (nin) => {
+    const ninRegex = /^(CM|CF)[A-Z0-9]{12}$/;
+    if (!nin) return "NIN is required";
+    if (nin.length !== 14) return "NIN must be exactly 14 characters long";
+    if (!nin.startsWith("CM") && !nin.startsWith("CF")) {
+      return "NIN must start with either 'CM' or 'CF'";
     }
-    const ninValidationResult = validateUgandanNIN(formData.national_identification_number);
-    if (ninValidationResult !== true) {
-      Alert.alert("Invalid National ID", ninValidationResult);
-      return false;
-    }
-    const pinRegex = /^[0-9]{4}$/;
-    if (!pinRegex.test(formData.personal_identification_number)) {
-      Alert.alert("Invalid PIN", "Must be 4 digits");
-      return false;
-    }
-    if (formData.email && !formData.email.includes('@')) {
-      Alert.alert("Invalid Email", "Please enter a valid email address");
-      return false;
+    if (!ninRegex.test(nin)) {
+      return "Invalid NIN format";
     }
     return true;
   };
 
+  const getStepFields = (stepNumber) => {
+    switch (stepNumber) {
+      case 1:
+        return ['first_name', 'last_name', 'other_name'];
+      case 2:
+        return ['email', 'contact_one', 'contact_two'];
+      case 3:
+        return ['date_of_birth', 'gender', 'national_identification_number'];
+      case 4:
+        return ['personal_identification_number'];
+      default:
+        return [];
+    }
+  };
+
   const handleSubmit = async () => {
-    if (!validateForm() || !validateDateOfBirth()) return;
+    if (!validateForm()) return;
 
     setLoading(true);
-    const formattedPhoneNumber = formatPhoneNumber(formData.contact_one);
     try {
       const requestData = {
         ...formData,
         date_of_birth: formData.date_of_birth.toISOString().split('T')[0],
-        pin_needs_reset: false,
-        contact_one: formattedPhoneNumber
+        contact_one: formatPhoneNumber(formData.contact_one),
+        pin_needs_reset: false
       };
 
       if (!requestData.other_name?.trim()) delete requestData.other_name;
       if (!requestData.contact_two?.trim()) delete requestData.contact_two;
       if (!requestData.email?.trim()) delete requestData.email;
 
-      console.log("Sending data:", requestData);
-
       const response = await axios.post(sign_up_url, requestData);
-
-      console.log("Response:", response.data);
-      Alert.alert("Success", "Account created successfully!");
-      router.push("/sign-in");
+      Alert.alert(
+        "Success!",
+        "Your account has been created successfully. Please log in to continue.",
+        [{ text: "OK", onPress: () => router.push("/sign-in") }]
+      );
     } catch (error) {
-      console.error("Signup error:", error.response?.data || error);
-
-      const errorMessage = error.response?.data?.message || "An unexpected error occurred. Please try again.";
+      const errorMessage = error.response?.data?.message || "An unexpected error occurred";
 
       if (errorMessage.includes(ExceptionEnum.phoneNumberTaken)) {
-        Alert.alert("Error", "This phone number is already registered. Please use a different number.");
+        Alert.alert("Error", "This phone number is already registered");
       } else if (errorMessage.includes(ExceptionEnum.emailTaken)) {
-        Alert.alert("Error", "This email is already registered. Please use a different email.");
+        Alert.alert("Error", "This email is already registered");
       } else if (errorMessage.includes(ExceptionEnum.NinTaken)) {
-        Alert.alert("Error", "This National ID Number (NIN) is already registered. Please use a different NIN or contact support if you believe this is an error.");
+        Alert.alert("Error", "This National ID Number is already registered");
       } else {
         Alert.alert("Error", errorMessage);
       }
-
     } finally {
       setLoading(false);
     }
   };
 
-  const nextStep = () => {
-    if (step < 3) setStep(step + 1);
-    else handleSubmit();
-  };
+  const renderField = (label, field, placeholder, options = {}) => {
+    const {
+      keyboardType = 'default',
+      maxLength,
+      isPassword,
+      isOptional = false
+    } = options;
 
-  const prevStep = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
-
-  const renderDateOfBirth = () => {
-    if (Platform.OS === 'ios') {
-      return (
-        <View className="mb-4">
-          <Text className="text-white mb-2">Date of Birth</Text>
-          <TouchableOpacity
-            onPress={() => {
-              console.log("Opening date picker");
-              setShowIOSDatePicker(true);
-            }}
-            className="bg-white bg-opacity-20 rounded-lg p-4 flex-row justify-between items-center"
-          >
-            <Text className="text-white text-lg">
-              {formData.date_of_birth.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-              })}
-            </Text>
-            <Ionicons name="calendar-outline" size={24} color="white" />
-          </TouchableOpacity>
-          <Modal
-            transparent={true}
-            animationType="slide"
-            visible={showIOSDatePicker}
-            onRequestClose={() => {
-              console.log("Closing date picker");
-              setShowIOSDatePicker(false);
-            }}
-          >
-            <View className="flex-1 justify-end bg-black bg-opacity-50">
-              <View className="bg-white rounded-t-3xl p-6">
-                <Text className="text-2xl font-bold text-center text-[#250048] mb-4">
-                  Select Your Birthday
-                </Text>
-                <DateTimePicker
-                  value={formData.date_of_birth}
-                  mode="date"
-                  display="spinner"
-                  onChange={(event, selectedDate) => {
-                    console.log("Date changed:", selectedDate);
-                    handleIOSDateChange(event, selectedDate);
-                  }}
-                  textColor="#250048"
-                />
-                <TouchableOpacity
-                  onPress={() => {
-                    console.log("Confirming date");
-                    setShowIOSDatePicker(false);
-                  }}
-                  className="bg-[#00E394] py-3 px-6 rounded-full mt-4 self-end"
-                >
-                  <Text className="text-white font-bold">Confirm</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </Modal>
-        </View>
-      );
-    } else {
-      return (
-        <View className="mb-4">
-          <Text className="text-white mb-2">Date of Birth</Text>
-          <View className="flex-row justify-between">
-            <View className="w-1/4">
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-l-lg p-3 text-black"
-                placeholder="Day"
-                placeholderTextColor="#000"
-                value={birthDay}
-                onChangeText={setBirthDay}
-                keyboardType="numeric"
-                maxLength={2}
+    return (
+      <View className="mb-4">
+        <Text className="text-white text-sm mb-1">
+          {label} {!isOptional && <Text className="text-red-400">*</Text>}
+        </Text>
+        <View className="relative">
+          <TextInput
+            className="bg-white bg-opacity-20 rounded-lg p-3 text-white"
+            placeholder={placeholder}
+            placeholderTextColor="rgba(255,255,255,0.5)"
+            value={formData[field]}
+            onChangeText={(text) => handleInputChange(field, text)}
+            keyboardType={keyboardType}
+            maxLength={maxLength}
+            secureTextEntry={isPassword && !showPassword}
+          />
+          {isPassword && (
+            <TouchableOpacity
+              className="absolute right-3 top-3"
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <Ionicons
+                name={showPassword ? "eye-off" : "eye"}
+                size={24}
+                color="white"
               />
-            </View>
-            <View className="w-2/5">
-              <Picker
-                selectedValue={birthMonth}
-                onValueChange={(itemValue) => setBirthMonth(itemValue)}
-                style={{ backgroundColor: '#fff', color: '#000' }}
-              >
-                <Picker.Item label="Month" value="" />
-                {months.map((month, index) => (
-                  <Picker.Item key={index} label={month} value={month} />
-                ))}
-              </Picker>
-            </View>
-            <View className="w-1/3">
-              <Picker
-                selectedValue={birthYear}
-                onValueChange={(itemValue) => setBirthYear(itemValue)}
-                style={{ backgroundColor: '#fff', color: '#000' }}
-                className="rounded-l-lg"
-              >
-                <Picker.Item label="Year" value="" />
-                {years.map((year, index) => (
-                  <Picker.Item key={index} label={year.toString()} value={year.toString()} />
-                ))}
-              </Picker>
-            </View>
-          </View>
+            </TouchableOpacity>
+          )}
         </View>
-      );
-    }
+      </View>
+    );
   };
 
   const renderStepContent = () => {
-    switch (step) {
-      case 1:
-        return (
-          <Animated.View entering={FadeInUp.duration(500)}>
+    const StepIcon = ({ name }) => (
+      <Ionicons name={name} size={32} color="#250048" />
+    );
+
+    return (
+      <Animated.View
+        entering={FadeInUp.duration(500)}
+        exiting={FadeOut.duration(200)}
+        className="space-y-4"
+      >
+        <View className="flex-row items-center space-x-4 mb-6">
+          <View className="bg-white p-2 rounded-full">
+            <StepIcon name={steps[step - 1].icon} />
+          </View>
+          <View>
+            <Text className="text-white text-xl font-bold">{steps[step - 1].title}</Text>
+            <Text className="text-gray-300">{steps[step - 1].subtitle}</Text>
+          </View>
+        </View>
+
+        {step === 1 && (
+          <>
+            {renderField("First Name", "first_name", "Enter your first name")}
+            {renderField("Last Name", "last_name", "Enter your last name")}
+            {renderField("Other Name", "other_name", "Enter other name (optional)", { isOptional: true })}
+          </>
+        )}
+
+        {step === 2 && (
+          <>
+            {renderField("Email Address", "email", "Enter your email address", { keyboardType: "email-address" })}
+            {renderField("Phone Number", "contact_one", "Enter your phone number", { keyboardType: "phone-pad" })}
+            {renderField("Alternative Phone", "contact_two", "Enter alternative number (optional)", {
+              keyboardType: "phone-pad",
+              isOptional: true
+            })}
+          </>
+        )}
+
+        {step === 3 && (
+          <>
             <View className="mb-4">
-              <Text className="text-white mb-2">First Name</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter your first name"
-                placeholderTextColor="#ccc"
-                value={formData.first_name}
-                onChangeText={(text) => handleInputChange("first_name", text)}
-              />
+              <Text className="text-white text-sm mb-1">Date of Birth <Text className="text-red-400">*</Text></Text>
+              <TouchableOpacity
+                onPress={() => setShowIOSDatePicker(true)}
+                className="bg-white bg-opacity-20 rounded-lg p-3 flex-row justify-between items-center"
+              >
+                <Text className="text-white">
+                  {formData.date_of_birth.toLocaleDateString()}
+                </Text>
+                <Ionicons name="calendar-outline" size={24} color="white" />
+              </TouchableOpacity>
             </View>
+
             <View className="mb-4">
-              <Text className="text-white mb-2">Last Name</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter your last name"
-                placeholderTextColor="#ccc"
-                value={formData.last_name}
-                onChangeText={(text) => handleInputChange("last_name", text)}
-              />
-            </View>
-            <View className="mb-4">
-              <Text className="text-white mb-2">Other Name (Optional)</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter your other name"
-                placeholderTextColor="#ccc"
-                value={formData.other_name}
-                onChangeText={(text) => handleInputChange("other_name", text)}
-              />
-            </View>
-          </Animated.View>
-        );
-      case 2:
-        return (
-          <Animated.View entering={FadeInUp.duration(500)}>
-            <View className="mb-4">
-              <Text className="text-white mb-2">Email</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter your email"
-                placeholderTextColor="#ccc"
-                value={formData.email}
-                onChangeText={(text) => handleInputChange("email", text)}
-                keyboardType="email-address"
-                required
-              />
-            </View>
-            <View className="mb-4">
-              <Text className="text-white mb-2">Phone Number</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter your phone number"
-                placeholderTextColor="#ccc"
-                value={formData.contact_one}
-                onChangeText={(text) => handleInputChange("contact_one", text)}
-                keyboardType="phone-pad"
-              />
-            </View>
-            <View className="mb-4">
-              <Text className="text-white mb-2">Alternative Phone Number (Optional)</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter alternative phone number"
-                placeholderTextColor="#ccc"
-                value={formData.contact_two}
-                onChangeText={(text) => handleInputChange("contact_two", text)}
-                keyboardType="phone-pad"
-              />
-            </View>
-          </Animated.View>
-        );
-      case 3:
-        return (
-          <Animated.View entering={FadeInUp.duration(500)}>
-            {renderDateOfBirth()}
-            {/* <View className="mb-4">
-              <Text className="text-white mb-2">Date of Birth</Text>
-              <View className="flex-row justify-between">
-                <View className="w-1/4">
-                  <TextInput
-                    className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                    placeholder="Day"
-                    placeholderTextColor="#ccc"
-                    value={birthDay}
-                    onChangeText={setBirthDay}
-                    keyboardType="numeric"
-                    maxLength={2}
-                  />
-                </View>
-                <View className="w-2/5">
-                  <Picker
-                    selectedValue={birthMonth}
-                    onValueChange={(itemValue) => setBirthMonth(itemValue)}
-                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: 'black' }}
-                  >
-                    <Picker.Item label="Month" value="" />
-                    {months.map((month, index) => (
-                      <Picker.Item key={index} label={month} value={month} />
-                    ))}
-                  </Picker>
-                </View>
-                <View className="w-1/3">
-                  <Picker
-                    selectedValue={birthYear}
-                    onValueChange={(itemValue) => setBirthYear(itemValue)}
-                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: 'black' }}
-                  >
-                    <Picker.Item label="Year" value="" />
-                    {years.map((year, index) => (
-                      <Picker.Item key={index} label={year.toString()} value={year.toString()} />
-                    ))}
-                  </Picker>
-                </View>
-              </View>
-            </View> */}
-            <View className="mb-4">
-              <Text className="text-white mb-2">Gender</Text>
+              <Text className="text-white text-sm mb-1">Gender <Text className="text-red-400">*</Text></Text>
               <View className="bg-white bg-opacity-20 rounded-lg">
                 <Picker
                   selectedValue={formData.gender}
-                  onValueChange={(itemValue) => handleInputChange("gender", itemValue)}
-                  style={{ color: 'black' }}
+                  onValueChange={(value) => handleInputChange("gender", value)}
+                  style={{ color: 'white' }}
                 >
                   <Picker.Item label="Male" value={EntityGenderEnum.MALE} />
                   <Picker.Item label="Female" value={EntityGenderEnum.FEMALE} />
@@ -472,90 +300,165 @@ const SignUp = () => {
                 </Picker>
               </View>
             </View>
-            <View className="mb-4">
-              <Text className="text-white mb-2">National ID Number</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter your National ID Number"
-                placeholderTextColor="#ccc"
-                value={formData.national_identification_number}
-                onChangeText={(text) => handleInputChange("national_identification_number", text)}
-              />
-            </View>
-            <View className="mb-4">
-              <Text className="text-white mb-2">PIN CODE</Text>
-              <TextInput
-                className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
-                placeholder="Enter your Personal Identification Number"
-                placeholderTextColor="#ccc"
-                value={formData.personal_identification_number}
-                onChangeText={(text) => handleInputChange("personal_identification_number", text)}
-                keyboardType="numeric"
-                maxLength={4}
-              />
-            </View>
-          </Animated.View>
-        );
-      default:
-        return null;
-    }
+
+            {renderField("National ID Number", "national_identification_number", "Enter your NIN")}
+          </>
+        )}
+
+        {step === 4 && (
+          <>
+            {renderField("PIN Code", "personal_identification_number", "Enter 4-digit PIN", {
+              keyboardType: "numeric",
+              maxLength: 4,
+              isPassword: true
+            })}
+          </>
+        )}
+      </Animated.View>
+    );
   };
 
   return (
     <SafeAreaView className="flex-1">
       <StatusBar style="light" />
       <LinearGradient
-        colors={['#028758', '#00E394', '#028758']}
+        colors={['#028758', '#016d46', '#028758']}
         className="flex-1"
       >
-        <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center', padding: 20 }}>
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{ flexGrow: 1 }}
+        >
           <Animated.View
             entering={FadeInDown.duration(1000)}
-            className="bg-[#250048] rounded-3xl p-6 shadow-lg"
+            className="flex-1 p-6"
           >
-            <View className="items-center mb-10">
-              <Image
-                source={logo}
-                className="w-32 h-32 rounded-full mb-6"
-                resizeMode="contain"
-              />
+            {/* Header */}
+            <View className="items-center mb-8">
+              <View className="w-36 h-36 bg-white/20 rounded-3xl mb-4 items-center justify-center">
+                <Image
+                  source={logo}
+                  className="w-[120px] h-[120px] rounded-3xl"
+                  resizeMode="contain"
+                />
+              </View>
+              <Text className="text-white text-3xl font-bold">Create Account</Text>
+              <Text className="text-gray-300 text-lg mt-2">Step {step} of 4</Text>
             </View>
-            {/* <Text className="text-3xl font-bold text-white text-center mb-2">Join Akiba</Text> */}
-            <Text className="text-lg text-gray-300 text-center mb-8">Create your account to start saving</Text>
+
+            {/* Progress Indicator */}
+            <View className="flex-row justify-between mb-8">
+              {[1, 2, 3, 4].map((stepNumber) => (
+                <View
+                  key={stepNumber}
+                  className="flex-1 items-center"
+                >
+                  <View
+                    className={`w-6 h-6 rounded-full items-center justify-center ${stepNumber === step
+                      ? 'bg-[#250048]'
+                      : stepNumber < step
+                        ? 'bg-[#250048]'
+                        : 'bg-gray-400'
+                      }`}
+                  >
+                    {stepNumber < step ? (
+                      <Ionicons name="checkmark" size={16} color="white" />
+                    ) : (
+                      <Text className="text-white text-xs">{stepNumber}</Text>
+                    )}
+                  </View>
+                  {stepNumber < 4 && (
+                    <View
+                      className={`h-0.5 w-full absolute top-3 left-1/2 ${stepNumber < step ? 'bg-white' : 'bg-gray-400'
+                        }`}
+                    />
+                  )}
+                </View>
+              ))}
+            </View>
 
             {renderStepContent()}
 
-            <View className="flex-row justify-between mt-6">
+            <View className="flex-row justify-between mt-8">
               {step > 1 && (
                 <TouchableOpacity
-                  onPress={prevStep}
-                  className="bg-[#250048] py-3 px-6 rounded-full"
+                  onPress={() => setStep(step - 1)}
+                  className="bg-gray-600 py-3 px-6 rounded-lg flex-row items-center"
                 >
-                  <Text className="text-white font-bold">Previous</Text>
+                  <Ionicons name="arrow-back" size={20} color="white" className="mr-2" />
+                  <Text className="text-white font-bold">Back</Text>
                 </TouchableOpacity>
               )}
+
               <TouchableOpacity
-                onPress={nextStep}
-                className="bg-[#00E394] py-3 px-6 rounded-lg ml-auto"
+                onPress={() => {
+                  if (validateForm()) {
+                    if (step < 4) setStep(step + 1);
+                    else handleSubmit();
+                  }
+                }}
+                className={`bg-[#250048] flex justify-center text-center py-3 px-6 rounded-lg flex-row items-center ${step === 1 ? 'flex-1' : 'flex-none ml-auto'
+                  }`}
               >
+
                 {loading ? (
-                  <View className="flex-row justify-center items-center">
-                    <ActivityIndicator size="small" color="#ffffff" />
-                  </View>
+                  <ActivityIndicator color="white" />
                 ) : (
-                  <Text className="text-white font-bold">{step === 3 ? 'Submit' : 'Next'}</Text>
+                  <Text className="text-white font-bold mr-2">
+                    {step === 4 ? 'Create Account' : 'Continue'}
+                  </Text>
                 )}
 
               </TouchableOpacity>
             </View>
 
-            <TouchableOpacity onPress={() => router.push("/sign-in")} className="mt-6">
-              <Text className="text-white text-center">Already have an account? Log in</Text>
-            </TouchableOpacity>
+            <View className="flex-row justify-between mt-8">
+              <TouchableOpacity
+                onPress={() => router.push("/sign-in")}
+                className="bg-[#250048] hover:bg-[#3b1a59] py-3 px-6 rounded-lg flex-1 mr-4 items-center"
+              >
+                <Text className="text-white font-bold">Personal Login</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => router.push("/group-login")}
+                className="bg-[#250048] hover:bg-[#3b1a59] py-3 px-6 rounded-lg flex-1 items-center"
+              >
+                <Text className="text-white font-bold">Group Login</Text>
+              </TouchableOpacity>
+            </View>
+
           </Animated.View>
+
+          {showIOSDatePicker && (
+            <Modal transparent={true} animationType="slide" visible={showIOSDatePicker}>
+              <View className="flex-1 justify-center bg-black bg-opacity-50">
+                <View className="bg-white rounded-lg p-4 mx-4">
+                  <DateTimePicker
+                    value={formData.date_of_birth}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={(event, date) => {
+                      setShowIOSDatePicker(false);
+                      if (date) {
+                        handleInputChange('date_of_birth', date);
+                      }
+                    }}
+                    maximumDate={new Date()}
+                  />
+                  <TouchableOpacity
+                    onPress={() => setShowIOSDatePicker(false)}
+                    className="mt-4 p-2 bg-[#00E394] rounded-lg"
+                  >
+                    <Text className="text-center text-white">Done</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </Modal>
+          )}
         </ScrollView>
       </LinearGradient>
-      {loading && <ActivityIndicator size="small" color="#ffffff" />}
+
     </SafeAreaView>
   );
 };
