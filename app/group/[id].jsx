@@ -119,7 +119,7 @@ const SingleGroup = () => {
   }
 
   return (
-    <View className="flex-1 bg-purple-50">
+    <View className="flex-1 bg-gray-100">
       {confetti && <Confetti ref={(node) => setConfetti(node)} />}
 
       <FlatList

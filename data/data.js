@@ -31,5 +31,5 @@ export const group_dashbord_data =
   [
     { id: 'dashboard', label: 'Dashboard' },
     { id: 'meetings', label: 'Meetings' },
-    { id: 'group-profile', label: 'Group Profile' }
+    { id: 'group-profile', label: 'Group Setup' }
   ]

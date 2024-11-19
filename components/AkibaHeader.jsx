@@ -15,8 +15,8 @@ const AkibaHeader = ({ title, message }) => {
 					/>
 				</View>
 				<View className="ml-3">
-					<Text className="text-white/70 text-[16px]">{message},</Text>
 					<Text className="text-white font-bold text-[24px]">{title}</Text>
+					<Text className="text-white/70 text-[16px]">{message}</Text>
 				</View>
 			</View>
 			

@@ -307,6 +307,17 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="group-profile/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'slide_from_right',
+            contentStyle: {
+              backgroundColor: '#53565a', 
+            },
+          }}
+        />
+        <Stack.Screen
           name="group/[id]"
           options={{
             headerShown: false,
