@@ -1,38 +1,26 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, TextInput, Alert, Dimensions, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, FlatList, ActivityIndicator, RefreshControl, Image } from 'react-native';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { saving_group_url } from '../../api/api';
-import { LinearGradient } from 'expo-linear-gradient';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Confetti from 'react-native-confetti';
-import GroupPaymentDurationSection from '../../components/savings/GroupPaymentDurationSection';
-import GroupInvitation from '../../components/saving-groups/GroupInvitation';
-import GroupJoinRequests from '../../components/savings/GroupJoinRequests';
-import TabBar from '../../components/saving-groups/TabBar';
-import EditableInfoItem from '../../components/saving-groups/EditableInfoItem';
-import FinancialCard from '../../components/saving-groups/FinancialCard';
-import GroupHeader from '../../components/saving-groups/GroupHeader';
-import SocialCard from '../../components/saving-groups/SocialCard';
-import PenaltyCard from '../../components/saving-groups/PenaltyCard';
-import GroupFooter from '../../components/saving-groups/GroupFooter';
-import GroupLoans from '../../components/loans/GroupLoans';
-
+import { Feather } from '@expo/vector-icons';
+import AkibaHeader from '../../components/AkibaHeader'
+import GroupTab from '../../components/group-dashboard/GroupTab';
+import MainGroupDashboard from '../../components/group-dashboard/MainGroupDashboard';
+import GroupMeetingSection from '../../components/group-dashboard/meetings/GroupMeetingSection';
+import GroupProfile from '../../components/group-dashboard/profile/GroupProfile';
 
 const SingleGroup = () => {
   const { id } = useLocalSearchParams();
   const [group, setGroup] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [editMode, setEditMode] = useState(false);
-  const [editedGroup, setEditedGroup] = useState(null);
   const [currentMember, setCurrentMember] = useState("");
-  const [activeTab, setActiveTab] = useState('financial');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const navigation = useNavigation();
   const [confetti, setConfetti] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
-
-
-
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -58,8 +46,6 @@ const SingleGroup = () => {
       if (response.ok) {
         const data = await response.json();
         setGroup(data);
-        setEditedGroup(data);
-        navigation.setOptions({ headerTitle: data.name });
       } else {
         setError('Failed to fetch group details');
       }
@@ -71,128 +57,47 @@ const SingleGroup = () => {
     }
   };
 
-  const handleEdit = () => {
-    setEditMode(true);
-  };
-
-  const handleSave = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch(`${saving_group_url}/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(editedGroup),
-      });
-
-      if (response.ok) {
-        const updatedGroup = await response.json();
-        setGroup(updatedGroup);
-        setEditMode(false);
-        Alert.alert('Success', 'Group details updated successfully');
-        setConfetti(true);
-        setTimeout(() => setConfetti(false), 5000);
-      } else {
-        throw new Error('Failed to update group details');
-      }
-    } catch (error) {
-      console.error('Error updating group details:', error);
-      Alert.alert('Error', 'Failed to update group details');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleInviteMember = () => {
-    // Implement the logic to invite a new member
-    Alert.alert(
-      "Invite New Member",
-      "This feature will allow you to invite a new member to the group.",
-      [
-        {
-          text: "Cancel",
-          style: "cancel"
-        },
-        {
-          text: "OK",
-          onPress: () => console.log("OK Pressed - Implement invitation logic here")
-        }
-      ]
-    );
-  };
-
-  const handleCancel = () => {
-    setEditedGroup(group);
-    setEditMode(false);
-  };
-
-  const handleChange = (field, value) => {
-    setEditedGroup(prev => ({ ...prev, [field]: value }));
-  };
-
-  const canEdit = currentMember.id === group?.created_by;
-
-
-
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await fetchGroupDetails();
-    await fetchMemberData();
     setRefreshing(false);
   }, [id]);
 
-  const renderHeader = useCallback(() => (
-    <GroupHeader
-      group={group}
-      activeTab={activeTab}
-      setActiveTab={setActiveTab}
-    />
-  ), [group, activeTab]);
+  const renderHeader = () => (
+    <View className="">
+      <AkibaHeader
+        message="Welcome to"
+        title={`${group?.name} Saving Group`}
+      />
+    </View>
+  );
 
   const renderTabContent = useCallback(() => {
     switch (activeTab) {
-      case 'financial':
+      case 'dashboard':
         return (
-          <FinancialCard editMode={editMode} editedGroup={editedGroup} handleChange={handleChange} />
+          <MainGroupDashboard group={group} />
+
         );
-      case 'social':
+      case 'meetings':
         return (
-          <SocialCard editMode={editMode} editedGroup={editedGroup} handleChange={handleChange} />
+          <GroupMeetingSection />
         );
-      case 'penalties':
+      case 'group-profile':
         return (
-          <PenaltyCard editMode={editMode} editedGroup={editedGroup} handleChange={handleChange} />
+          <GroupProfile group={group} />
         );
-      case 'members':
-        return <View>
-          <GroupInvitation groupId={group.id} canEdit={canEdit}/>
-        </View>;
-      case 'durations':
-        return <GroupPaymentDurationSection groupId={group.id} />;
-      case 'requests':
-        return <GroupJoinRequests groupId={group.id} group={group} />;
-      case 'loans':
-        return <GroupLoans groupId={group.id} group={group} />;
       default:
         return null;
     }
-  }, [activeTab, editedGroup, editMode, group]);
+  }, [activeTab, group]);
 
-  const renderFooter = useCallback(() => {
-    const editableTabs = ['financial', 'social', 'penalties'];
-    if (canEdit && editableTabs.includes(activeTab)) {
-      return (
-        <GroupFooter
-          editMode={editMode}
-          handleEdit={handleEdit}
-          handleSave={handleSave}
-          handleCancel={handleCancel}
-        />
-      );
-    }
-    return null;
-  }, [canEdit, editMode, activeTab]);
+  const renderTabBar = () => (
+    <GroupTab
+      setActiveTab={setActiveTab}
+      activeTab={activeTab}
+    />
+  );
 
   if (loading && !refreshing) {
     return (
@@ -212,29 +117,32 @@ const SingleGroup = () => {
       </View>
     );
   }
+
   return (
     <View className="flex-1 bg-purple-50">
       {confetti && <Confetti ref={(node) => setConfetti(node)} />}
 
       <FlatList
         data={[{ key: 'content' }]}
+        ListHeaderComponent={() => (
+          <>
+            {renderHeader()}
+            {renderTabBar()}
+          </>
+        )}
         renderItem={() => renderTabContent()}
-        ListHeaderComponent={renderHeader}
-        ListFooterComponent={renderFooter}
         keyExtractor={(item) => item.key}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            colors={["#250048"]}
-            tintColor="#250048"
+            colors={["#111827"]}
+            tintColor="#111827"
           />
         }
       />
     </View>
   );
 };
-
-
 
 export default SingleGroup;

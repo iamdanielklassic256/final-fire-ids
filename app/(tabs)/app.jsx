@@ -5,14 +5,13 @@ import { router } from "expo-router";
 import Statistic from "../../components/app/Statistic";
 import Activities from "../../components/app/Activities";
 import Logout from "../../components/app/Logout";
-import VerificationModal from "../../components/app/VerificationModal";
 import VerificationModalCard from "../../components/auth/VerificationModalCard";
 
 const Home = () => {
   const [memberData, setMemberData] = useState({
     fullName: "",
     isPhoneVerified: true,
-    member: null
+     member: null
   });
   const [greeting, setGreeting] = useState("");
   const [showVerificationModal, setShowVerificationModal] = useState(false);

@@ -9,7 +9,7 @@ import Animated, { FadeInDown, FadeInUp, FadeOut } from 'react-native-reanimated
 import axios from 'axios';
 import { sign_up_url } from '../../api/api';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import logo from '../../assets/icons/logo/logoname.png';
 
 const EntityGenderEnum = {
@@ -76,7 +76,7 @@ const SignUp = () => {
     }
   };
 
-  const formatPhoneNumber = (number) => {
+   const formatPhoneNumber = (number) => {
     let cleaned = number.replace(/\D/g, '');
     if (cleaned.startsWith('07')) {
       cleaned = '256' + cleaned.substring(1);
@@ -95,7 +95,7 @@ const SignUp = () => {
     let errorMessage = '';
 
     currentStepFields.forEach(field => {
-      if (!formData[field] && field !== 'other_name' && field !== 'contact_two') {
+      if (!formData[field] && field !== 'other_name' && field !== 'contact_two' && field!== 'email') {
         isValid = false;
         errorMessage = `Please fill in all required fields`;
       }
@@ -205,9 +205,9 @@ const SignUp = () => {
         </Text>
         <View className="relative">
           <TextInput
-            className="bg-white bg-opacity-20 rounded-lg p-3 text-white"
+            className="bg-white bg-opacity-20 rounded-lg p-3 text-black"
             placeholder={placeholder}
-            placeholderTextColor="rgba(255,255,255,0.5)"
+            placeholderTextColor="#928b8b"
             value={formData[field]}
             onChangeText={(text) => handleInputChange(field, text)}
             keyboardType={keyboardType}
@@ -279,7 +279,7 @@ const SignUp = () => {
                 onPress={() => setShowIOSDatePicker(true)}
                 className="bg-white bg-opacity-20 rounded-lg p-3 flex-row justify-between items-center"
               >
-                <Text className="text-white">
+                <Text className="text-black">
                   {formData.date_of_birth.toLocaleDateString()}
                 </Text>
                 <Ionicons name="calendar-outline" size={24} color="white" />
@@ -292,7 +292,7 @@ const SignUp = () => {
                 <Picker
                   selectedValue={formData.gender}
                   onValueChange={(value) => handleInputChange("gender", value)}
-                  style={{ color: 'white' }}
+                  style={{ color: 'black' }}
                 >
                   <Picker.Item label="Male" value={EntityGenderEnum.MALE} />
                   <Picker.Item label="Female" value={EntityGenderEnum.FEMALE} />

@@ -172,6 +172,17 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="dashboard"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'slide_from_bottom',
+            contentStyle: {
+              backgroundColor: '#111827', 
+            },
+          }}
+        />
+        <Stack.Screen
           name="wallet/wallet_type"
           options={{
             headerTitle: "Wallet Type",
@@ -298,31 +309,11 @@ export default function RootLayout() {
         <Stack.Screen
           name="group/[id]"
           options={{
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
+            headerShown: false,
+            presentation: 'fullScreenModal',
             animation: 'slide_from_bottom',
             contentStyle: {
-              backgroundColor: '#FFFFFF',
+              backgroundColor: '#111827', 
             },
           }}
         />
