@@ -141,7 +141,7 @@ const GroupProfile = () => {
   );
 
   return (
-    <View className="flex-1 bg-gray-100">
+    <View className="flex-1 bg-gray-100 mt-4">
       <AkibaHeader title={group?.name || 'Group Profile'} message="Complete the profile step by step" />
       <ScrollView className="px-4 pt-4">
         <View className="bg-white rounded-lg p-4 shadow-md mb-4">

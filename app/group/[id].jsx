@@ -64,9 +64,9 @@ const SingleGroup = () => {
   }, [id]);
 
   const renderHeader = () => (
-    <View className="">
+    <View className="mt-4">
       <AkibaHeader
-        message="Welcome to"
+        message="You are most welcome"
         title={`${group?.name} Saving Group`}
       />
     </View>

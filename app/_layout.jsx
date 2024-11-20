@@ -313,7 +313,7 @@ export default function RootLayout() {
             presentation: 'fullScreenModal',
             animation: 'slide_from_right',
             contentStyle: {
-              backgroundColor: '#53565a', 
+              backgroundColor: '#111827', 
             },
           }}
         />

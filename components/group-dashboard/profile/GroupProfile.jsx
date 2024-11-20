@@ -4,16 +4,15 @@ import { ChevronRight } from 'lucide-react-native'
 import { router } from 'expo-router'
 
 const GroupProfile = ({ group }) => {
-	const [activeSection, setActiveSection] = useState(null)
 
 	const ProfileSection = ({ title, onPress, children }) => (
-		<View className="mb-4 bg-white rounded-lg shadow-md">
+		<View className="mb-4 bg-white rounded-lg shadow-md border-b-2 border-[#028758]">
 			<TouchableOpacity
-				className="flex-row justify-between items-center p-4 border-b border-gray-200"
+				className="flex-row justify-between   items-center p-4 "
 				onPress={onPress}
 			>
-				<Text className="text-lg font-semibold">{title}</Text>
-				<ChevronRight color="gray" size={24} />
+				<Text className="text-lg font-bold">{title}</Text>
+				<ChevronRight color="#028758" size={24} />
 			</TouchableOpacity>
 
 		</View>
