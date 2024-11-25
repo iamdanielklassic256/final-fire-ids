@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { View, ScrollView, TouchableOpacity, Text } from "react-native";
+import { View, ScrollView} from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import Logout from "../../components/app/Logout";
@@ -10,6 +10,7 @@ import GroupCreationCard from "../../components/personal-account/GroupCreationCa
 import DeleteAccount from "../../components/personal-account/DeleteAccount";
 import FindGroup from "../../components/personal-account/FindGroup";
 import ViewGroups from "../../components/personal-account/ViewGroups";
+import { StatusBar } from 'expo-status-bar';
 
 const Home = () => {
   const [memberData, setMemberData] = useState({
@@ -81,11 +82,25 @@ const Home = () => {
     setShowVerificationModal(false);
   };
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("member");
+      await AsyncStorage.removeItem("accessToken");
+      router.push("/sign-in");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  }
+
   return (
     <View className=" flex-1 bg-gray-100">
+      <StatusBar style="light" />
       <AkibaHeader
         message={memberData.fullName}
         title={greeting}
+        color="white"
+        handlePress={handleLogout}
+        icon="log-out"
       />
       <ScrollView className=" flex-1 px-4 pt-6">
         <SavingOverview />

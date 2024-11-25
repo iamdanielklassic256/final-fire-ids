@@ -33,3 +33,12 @@ export const group_dashbord_data =
     { id: 'meetings', label: 'Meetings' },
     { id: 'group-profile', label: 'Group Setup' }
   ]
+
+
+export const group_creation_steps = [
+  "Group Profile",
+  "Share Details",
+  "Loan Settings",
+  "Saving Cycle"
+]
+

@@ -9,6 +9,8 @@ import InvitationItem from '../../components/personal-account/InvitationItem';
 import SavingGroupItem from '../../components/personal-account/SavingGroupItem';
 import JoinRequestModal from '../../components/personal-account/JoinRequestModal';
 import DeleteRequestModal from '../../components/personal-account/DeleteRequestModal';
+import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 const Invitations = () => {
 	const [member, setMember] = useState(null);
@@ -149,6 +151,8 @@ const Invitations = () => {
 	};
 
 
+
+
 	const handleDeleteRequest = async (request) => {
 		setRequestToDelete(request);
 		setShowDeleteConfirmation(true);
@@ -184,6 +188,11 @@ const Invitations = () => {
 			setRequestToDelete(null);
 		}
 	};
+
+	const handleGoBack = () => {
+		router.back()
+
+	}
 
 	const renderInvitationItem = ({ item }) => {
 		if (item.status !== 'pending') return null;
@@ -234,9 +243,13 @@ const Invitations = () => {
 
 	return (
 		<View className="flex-1 bg-gray-200 text-white">
+			<StatusBar style="light" />
 			<AkibaHeader
 				title="Saving Groups"
 				message="Find your saving groups"
+				color="white"
+				handlePress={handleGoBack}
+				icon="arrow-back"
 			/>
 			<InvitationTab
 				activeTab={activeTab}

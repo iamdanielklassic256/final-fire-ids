@@ -6,7 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 const GroupCreationCard = () => {
 
 	const handleCreateGroup = () => {
-		router.push("/create-saving-group");
+		router.push("/add-group");
 	};
 
 	return (

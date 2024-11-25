@@ -4,6 +4,8 @@ import AkibaHeader from '../../components/AkibaHeader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { all_savings_groups_by_member_id } from '../../api/api';
 import EnhancedLoader from '../../utils/EnhancedLoader';
+import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 
 const ViewAllGroups = () => {
 	const [member, setMember] = useState(null);
@@ -47,6 +49,11 @@ const ViewAllGroups = () => {
 		}
 	};
 
+	const handleGoBack = () => {
+		router.back()
+
+	}
+
 	const renderGroup = ({ item }) => (
 		<View style={{ padding: 16, borderBottomWidth: 1, borderColor: '#ddd' }}>
 			<Text style={{ fontWeight: 'bold', fontSize: 16 }}>{item.name}</Text>
@@ -65,7 +72,14 @@ const ViewAllGroups = () => {
 
 	return (
 		<View style={{ flex: 1 }} className="bg-gray-500">
-			<AkibaHeader title="Saving Groups" message="View all your saving groups" />
+			<StatusBar style="light" />
+			<AkibaHeader
+				title="Saving Groups"
+				message="View all your saving groups"
+				color="white"
+				handlePress={handleGoBack}
+				icon="arrow-back"
+			/>
 			{groups.length > 0 ? (
 				<FlatList
 					data={groups}
