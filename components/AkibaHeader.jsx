@@ -1,7 +1,5 @@
 import { View, Text, Image } from 'react-native'
 import React from 'react'
-import { TouchableOpacity } from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const AkibaHeader = ({ title, message }) => {
 	return (

@@ -1,22 +1,23 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Text, TouchableOpacity } from 'react-native';
 import React from 'react';
-import { useRouter } from 'expo-router'; // Assuming you're using Expo Router
+import { router } from 'expo-router'; 
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const FindGroup = () => {
-  const router = useRouter();
+ 
 
   const handleFetchGroupInvitation = () => {
     router.push('/group/invitation');
   };
 
   return (
-    <View className="bg-[#028758] p-4 flex-row justify-center items-center mt-6 rounded-lg">
-      <TouchableOpacity  
-        onPress={handleFetchGroupInvitation}
-      >
-        <Text className="text-white font-bold">View Group Invitations</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity
+      className="w-[48%] bg-white rounded-xl shadow-md p-4 items-center"
+      onPress={handleFetchGroupInvitation}
+    >
+      <Icon name="account-group" size={40} color="#028758" />
+      <Text className="mt-2 font-semibold text-center">Find Groups</Text>
+    </TouchableOpacity>
   );
 };
 

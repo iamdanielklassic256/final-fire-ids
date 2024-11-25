@@ -6,7 +6,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Logout from '../../components/app/Logout';
 import SettingOption from '../../components/app/SettingOption';
 import { settingsData } from '../../data/data';
-
+import DeleteAccount from '../../components/personal-account/DeleteAccount';
 
 
 const Profile = () => {
@@ -41,8 +41,8 @@ const Profile = () => {
         </View>
         <View className="flex flex-row items-center justify-center flex-1 mx-4 mb-8 bg-red-500 rounded-xl p-2">
           <Logout />
-          <Text className="text-white text-md uppercase ml-2">sign out</Text>
         </View>
+        <DeleteAccount />
       </ScrollView>
     </SafeAreaView>
   );

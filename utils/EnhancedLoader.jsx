@@ -15,7 +15,7 @@ const EnhancedLoader = ({ isLoading, message = 'Loading...' }) => {
     >
       <View style={styles.container}>
         <View style={styles.loaderBox}>
-          <ActivityIndicator size="large" color="#028758" />
+          <ActivityIndicator size="large" color="#ffffff" />
           <Text style={styles.loadingText}>{message}</Text>
         </View>
       </View>
@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loaderBox: {
-    backgroundColor: 'white',
+    backgroundColor: '#028758',
     padding: 20,
     borderRadius: 12,
     alignItems: 'center',
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     marginTop: 10,
-    color: '#4a008f',
+    color: '#ffffff',
     fontSize: 16,
     fontWeight: '600',
   },

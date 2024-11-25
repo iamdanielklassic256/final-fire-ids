@@ -31,12 +31,10 @@ const ActivityDashboard = () => {
   const activities = [
     { name: 'Accounts', route: '/account' },
     { name: 'Saving Groups', route: '/saving-group' },
-    { name: 'Wallets', route: '/group-wallet' },
-    { name: 'Meetings', route: '/meetings/meetings' },
   ];
 
   return (
-    <View className="flex-row flex-wrap justify-between">
+    <View className="mt-4 flex-row flex-wrap justify-between">
       {activities.map((item, index) => (
         <ActivityItem 
           key={index} 
