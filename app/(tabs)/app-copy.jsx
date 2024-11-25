@@ -1,31 +1,20 @@
 import { useState, useEffect } from "react";
-import { Text, View, ScrollView, TouchableOpacity, Alert } from "react-native";
+import { Text, View, ScrollView } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { Ionicons } from '@expo/vector-icons';
 import Statistic from "../../components/app/Statistic";
 import Activities from "../../components/app/Activities";
 import Logout from "../../components/app/Logout";
 import VerificationModalCard from "../../components/auth/VerificationModalCard";
-import AkibaHeader from '../../components/AkibaHeader';
-import SavingOverview from "../../components/personal-account/SavingOverview";
-import GroupCreationCard from "../../components/personal-account/GroupCreationCard";
-import DeleteAccount from "../../components/personal-account/DeleteAccount";
 
 const Home = () => {
   const [memberData, setMemberData] = useState({
     fullName: "",
     isPhoneVerified: true,
-    member: null
+     member: null
   });
   const [greeting, setGreeting] = useState("");
   const [showVerificationModal, setShowVerificationModal] = useState(false);
-  const [savingsData, setSavingsData] = useState({
-    totalSavings: 0,
-    personalSavings: 0,
-    groupSavings: 0,
-    totalGroups: 0
-  });
 
   useEffect(() => {
     const fetchMemberData = async () => {
@@ -47,6 +36,7 @@ const Home = () => {
         }
       } catch (error) {
         console.error("Error fetching member data:", error);
+        // Consider adding error handling UI feedback
       }
     };
 
@@ -57,24 +47,13 @@ const Home = () => {
       return 'Good Morning,';
     };
 
-    // Mock function to fetch savings data
-    const fetchSavingsData = async () => {
-      // This would typically be an API call
-      setSavingsData({
-        totalSavings: 125000,
-        personalSavings: 75000,
-        groupSavings: 50000,
-        totalGroups: 3
-      });
-    };
-
     fetchMemberData();
-    fetchSavingsData();
     setGreeting(setGreetingByTime());
   }, []);
 
   const formatFullName = (member) => {
-    return `${member.first_name} ${member.last_name}${member.other_name ? ` ${member.other_name}` : ''}`.trim();
+    return `${member.first_name} ${member.last_name}${member.other_name ? ` ${member.other_name}` : ''
+      }`.trim();
   };
 
   const handleVerifyNow = () => {
@@ -82,39 +61,25 @@ const Home = () => {
     setShowVerificationModal(false);
   };
 
-
-
-  
-
   return (
-    <View className=" flex-1 bg-gray-100">
-      <AkibaHeader
-        message={memberData.fullName}
-        title={greeting}
-      />
-
-      <ScrollView className=" flex-1 px-4 pt-6">
-        <SavingOverview
-          savingsData={savingsData}
-        />
-
-        {/* GroupCreationCard */}
-        <GroupCreationCard />
-
-        {/* Current Groups Summary */}
-        <View className="bg-white rounded-xl p-4 mt-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800">Your SACCO Groups</Text>
-          <Text className="text-gray-600 mt-2">
-            You are currently a member of {savingsData.totalGroups} savings groups
-          </Text>
-        </View>
-
-        <View className="">
-          <View className="bg-red-500 p-2 flex-row justify-center items-center mt-6 rounded-lg">
-            <Logout />
+    <View className="flex-1 bg-gray-100">
+      <View className="bg-[#028758] h-36 rounded-b-3xl">
+        <View className="pt-16 px-4 flex flex-row justify-between items-center">
+          <View>
+            <Text className="text-white text-lg font-bold">
+              {greeting}
+            </Text>
+            <Text className="text-white text-xl font-bold">
+              {memberData.fullName}
+            </Text>
           </View>
-          <DeleteAccount />
+          <Logout />
         </View>
+      </View>
+
+      <ScrollView className="flex-1 px-4 pt-6">
+        <Statistic />
+        <Activities />
       </ScrollView>
 
       {!memberData.member?.contact_verified && (
@@ -122,7 +87,7 @@ const Home = () => {
           visible={showVerificationModal}
           onClose={() => setShowVerificationModal(false)}
           onVerifyNow={handleVerifyNow}
-          message='Please verify your phone number to continue using the SACCO app.'
+          message='Please verify your phone number to continue using Akiba.'
         />
       )}
     </View>
@@ -130,3 +95,6 @@ const Home = () => {
 };
 
 export default Home;
+
+
+

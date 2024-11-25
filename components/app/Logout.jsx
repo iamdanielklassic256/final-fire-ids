@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import React from 'react'
-import { TouchableOpacity } from 'react-native'
+import { Text, TouchableOpacity } from 'react-native'
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Logout = () => {
@@ -17,8 +17,9 @@ const Logout = () => {
 	};
 
 	return (
-		<TouchableOpacity className="items-center" onPress={handleLogOut}>
+		<TouchableOpacity className="flex flex-row justify-center items-center" onPress={handleLogOut}>
 			<Icon name="logout" size={28} color="white" />
+			<Text style={{ color: "white", fontSize: 16, marginLeft: 10 }}>Log Out</Text>
 		</TouchableOpacity>
 	)
 }

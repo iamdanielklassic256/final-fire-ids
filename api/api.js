@@ -16,6 +16,7 @@ export const update_pin_url = `${akiba_api_url}/auth/update-pincode`
 export const forgot_password_url = `${akiba_api_url}/auth/request-pin-reset` 
 export const reset_password_url = `${akiba_api_url}/auth/reset-pin` 
 export const all_members_url = `${akiba_api_url}/members`
+export const delete_member_url = `${akiba_api_url}/members`
 
 
 
