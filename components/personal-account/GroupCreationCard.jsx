@@ -10,7 +10,7 @@ const GroupCreationCard = () => {
 	};
 
 	return (
-		<View className="bg-white rounded-xl p-4 mt-6 shadow-sm">
+		<View className="bg-white border-2 border-[#028758] rounded-xl p-4 mt-6 shadow-sm">
 			<Text className="text-lg font-semibold text-gray-800">Create a Savings Group</Text>
 			<Text className="text-gray-600 mt-2 mb-4">
 				Start a new savings group with other SACCO members. Pool resources together,
@@ -19,7 +19,7 @@ const GroupCreationCard = () => {
 
 			<TouchableOpacity
 				onPress={handleCreateGroup}
-				className="bg-blue-600 rounded-lg py-3 flex-row items-center justify-center"
+				className="bg-[#111827] rounded-lg py-3 flex-row items-center justify-center"
 			>
 				<Ionicons name="people-outline" size={24} color="#ffffff" />
 				<Text className="text-white font-semibold ml-2">Create New Savings Group</Text>
