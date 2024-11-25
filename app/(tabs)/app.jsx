@@ -11,6 +11,7 @@ import AkibaHeader from '../../components/AkibaHeader';
 import SavingOverview from "../../components/personal-account/SavingOverview";
 import GroupCreationCard from "../../components/personal-account/GroupCreationCard";
 import DeleteAccount from "../../components/personal-account/DeleteAccount";
+import FindGroup from "../../components/personal-account/FindGroup";
 
 const Home = () => {
   const [memberData, setMemberData] = useState({
@@ -102,12 +103,7 @@ const Home = () => {
         <GroupCreationCard />
 
         {/* Current Groups Summary */}
-        <View className="bg-white rounded-xl p-4 mt-6 shadow-sm">
-          <Text className="text-lg font-semibold text-gray-800">Your SACCO Groups</Text>
-          <Text className="text-gray-600 mt-2">
-            You are currently a member of {savingsData.totalGroups} savings groups
-          </Text>
-        </View>
+        <FindGroup />
 
         <View className="">
           <View className="bg-red-500 p-2 flex-row justify-center items-center mt-6 rounded-lg">
