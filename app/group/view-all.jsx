@@ -1,99 +1,329 @@
-import { View, Text, Alert, FlatList, ActivityIndicator } from 'react-native';
-import React, { useState, useEffect } from 'react';
-import AkibaHeader from '../../components/AkibaHeader';
+import React, { useState, useEffect, useCallback } from 'react';
+import { 
+  View, 
+  Text, 
+  Alert, 
+  FlatList, 
+  TouchableOpacity, 
+  StyleSheet, 
+  SafeAreaView
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { StatusBar } from 'expo-status-bar';
+import { router } from 'expo-router';
+import { Feather } from '@expo/vector-icons';
+
+// API and Utility Imports
 import { all_savings_groups_by_member_id } from '../../api/api';
 import EnhancedLoader from '../../utils/EnhancedLoader';
-import { router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+import AkibaHeader from '../../components/AkibaHeader';
 
 const ViewAllGroups = () => {
-	const [member, setMember] = useState(null);
-	const [groups, setGroups] = useState([]);
-	const [loading, setLoading] = useState(true);
+  // State Management
+  const [isLoading, setIsLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [groups, setGroups] = useState([]);
+  const [error, setError] = useState(null);
+  const [member, setMember] = useState(null);
+  const [loadingMessage, setLoadingMessage] = useState("Loading your savings groups...");
 
-	useEffect(() => {
-		const fetchMemberData = async () => {
-			try {
-				const memberData = await AsyncStorage.getItem('member');
-				if (memberData) {
-					const memberInfo = JSON.parse(memberData);
-					setMember(memberInfo);
-					fetchGroups(memberInfo.id);
-				} else {
-					throw new Error('No member data found.');
-				}
-			} catch (error) {
-				console.error('Error fetching member data:', error);
-				Alert.alert('Error', 'Unable to load your profile. Please try again.');
-				setLoading(false);
-			}
-		};
+  // Dynamic Loading Messages
+  const loadingMessages = [
+    "Calculating your savings progress...",
+    "Gathering your group details...",
+    "Preparing your financial overview...",
+    "Loading your savings journey...",
+    "Fetching your group activities...",
+    "Updating your savings dashboard..."
+  ];
 
-		fetchMemberData();
-	}, []);
+  // Fetch Member Data
+  useEffect(() => {
+    const fetchMemberData = async () => {
+      try {
+        const memberData = await AsyncStorage.getItem('member');
+        if (memberData) {
+          const memberInfo = JSON.parse(memberData);
+          setMember(memberInfo);
+        } else {
+          throw new Error('No member data found.');
+        }
+      } catch (error) {
+        console.error('Error fetching member data:', error);
+        Alert.alert(
+          'Profile Error', 
+          'Unable to load your profile. Please log in again.', 
+          [{ 
+            text: 'OK', 
+            onPress: () => router.replace('/login') 
+          }]
+        );
+      }
+    };
 
-	const fetchGroups = async (memberId) => {
-		try {
-			const response = await fetch(`${all_savings_groups_by_member_id}/${memberId}`);
-			if (!response.ok) {
-				throw new Error('Failed to fetch groups');
-			}
-			const data = await response.json();
-			setGroups(data);
-		} catch (error) {
-			console.error('Error fetching groups:', error);
-			Alert.alert('Error', 'Unable to load saving groups. Please try again later.');
-		} finally {
-			setLoading(false);
-		}
-	};
+    fetchMemberData();
+  }, []);
 
-	const handleGoBack = () => {
-		router.back()
+  // Fetch Savings Groups when Member is Available
+  useEffect(() => {
+    if (member && member.id) {
+      fetchAllSavingGroups();
+    }
+  }, [member]);
 
-	}
+  // Cycling Loading Messages
+  useEffect(() => {
+    let messageInterval;
+    if (isLoading) {
+      messageInterval = setInterval(() => {
+        setLoadingMessage(prev => {
+          const currentIndex = loadingMessages.indexOf(prev);
+          const nextIndex = (currentIndex + 1) % loadingMessages.length;
+          return loadingMessages[nextIndex];
+        });
+      }, 2000);
+    }
+    return () => clearInterval(messageInterval);
+  }, [isLoading]);
 
-	const renderGroup = ({ item }) => (
-		<View style={{ padding: 16, borderBottomWidth: 1, borderColor: '#ddd' }}>
-			<Text style={{ fontWeight: 'bold', fontSize: 16 }}>{item.name}</Text>
-			<Text>{item.description}</Text>
-		</View>
-	);
+  // Fetch Savings Groups
+  const fetchAllSavingGroups = async () => {
+    if (!member || !member.id) return;
 
-	if (loading) {
-		return (
-			<EnhancedLoader
-				isLoading={true}
-				message='Loading your saving groups...'
-			/>
-		);
-	}
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      const response = await fetch(`${all_savings_groups_by_member_id}/${member.id}`);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      setGroups(data);
+    } catch (error) {
+      console.error('Error fetching groups:', error);
+      setError('Unable to fetch your savings groups. Please check your connection.');
+      Alert.alert('Network Error', 'Could not load savings groups. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-	return (
-		<View style={{ flex: 1 }} className="bg-gray-500">
-			<StatusBar style="light" />
-			<AkibaHeader
-				title="Saving Groups"
-				message="View all your saving groups"
-				color="white"
-				handlePress={handleGoBack}
-				icon="arrow-back"
-			/>
-			{groups.length > 0 ? (
-				<FlatList
-					data={groups}
-					keyExtractor={(item) => item.id.toString()}
-					renderItem={renderGroup}
-					contentContainerStyle={{ padding: 16 }}
-				/>
-			) : (
-				<View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-					<Text className="text-white text-lg">No saving groups found.</Text>
-				</View>
-			)}
-		</View>
-	);
+  // Pull to Refresh Handler
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchAllSavingGroups().then(() => setRefreshing(false));
+  }, [member]);
+
+  // Navigate Back
+  const handleGoBack = () => router.back();
+
+
+
+  const getMemberCount = (group) => {
+    return group.members ? group.members.length : 0;
+  };
+
+
+
+  // Render Individual Group Item
+  const renderGroupItem = ({ item }) => (
+    <TouchableOpacity 
+      style={styles.groupItem}
+      onPress={() => router.push(`/groups/${item.id}`)}
+    >
+      <View style={styles.groupDetails}>
+        <Text style={styles.groupName}>{item.name}</Text>
+        <Text style={styles.groupDescription} numberOfLines={2}>
+          {item.description}
+        </Text>
+        <View style={styles.groupStats}>
+          <View style={styles.statContainer}>
+            <Feather name="dollar-sign" size={16} color="#4A5568" />
+            <Text style={styles.statText}>
+              Total Savings: ${item.total_savings ? item.total_savings.toLocaleString() : '0'}
+            </Text>
+          </View>
+          <View style={styles.statContainer}>
+            <Feather name="users" size={16} color="#4A5568" />
+            <Text style={styles.statText}>
+              Members: {getMemberCount(item)}
+            </Text>
+          </View>
+        </View>
+      </View>
+      <Feather name="chevron-right" size={24} color="#4A5568" />
+    </TouchableOpacity>
+  );
+
+  // Empty State Component
+  const EmptyState = () => (
+    <View style={styles.emptyStateContainer}>
+      <Feather name="folder-plus" size={64} color="#CBD5E0" />
+      <Text style={styles.emptyStateTitle}>No Savings Groups Yet</Text>
+      <Text style={styles.emptyStateSubtitle}>
+        Create your first savings group and start your financial journey
+      </Text>
+      <TouchableOpacity 
+        style={styles.createGroupButton}
+        onPress={() => router.push('/create-group')}
+      >
+        <Text style={styles.createGroupButtonText}>Create Group</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Error State Component
+  const ErrorState = () => (
+    <View style={styles.errorStateContainer}>
+      <Feather name="alert-triangle" size={64} color="#E53E3E" />
+      <Text style={styles.errorStateTitle}>Something Went Wrong</Text>
+      <Text style={styles.errorStateSubtitle}>{error}</Text>
+      <TouchableOpacity 
+        style={styles.retryButton}
+        onPress={fetchAllSavingGroups}
+      >
+        <Text style={styles.retryButtonText}>Retry</Text>
+      </TouchableOpacity>
+    </View>
+  );
+
+  // Main Render
+  if (isLoading && !groups.length) {
+    return <EnhancedLoader isLoading={true} message={loadingMessage} />;
+  }
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar style="light" />
+      <AkibaHeader
+        title="Saving Groups"
+        message="View all your saving groups"
+        color="white"
+        handlePress={handleGoBack}
+        icon="arrow-back"
+      />
+      <FlatList
+        data={groups}
+        keyExtractor={(item) => item.id.toString()}
+        renderItem={renderGroupItem}
+        contentContainerStyle={styles.listContainer}
+        ListEmptyComponent={error ? <ErrorState /> : <EmptyState />}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        ListHeaderComponent={error ? <ErrorState /> : null}
+      />
+    </SafeAreaView>
+  );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#718096',
+  },
+  listContainer: {
+    padding: 16,
+  },
+  groupItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  groupDetails: {
+    flex: 1,
+    marginRight: 12,
+  },
+  groupName: {
+    fontSize: 18,
+    fontWeight: '700',
+    marginBottom: 4,
+    color: '#2D3748',
+  },
+  groupDescription: {
+    color: '#4A5568',
+    marginBottom: 8,
+  },
+  groupStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  statContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  statText: {
+    marginLeft: 4,
+    color: '#4A5568',
+    fontSize: 12,
+  },
+  emptyStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  emptyStateTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 16,
+    color: 'white',
+  },
+  emptyStateSubtitle: {
+    textAlign: 'center',
+    color: '#CBD5E0',
+    marginTop: 8,
+  },
+  createGroupButton: {
+    backgroundColor: '#4299E1',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  createGroupButtonText: {
+    color: 'white',
+    fontWeight: '700',
+  },
+  errorStateContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 24,
+  },
+  errorStateTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    marginTop: 16,
+    color: '#E53E3E',
+  },
+  errorStateSubtitle: {
+    textAlign: 'center',
+    color: '#4A5568',
+    marginTop: 8,
+  },
+  retryButton: {
+    backgroundColor: '#4299E1',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  retryButtonText: {
+    color: 'white',
+    fontWeight: '700',
+  },
+});
 
 export default ViewAllGroups;
