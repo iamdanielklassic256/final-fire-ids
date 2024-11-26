@@ -531,7 +531,9 @@ const CreateSavingGroup = () => {
           onPress={handleCreateNewGroup}
           classNames="bg-blue-500 p-4 rounded-lg mt-8"
         >
-          <Text className="text-white text-center font-semibold text-lg">Create</Text>
+          <Text className="text-white text-center font-semibold text-lg">
+            {loading ? <ActivityIndicator color="white" /> : "Create Saving Group"}
+          </Text>
         </TouchableOpacity>
       </View>
       )} 

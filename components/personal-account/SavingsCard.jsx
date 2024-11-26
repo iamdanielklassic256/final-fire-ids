@@ -19,7 +19,7 @@ const SavingsCard = ({ title, amount, icon, backgroundColor }) => {
 				<View>
 					<Text style={{ fontSize: 14, color: '#666', marginBottom: 4 }}>{title}</Text>
 					<Text style={{ fontSize: 24, fontWeight: 'bold', color: '#333' }}>
-						UGX {amount.toLocaleString()}
+						UGX {amount}
 					</Text>
 				</View>
 				<Ionicons name={icon} size={24} color="#00E394" />
