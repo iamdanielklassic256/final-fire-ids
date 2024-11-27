@@ -17,6 +17,8 @@ import { Feather } from '@expo/vector-icons';
 import { all_savings_groups_by_member_id } from '../../api/api';
 import EnhancedLoader from '../../utils/EnhancedLoader';
 import AkibaHeader from '../../components/AkibaHeader';
+import GroupItem from '../../components/personal-account/GroupItem';
+import ErrorState from '../../components/ErrorState';
 
 const ViewAllGroups = () => {
   // State Management
@@ -130,32 +132,11 @@ const ViewAllGroups = () => {
 
   // Render Individual Group Item
   const renderGroupItem = ({ item }) => (
-    <TouchableOpacity 
-      style={styles.groupItem}
-      onPress={() => router.push(`/groups/${item.id}`)}
-    >
-      <View style={styles.groupDetails}>
-        <Text style={styles.groupName}>{item.name}</Text>
-        <Text style={styles.groupDescription} numberOfLines={2}>
-          {item.description}
-        </Text>
-        <View style={styles.groupStats}>
-          <View style={styles.statContainer}>
-            <Feather name="dollar-sign" size={16} color="#4A5568" />
-            <Text style={styles.statText}>
-              Total Savings: ${item.total_savings ? item.total_savings.toLocaleString() : '0'}
-            </Text>
-          </View>
-          <View style={styles.statContainer}>
-            <Feather name="users" size={16} color="#4A5568" />
-            <Text style={styles.statText}>
-              Members: {getMemberCount(item)}
-            </Text>
-          </View>
-        </View>
-      </View>
-      <Feather name="chevron-right" size={24} color="#4A5568" />
-    </TouchableOpacity>
+    <GroupItem 
+    getMemberCount={getMemberCount}
+    item={item}
+    router={router}
+    />
   );
 
   // Empty State Component
@@ -171,21 +152,6 @@ const ViewAllGroups = () => {
         onPress={() => router.push('/create-group')}
       >
         <Text style={styles.createGroupButtonText}>Create Group</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  // Error State Component
-  const ErrorState = () => (
-    <View style={styles.errorStateContainer}>
-      <Feather name="alert-triangle" size={64} color="#E53E3E" />
-      <Text style={styles.errorStateTitle}>Something Went Wrong</Text>
-      <Text style={styles.errorStateSubtitle}>{error}</Text>
-      <TouchableOpacity 
-        style={styles.retryButton}
-        onPress={fetchAllSavingGroups}
-      >
-        <Text style={styles.retryButtonText}>Retry</Text>
       </TouchableOpacity>
     </View>
   );
@@ -210,10 +176,20 @@ const ViewAllGroups = () => {
         keyExtractor={(item) => item.id.toString()}
         renderItem={renderGroupItem}
         contentContainerStyle={styles.listContainer}
-        ListEmptyComponent={error ? <ErrorState /> : <EmptyState />}
+        ListEmptyComponent={error ? (
+          <ErrorState
+            error={error}
+            fetchAllSavingGroups={fetchAllSavingGroups}
+          />
+        ) : <EmptyState />}
         refreshing={refreshing}
         onRefresh={onRefresh}
-        ListHeaderComponent={error ? <ErrorState /> : null}
+        ListHeaderComponent={error ? (
+          <ErrorState
+            error={error}
+            fetchAllSavingGroups={fetchAllSavingGroups}
+          />
+        ) : null}
       />
     </SafeAreaView>
   );
