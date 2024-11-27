@@ -42,3 +42,11 @@ export const group_creation_steps = [
   "Saving Cycle"
 ]
 
+
+export const single_group_dashbord_data =
+  [
+    { id: 'dashboard', label: 'Dashboard' },
+    { id: 'setup', label: 'Set Up' }
+  ]
+
+

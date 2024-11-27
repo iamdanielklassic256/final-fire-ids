@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { 
-  View, 
-  Text, 
-  TextInput, 
-  TouchableOpacity, 
-  ScrollView, 
-  Alert, 
-  ActivityIndicator 
+import React, { act, useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -19,20 +19,28 @@ import { saving_group_url } from '../../api/api';
 import AkibaHeader from '../../components/AkibaHeader';
 import StepIndicator from '../../components/group-creation/StepIndicator';
 import StepItem from '../../components/group-creation/StepItem';
-import { group_creation_steps } from '../../data/data';
+import { group_creation_steps, single_group_dashbord_data } from '../../data/data';
 import EnhancedLoader from '../../utils/EnhancedLoader';
+import { StyleSheet } from 'react-native';
+import StepSection from '../../components/personal-account/StepSection';
+import SingleGroupTab from '../../components/personal-account/SingleGroupTab';
+import SingleGroupDashboard from '../../components/personal-account/SingleGroupDashboard';
+import InterestMethodPickers from '../../components/personal-account/InterestMethodPickers';
+import SavingCyclePickers from '../../components/personal-account/SavingCyclePickers';
 
 const GroupProfile = () => {
   const { id } = useLocalSearchParams();
-  
+
   const [currentView, setCurrentView] = useState("steps");
   const [currentStep, setCurrentStep] = useState(null);
   const [stepsCompleted, setStepsCompleted] = useState([false, false, false, false]);
-  
+
   const [loading, setLoading] = useState(true);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [member, setMember] = useState(null);
-  
+
+  const [activeTab, setActiveTab] = useState('dashboard');
+
   const [groupProfile, setGroupProfile] = useState({
     name: "",
     location: "",
@@ -63,6 +71,10 @@ const GroupProfile = () => {
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
   const [showShareoutDatePicker, setShowShareoutDatePicker] = useState(false);
 
+  const handleTabClick = (tab) => {
+    setActiveTab(tab);
+  };
+
   useEffect(() => {
     const fetchGroupDetails = async () => {
       try {
@@ -73,7 +85,7 @@ const GroupProfile = () => {
 
         const response = await axios.get(`${saving_group_url}/${id}`);
         const groupData = response.data;
-        
+
         // Populate initial state with group data
         setGroupProfile({
           name: groupData.name,
@@ -220,32 +232,12 @@ const GroupProfile = () => {
   // Rendering methods from previous component (renderSteps, renderStepContent) would be added here
 
   const renderSteps = () => (
-    <ScrollView className="p-6">
-      <View className="mb-8">
-        <Text className="text-2xl font-bold text-gray-800 mb-2">
-          Let's get your group ready to save!
-        </Text>
-        <Text className="text-gray-600">Complete these steps in order to set up your group</Text>
-      </View>
-
-      {group_creation_steps.map((step, index) => {
-        const isLocked = index > 0 && !stepsCompleted[index - 1];
-
-        return (
-          <StepItem
-            currentStep={currentStep}
-            key={index}
-            index={index}
-            handleStepClick={handleStepClick}
-            step={step}
-            isLocked={isLocked}
-            StepIndicator={StepIndicator}
-            stepsCompleted={stepsCompleted}
-          />
-
-        );
-      })}
-    </ScrollView>
+    <StepSection
+      StepIndicator={StepIndicator}
+      currentStep={currentStep}
+      handleStepClick={handleStepClick}
+      stepsCompleted={stepsCompleted}
+    />
   );
 
   const renderStepContent = () => {
@@ -283,66 +275,10 @@ const GroupProfile = () => {
             };
 
     const renderInterestMethodPickers = () => (
-      <>
-        {/* Main Interest Method Picker */}
-        <View className="mb-4">
-          <Text className="text-gray-700 font-medium mb-2">Interest Calculation Method</Text>
-          <Picker
-            selectedValue={loanDetails.interate_method}
-            onValueChange={(value) => handleInputChange("interate_method", value)}
-          >
-            <Picker.Item label="Select Method" value="" />
-            <Picker.Item label="One-Time" value="one-time" />
-            <Picker.Item label="Monthly" value="monthly" />
-          </Picker>
-        </View>
-
-        {/* One-Time Method Specific Pickers */}
-        {loanDetails.interate_method === "one-time" && (
-          <>
-            <View className="mb-4">
-              <Text className="text-gray-700 font-medium mb-2">One-Time Interest Method</Text>
-              <Picker
-                selectedValue={loanDetails.oneTimeInterestMethod}
-                onValueChange={(value) => handleInputChange("oneTimeInterestMethod", value)}
-              >
-                <Picker.Item label="Select Option" value="" />
-                <Picker.Item label="Added" value="added" />
-                <Picker.Item label="Subtracted" value="subtracted" />
-              </Picker>
-            </View>
-          </>
-        )}
-
-        {/* Monthly Method Specific Pickers */}
-        {loanDetails.interate_method === "monthly" && (
-          <>
-            <View className="mb-4">
-              <Text className="text-gray-700 font-medium mb-2">Monthly Interest Method</Text>
-              <Picker
-                selectedValue={loanDetails.monthlyInterestMethod}
-                onValueChange={(value) => handleInputChange("monthlyInterestMethod", value)}
-              >
-                <Picker.Item label="Select Option" value="" />
-                <Picker.Item label="Declining Balance" value="declining" />
-                <Picker.Item label="Fixed Rate" value="fixed" />
-              </Picker>
-            </View>
-          </>
-        )}
-
-        {/* Interest Rate Input */}
-        <View className="mb-4">
-          <Text className="text-gray-700 font-medium mb-2">Interest Rate (%)</Text>
-          <TextInput
-            value={loanDetails.interestRate}
-            onChangeText={(value) => handleInputChange("interestRate", value)}
-            placeholder="Enter Interest Rate"
-            keyboardType="numeric"
-            className="bg-white border border-gray-300 p-4 rounded-lg"
-          />
-        </View>
-      </>
+      <InterestMethodPickers
+        loanDetails={loanDetails}
+        handleInputChange={handleInputChange}
+      />
     );
 
     const renderSavingCyclePickers = () => {
@@ -376,75 +312,15 @@ const GroupProfile = () => {
       };
 
       return (
-        <>
-          <View className="mb-4">
-            <Text className="text-gray-700 font-medium mb-2">Saving Cycle Method</Text>
-            <Picker
-              selectedValue={savingCycleDetails.saving_cycle_method}
-              onValueChange={(value) => handleInputChange("saving_cycle_method", value)}
-            >
-              <Picker.Item label="Select Cycle Method" value="" />
-              <Picker.Item label="Daily" value="daily" />
-              <Picker.Item label="Biweekly" value="biweekly" />
-              <Picker.Item label="Weekly" value="weekly" />
-              <Picker.Item label="Monthly" value="monthly" />
-            </Picker>
-          </View>
-
-          <View className="mb-4">
-            <Text className="text-gray-700 font-medium mb-2">Saving Cycle Start Day</Text>
-            <Picker
-              selectedValue={savingCycleDetails.saving_starting_day}
-              onValueChange={(value) => {
-                handleInputChange("saving_starting_day", value);
-                // setDayToClosestDate(value); // Adjust dates based on the selected start day
-              }}
-            >
-              <Picker.Item label="Select Day" value="" />
-              {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day, index) => (
-                <Picker.Item key={index} label={day} value={day} />
-              ))}
-            </Picker>
-          </View>
-
-          <View className="mb-4">
-            <Text className="text-gray-700 font-medium mb-2">Start Date</Text>
-            <TouchableOpacity onPress={() => setShowStartDatePicker(true)} className={`bg-white border ${savingCycleDetails.start_date.toLocaleDateString() === savingCycleDetails.saving_starting_day ? 'bg-green-300' : 'border-gray-300'} p-4 rounded-lg`}>
-              <Text>{savingCycleDetails.start_date.toLocaleDateString()}</Text>
-            </TouchableOpacity>
-            {showStartDatePicker && (
-              <DateTimePicker
-                value={savingCycleDetails.start_date}
-                mode="date"
-                onChange={(event, selectedDate) => {
-                  if (selectedDate) {
-                    handleInputChange("start_date", selectedDate);
-                  }
-                  setShowStartDatePicker(false);
-                }}
-              />
-            )}
-          </View>
-
-          <View className="mb-4">
-            <Text className="text-gray-700 font-medium mb-2">Shareout Date</Text>
-            <TouchableOpacity onPress={() => setShowShareoutDatePicker(true)} className={`bg-white border ${savingCycleDetails.shareout_date.toLocaleDateString() === savingCycleDetails.saving_starting_day ? 'bg-green-300' : 'border-gray-300'} p-4 rounded-lg`}>
-              <Text>{savingCycleDetails.shareout_date.toLocaleDateString()}</Text>
-            </TouchableOpacity>
-            {showShareoutDatePicker && (
-              <DateTimePicker
-                value={savingCycleDetails.shareout_date}
-                mode="date"
-                onChange={(event, selectedDate) => {
-                  if (selectedDate) {
-                    handleInputChange("shareout_date", selectedDate);
-                  }
-                  setShowShareoutDatePicker(false);
-                }}
-              />
-            )}
-          </View>
-        </>
+        <SavingCyclePickers 
+        handleInputChange={handleInputChange}
+        savingCycleDetails={savingCycleDetails}
+        setDayToClosestDate={setDayToClosestDate}
+        showStartDatePicker={showStartDatePicker}
+        setShowStartDatePicker={setShowStartDatePicker}
+        setShowShareoutDatePicker={setShowShareoutDatePicker}
+        showShareoutDatePicker={showShareoutDatePicker}
+        />
       );
     };
 
@@ -496,7 +372,7 @@ const GroupProfile = () => {
       </ScrollView>
     );
   };
-  
+
   return (
     <View className="flex-1 bg-gray-50">
       <StatusBar style="light" />
@@ -511,19 +387,44 @@ const GroupProfile = () => {
         <EnhancedLoader isLoading={true} message='Loading group details...' />
       ) : (
         <>
-          {currentView === "steps" ? renderSteps() : renderStepContent()}
-          {stepsCompleted && stepsCompleted.every((step) => step) && (
-            <View className="fixed items-center justify-center bottom-10 left-0 right-0 px-14 mx-4 p-4 z-10 bg-[#111827] rounded-lg">
-              <TouchableOpacity
-                onPress={handleUpdateGroup}
-                className=""
-              >
-                <Text className="text-white text-center font-semibold text-lg">
-                  {updateLoading ? <ActivityIndicator color="white" /> : "Update Saving Group"}
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )}
+          <View className="flex-row justify-around rounded-2xl bg-[#111827] mx-4 mt-4 py-1">
+            {/* Render Tab navigation */}
+            {single_group_dashbord_data.map((tab) => (
+              <SingleGroupTab
+                key={tab.id}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+                tab={tab}
+              />
+            ))}
+            {/* Render Tab Content based on the active tab */}
+          </View>
+          <View >
+            {activeTab === 'dashboard' && (
+              <SingleGroupDashboard
+                groupId={id}
+                groupName={groupProfile.name}
+              />
+            )}
+            {activeTab === 'setup' && (
+              <>
+                {currentView === "steps" ? renderSteps() : renderStepContent()}
+                {stepsCompleted && stepsCompleted.every((step) => step) && (
+                  <View className="fixed items-center justify-center bottom-2 left-0 right-0 px-14 mx-4 p-4 z-10 bg-[#111827] rounded-lg">
+                    <TouchableOpacity
+                      onPress={handleUpdateGroup}
+                      className=""
+                    >
+                      <Text className="text-white text-center font-semibold text-lg">
+                        {updateLoading ? <ActivityIndicator color="white" /> : "Update Saving Group"}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                )}
+              </>
+            )}
+          </View>
+
         </>
       )}
     </View>
