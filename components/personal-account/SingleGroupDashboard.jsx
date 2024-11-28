@@ -13,20 +13,16 @@ const SingleGroupDashboard = ({ groupId, groupName }) => {
       icon: Users,
       route: `member-profile/${groupId}`,
     },
-    { 
-      id: 'electOfficers', 
-      label: 'Elect Officers', 
-      icon: Award,
-      route: `officers/${groupId}`,
-    }
+    // { 
+    //   id: 'electOfficers', 
+    //   label: 'Elect Officers', 
+    //   icon: Award,
+    //   route: `officers/${groupId}`,
+    // }
   ];
 
   return (
     <View className="mx-4 mt-4">
-      <View className="mb-4">
-        <Text className="text-xl font-bold text-gray-800 mb-3">{groupName}</Text>
-      </View>
-      
       <View>
         {sections.map((section) => {
           const Icon = section.icon;

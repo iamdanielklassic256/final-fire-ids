@@ -10,7 +10,7 @@ import {
 import EnhancedLoader from '../../utils/EnhancedLoader';
 import MemberItem from './renderMemberItem';
 
-const GroupMemberSection = ({ groupId, onAddMember }) => {
+const GroupMemberSection = ({ groupId, groupMembers }) => {
 	const [loading, setLoading] = useState(true);
 	const [members, setMembers] = useState([]);
 	const [allMembers, setAllMembers] = useState([]);
@@ -19,6 +19,10 @@ const GroupMemberSection = ({ groupId, onAddMember }) => {
 	const [isAddMemberModalVisible, setIsAddMemberModalVisible] = useState(false);
 	const [addMemberLoading, setAddMemberLoading] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
+
+
+
+	console.log('Group Members', groupMembers)
 
 	useEffect(() => {
 		fetchAllGroupMembers();
@@ -138,19 +142,19 @@ const GroupMemberSection = ({ groupId, onAddMember }) => {
 
 	const renderAllMemberItem = ({ item }) => (
 		<TouchableOpacity
-        style={[
-            styles.memberItem,
-            selectedMember?.id === item.id && { backgroundColor: '#E0E0E0' }
-        ]}
-        onPress={() => handleMemberSelect(item)}
-    >
-        <View className="flex-row justify-between items-center">
-            <Text style={styles.memberName}>{getFullMemberName(item)}</Text>
-            {selectedMember?.id === item.id && (
-                <Text style={styles.selectedIndicator}>✓</Text>
-            )}
-        </View>
-    </TouchableOpacity>
+			style={[
+				styles.memberItem,
+				selectedMember?.id === item.id && { backgroundColor: '#E0E0E0' }
+			]}
+			onPress={() => handleMemberSelect(item)}
+		>
+			<View className="flex-row justify-between items-center">
+				<Text style={styles.memberName}>{getFullMemberName(item)}</Text>
+				{selectedMember?.id === item.id && (
+					<Text style={styles.selectedIndicator}>✓</Text>
+				)}
+			</View>
+		</TouchableOpacity>
 	);
 
 
@@ -164,12 +168,16 @@ const GroupMemberSection = ({ groupId, onAddMember }) => {
 		<View className="flex-1">
 			<View className="flex-row justify-between items-center p-4 bg-[#111827] mx-4 mt-2 rounded-lg border-b border-gray-200">
 				<Text className="text-lg font-bold text-white">Group Members ({members.length})</Text>
-				<TouchableOpacity
-					className="p-2"
-					onPress={handleAddNewGroupMember}
-				>
-					<UserPlus color="green" size={24} />
-				</TouchableOpacity>
+
+				{groupMembers.length !== 3 && (
+					<TouchableOpacity
+						className="p-2"
+						onPress={handleAddNewGroupMember}
+					>
+						<UserPlus color="green" size={24} />
+					</TouchableOpacity>
+				)}
+
 			</View>
 
 			<FlatList
@@ -177,7 +185,7 @@ const GroupMemberSection = ({ groupId, onAddMember }) => {
 				renderItem={({ item }) => (
 					<MemberItem
 						item={item}
-
+						groupMembers={groupMembers}
 						onRemove={() => handleRemoveMember(item.groupMemberId)}
 					/>
 				)}

@@ -67,6 +67,7 @@ const MemberProfile = () => {
 			) : (
 				<GroupMemberSection
 					groupId={id}
+					groupMembers={group.members}
 					onAddMember={handleAddNewGroupMember}
 				/>
 			)}
