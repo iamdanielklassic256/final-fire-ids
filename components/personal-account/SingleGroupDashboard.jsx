@@ -11,7 +11,7 @@ const SingleGroupDashboard = ({ groupId, groupName }) => {
       id: 'memberProfile', 
       label: 'Member Profile', 
       icon: Users,
-      route: `groupmember/${groupId}`,
+      route: `member-profile/${groupId}`,
     },
     { 
       id: 'memberPassbook', 

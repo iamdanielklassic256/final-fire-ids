@@ -130,6 +130,17 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="member-profile/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'simple_push',
+            contentStyle: {
+              backgroundColor: '#111827',
+            },
+          }}
+        />
+        <Stack.Screen
           name="group-wallet"
           options={{
             headerTitle: "Group Wallet",
