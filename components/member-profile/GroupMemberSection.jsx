@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Trash2, UserPlus } from 'lucide-react-native';
 import { all_members_in_a_group } from '../../api/api';
 import EnhancedLoader from '../../utils/EnhancedLoader';
+import MemberItem from './renderMemberItem';
 
 const GroupMemberSection = ({ groupId, onAddMember }) => {
 	const [loading, setLoading] = useState(true);
@@ -64,17 +65,7 @@ const GroupMemberSection = ({ groupId, onAddMember }) => {
 
 
 	const renderMemberItem = ({ item }) => (
-		<View className="flex-row justify-between items-center  px-4 py-3 border-b border-gray-200">
-			<View className="flex-1 mr-3">
-				<Text className="text-base font-bold">{item.name}</Text>
-			</View>
-			<TouchableOpacity
-				className="p-2"
-				onPress={() => handleRemoveMember(item.id)}
-			>
-				<Trash2 color="red" size={20} />
-			</TouchableOpacity>
-		</View>
+		<MemberItem item={item} />
 	);
 
 	console.log(members)
