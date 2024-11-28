@@ -14,12 +14,6 @@ const SingleGroupDashboard = ({ groupId, groupName }) => {
       route: `member-profile/${groupId}`,
     },
     { 
-      id: 'memberPassbook', 
-      label: 'Member Passbook', 
-      icon: BookOpen,
-      route: `passbook/${groupId}`,
-    },
-    { 
       id: 'electOfficers', 
       label: 'Elect Officers', 
       icon: Award,
