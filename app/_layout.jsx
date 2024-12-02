@@ -130,7 +130,29 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="wallet/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'simple_push',
+            contentStyle: {
+              backgroundColor: '#111827',
+            },
+          }}
+        />
+        <Stack.Screen
           name="member-profile/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'simple_push',
+            contentStyle: {
+              backgroundColor: '#111827',
+            },
+          }}
+        />
+        <Stack.Screen
+          name="officers/[id]"
           options={{
             headerShown: false,
             presentation: 'fullScreenModal',
@@ -183,70 +205,7 @@ export default function RootLayout() {
             },
           }}
         />
-        <Stack.Screen
-          name="wallet/wallet_type"
-          options={{
-            headerTitle: "Wallet Type",
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="wallet/add-wallet"
-          options={{
-            headerTitle: "Add New Group Wallet",
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
+        
         <Stack.Screen
           name="add-group"
           options={{

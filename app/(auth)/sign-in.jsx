@@ -70,6 +70,7 @@ const Login = () => {
         ? "Incorrect phone number or PIN code"
         : "An error occurred while logging in. Please try again.";
       Alert.alert("Login Failed", errorMessage);
+      console.log(errorMessage);
     } finally {
       setIsLoading(false);
     }

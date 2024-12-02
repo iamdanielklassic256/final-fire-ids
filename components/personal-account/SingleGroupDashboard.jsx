@@ -1,24 +1,31 @@
 import React from 'react'
 import { View, Text, TouchableOpacity } from 'react-native'
-import { Users, BookOpen, Award } from 'lucide-react-native'
+import { Users, BookOpen, Award, Wallet } from 'lucide-react-native'
 import { useRouter } from 'expo-router'
 
-const SingleGroupDashboard = ({ groupId, groupName }) => {
+const SingleGroupDashboard = ({ groupId }) => {
   const router = useRouter();
 
   const sections = [
+    { 
+      id: 'groupWallets', 
+      label: 'Group Wallet', 
+      icon: Wallet,
+      route: `wallet/${groupId}`,
+    },
     { 
       id: 'memberProfile', 
       label: 'Member Profile', 
       icon: Users,
       route: `member-profile/${groupId}`,
     },
-    // { 
-    //   id: 'electOfficers', 
-    //   label: 'Elect Officers', 
-    //   icon: Award,
-    //   route: `officers/${groupId}`,
-    // }
+    { 
+      id: 'electOfficers', 
+      label: 'Elect Officers', 
+      icon: Award,
+      route: `officers/${groupId}`,
+    }
+    
   ];
 
   return (

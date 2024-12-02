@@ -312,14 +312,14 @@ const GroupProfile = () => {
       };
 
       return (
-        <SavingCyclePickers 
-        handleInputChange={handleInputChange}
-        savingCycleDetails={savingCycleDetails}
-        setDayToClosestDate={setDayToClosestDate}
-        showStartDatePicker={showStartDatePicker}
-        setShowStartDatePicker={setShowStartDatePicker}
-        setShowShareoutDatePicker={setShowShareoutDatePicker}
-        showShareoutDatePicker={showShareoutDatePicker}
+        <SavingCyclePickers
+          handleInputChange={handleInputChange}
+          savingCycleDetails={savingCycleDetails}
+          setDayToClosestDate={setDayToClosestDate}
+          showStartDatePicker={showStartDatePicker}
+          setShowStartDatePicker={setShowStartDatePicker}
+          setShowShareoutDatePicker={setShowShareoutDatePicker}
+          showShareoutDatePicker={showShareoutDatePicker}
         />
       );
     };
@@ -373,6 +373,10 @@ const GroupProfile = () => {
     );
   };
 
+  if (loading) {
+    <EnhancedLoader isLoading={true} message='Loading group details...' />
+  }
+
   return (
     <View className="flex-1 bg-gray-50">
       <StatusBar style="light" />
@@ -383,10 +387,7 @@ const GroupProfile = () => {
         color="white"
         handlePress={() => router.back()}
       />
-      {loading ? (
-        <EnhancedLoader isLoading={true} message='Loading group details...' />
-      ) : (
-        <>
+      
           <View className="flex-row justify-around rounded-2xl bg-[#111827] mx-4 mt-4 py-1">
             {/* Render Tab navigation */}
             {single_group_dashbord_data.map((tab) => (
@@ -424,9 +425,6 @@ const GroupProfile = () => {
               </>
             )}
           </View>
-
-        </>
-      )}
     </View>
   );
 };

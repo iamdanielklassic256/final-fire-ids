@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, Alert, FlatList, TouchableOpacity, Modal, TextInput, StyleSheet, Platform } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
+import { View, Text, Alert, FlatList, TouchableOpacity, Modal, TextInput, StyleSheet, Platform, RefreshControl } from 'react-native';
 import axios from 'axios';
-import { UserPlus, X } from 'lucide-react-native';
+import { UserPlus, X, RefreshCw, AlertTriangle  } from 'lucide-react-native';
 import {
 	all_members_in_a_group,
 	all_members_url,
@@ -12,40 +12,53 @@ import MemberItem from './renderMemberItem';
 
 const GroupMemberSection = ({ groupId, groupMembers }) => {
 	const [loading, setLoading] = useState(true);
+	const [refreshing, setRefreshing] = useState(false);
 	const [members, setMembers] = useState([]);
 	const [allMembers, setAllMembers] = useState([]);
 	const [filteredAllMembers, setFilteredAllMembers] = useState([]);
 	const [selectedMember, setSelectedMember] = useState(null);
 	const [isAddMemberModalVisible, setIsAddMemberModalVisible] = useState(false);
 	const [addMemberLoading, setAddMemberLoading] = useState(false);
+	const [isMemberLimitModalVisible, setIsMemberLimitModalVisible] = useState(false);
 	const [searchQuery, setSearchQuery] = useState('');
 
-
-
-	console.log('Group Members', groupMembers)
-
-	useEffect(() => {
-		fetchAllGroupMembers();
-		fetchAllMembers();
-	}, [groupId]);
-
-	const fetchAllMembers = async () => {
-		setLoading(true);
+	// Consolidated fetch function for all data
+	const fetchAllData = useCallback(async () => {
 		try {
-			const response = await axios.get(all_members_url);
-			const all_members_data = response.data;
+			// Fetch group members and all members concurrently
+			const [groupMembersResponse, allMembersResponse] = await Promise.all([
+				axios.get(`${all_members_in_a_group}/${groupId}`),
+				axios.get(all_members_url)
+			]);
+
+			// Set group members
+			setMembers(groupMembersResponse.data.members || []);
+
+			// Set all members
+			const all_members_data = allMembersResponse.data;
 			if (all_members_data && all_members_data.data) {
 				setAllMembers(all_members_data.data);
 				setFilteredAllMembers(all_members_data.data);
 			}
-		}
-		catch (error) {
-			console.error("Error fetching all members details:", error);
-			Alert.alert("Error", "Failed to load all members details");
+		} catch (error) {
+			console.error("Error fetching data:", error);
+			Alert.alert("Error", "Failed to load members details");
 		} finally {
 			setLoading(false);
+			setRefreshing(false);
 		}
-	};
+	}, [groupId]);
+
+	// Initial data load
+	useEffect(() => {
+		fetchAllData();
+	}, [fetchAllData]);
+
+	// Pull to refresh handler
+	const onRefresh = useCallback(() => {
+		setRefreshing(true);
+		fetchAllData();
+	}, [fetchAllData]);
 
 	const getFullMemberName = (member) => {
 		const names = [member.first_name, member.last_name, member.other_name].filter(Boolean);
@@ -53,7 +66,6 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 	};
 
 	const handleMemberSelect = (member) => {
-		console.log('selecting a member:', member)
 		setSelectedMember(member);
 		setSearchQuery('');
 	};
@@ -72,21 +84,13 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 		}
 	}, [searchQuery, allMembers]);
 
-	const fetchAllGroupMembers = async () => {
-		setLoading(true);
-		try {
-			const response = await axios.get(`${all_members_in_a_group}/${groupId}`);
-			setMembers(response.data.members || []);
-		} catch (error) {
-			console.error("Error fetching group members details:", error);
-			Alert.alert("Error", "Failed to load group members details");
-		} finally {
-			setLoading(false);
-		}
-	};
-
 	const handleAddNewGroupMember = () => {
-		setIsAddMemberModalVisible(true);
+		// setIsAddMemberModalVisible(true);
+		if (members.length >= 3) {
+			setIsMemberLimitModalVisible(true);
+		} else {
+			setIsAddMemberModalVisible(true);
+		}
 	};
 
 	const submitNewMember = async () => {
@@ -103,7 +107,8 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 			});
 
 			if (response.data.member) {
-				setMembers(prevMembers => [...prevMembers, response.data.member]);
+				// Refresh all data after successfully adding a member
+				await fetchAllData();
 				setSelectedMember(null);
 				setIsAddMemberModalVisible(false);
 				Alert.alert("Success", "Member added successfully");
@@ -116,8 +121,7 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 		}
 	};
 
-	const handleRemoveMember = (groupMemberId) => {
-		console.log('hello!', groupMemberId);
+	const handleRemoveMember = async (groupMemberId) => {
 		Alert.alert(
 			"Remove Member",
 			"Are you sure you want to remove this member from the group?",
@@ -129,6 +133,8 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 					onPress: async () => {
 						try {
 							await axios.delete(`${saving_group_members_url}/${groupMemberId}`);
+							// Refresh data after removing member
+							await fetchAllData();
 							Alert.alert("Success", "Member removed successfully");
 						} catch (error) {
 							console.error("Error removing member:", error);
@@ -157,9 +163,6 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 		</TouchableOpacity>
 	);
 
-
-	console.log(members)
-
 	if (loading) {
 		return <EnhancedLoader isLoading={loading} message='Loading group members' />;
 	}
@@ -169,15 +172,23 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 			<View className="flex-row justify-between items-center p-4 bg-[#111827] mx-4 mt-2 rounded-lg border-b border-gray-200">
 				<Text className="text-lg font-bold text-white">Group Members ({members.length})</Text>
 
-				{groupMembers.length !== 3 && (
+				<View className="flex-row items-center">
 					<TouchableOpacity
-						className="p-2"
-						onPress={handleAddNewGroupMember}
+						className="p-2 mr-2"
+						onPress={onRefresh}
 					>
-						<UserPlus color="green" size={24} />
+						<RefreshCw color="white" size={24} />
 					</TouchableOpacity>
-				)}
 
+					{groupMembers.length !== 4 && (
+						<TouchableOpacity
+							className="p-2"
+							onPress={handleAddNewGroupMember}
+						>
+							<UserPlus color="green" size={24} />
+						</TouchableOpacity>
+					)}
+				</View>
 			</View>
 
 			<FlatList
@@ -190,6 +201,13 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 					/>
 				)}
 				keyExtractor={(item) => item.id.toString()}
+				refreshControl={
+					<RefreshControl
+						refreshing={refreshing}
+						onRefresh={onRefresh}
+						colors={['#9Bd35A', '#689F38']}
+					/>
+				}
 				ListEmptyComponent={
 					<Text className="text-center mt-5 text-gray-600">No members in this group</Text>
 				}
@@ -197,8 +215,38 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 			/>
 
 			<Modal
+				visible={isMemberLimitModalVisible}
+				transparent={true}
+				animationType="slide"
+				onRequestClose={() => setIsMemberLimitModalVisible(false)}
+			>
+				<View className="flex-1 justify-center items-center bg-black/50">
+					<View className="bg-white rounded-lg p-6 w-[85%]">
+						<View className="flex-row items-center justify-center mb-4">
+							<AlertTriangle color="red" size={32} />
+						</View>
+						<Text className="text-center text-xl font-bold mb-4 text-red-600">
+							Member Limit Reached
+						</Text>
+						<Text className="text-center text-base mb-6">
+							You can only add up to 3 members to this group.
+							Please you need to login as a group to add or remove more members.
+						</Text>
+						<TouchableOpacity
+							className="bg-[#028758] rounded-lg p-3"
+							onPress={() => setIsMemberLimitModalVisible(false)}
+						>
+							<Text className="text-white text-center text-base">
+								Understood
+							</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
+
+			<Modal
 				visible={isAddMemberModalVisible}
-				transparent={false}  // Change to false to take full screen
+				transparent={false}
 				animationType="slide"
 				onRequestClose={() => setIsAddMemberModalVisible(false)}
 			>
@@ -232,7 +280,6 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 						className={`rounded-lg p-3 bg-[#028758] m-4`}
 						onPress={submitNewMember}
 						disabled={!selectedMember || addMemberLoading}
-
 					>
 						{addMemberLoading ? (
 							<Text className="text-white text-center">Adding...</Text>
@@ -247,6 +294,7 @@ const GroupMemberSection = ({ groupId, groupMembers }) => {
 };
 
 export default GroupMemberSection;
+
 
 
 const styles = StyleSheet.create({
