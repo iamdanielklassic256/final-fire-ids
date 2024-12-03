@@ -7,25 +7,25 @@ const SingleGroupSection = ({ groupId }) => {
   const router = useRouter();
 
   const sections = [
-    { 
-      id: 'groupWallets', 
-      label: 'Group Wallet', 
+    {
+      id: 'groupWallets',
+      label: 'Group Wallet',
       icon: Wallet,
       route: `group-wallet/${groupId}`,
     },
-    { 
-      id: 'memberProfile', 
-      label: 'Member Profile', 
+    {
+      id: 'memberProfile',
+      label: 'Member Profile',
       icon: Users,
-      route: `group-member-profile/${groupId}`,
+      route: `group-member/${groupId}`,
     },
-    { 
-      id: 'electOfficers', 
-      label: 'Elect Officers', 
+    {
+      id: 'electOfficers',
+      label: 'Elect Officers',
       icon: Award,
       route: `group-officers/${groupId}`,
     }
-    
+
   ];
 
   return (
@@ -34,7 +34,7 @@ const SingleGroupSection = ({ groupId }) => {
         {sections.map((section) => {
           const Icon = section.icon;
           return (
-            <TouchableOpacity 
+            <TouchableOpacity
               key={section.id}
               className="flex-row items-center p-4 rounded-xl mb-4 bg-blue-50 border border-[#028758] shadow-sm"
               onPress={() => router.push(section.route)}

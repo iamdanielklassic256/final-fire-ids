@@ -119,6 +119,28 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
+          name="group-member/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'simple_push',
+            contentStyle: {
+              backgroundColor: '#111827',
+            },
+          }}
+        />
+        <Stack.Screen
+          name="group-officers/[id]"
+          options={{
+            headerShown: false,
+            presentation: 'fullScreenModal',
+            animation: 'simple_push',
+            contentStyle: {
+              backgroundColor: '#111827',
+            },
+          }}
+        />
+        <Stack.Screen
           name="group/invitation"
           options={{
             headerShown: false,
