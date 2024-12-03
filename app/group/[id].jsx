@@ -10,6 +10,7 @@ import GroupTab from '../../components/group-dashboard/GroupTab';
 import MainGroupDashboard from '../../components/group-dashboard/MainGroupDashboard';
 import GroupMeetingSection from '../../components/group-dashboard/meetings/GroupMeetingSection';
 import GroupProfile from '../../components/group-dashboard/profile/GroupProfile';
+import EnhancedLoader from '../../utils/EnhancedLoader';
 
 const SingleGroup = () => {
   const { id } = useLocalSearchParams();
@@ -67,7 +68,10 @@ const SingleGroup = () => {
     <View className="mt-4">
       <AkibaHeader
         message="You are most welcome"
-        title={`${group?.name} Saving Group`}
+        title={`${group?.name}`}
+        icon="arrow-back"
+        color="white"
+        handlePress={() => router.back()}
       />
     </View>
   );
@@ -101,9 +105,7 @@ const SingleGroup = () => {
 
   if (loading && !refreshing) {
     return (
-      <View className="flex-1 justify-center items-center bg-purple-50">
-        <ActivityIndicator size="large" color="#250048" />
-      </View>
+      <EnhancedLoader isLoading={loading} message='Loading group detail' />
     );
   }
 

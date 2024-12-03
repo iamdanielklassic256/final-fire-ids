@@ -156,7 +156,7 @@ const GroupWallet = () => {
 					}
 				/>
 			</View>
-			<Modal
+			{/* <Modal
 				visible={isModalVisible}
 				transparent={true}
 				animationType="slide"
@@ -180,7 +180,7 @@ const GroupWallet = () => {
 						<Button title="Close" onPress={closeModal} color="#689F38" />
 					</View>
 				</View>
-			</Modal>
+			</Modal> */}
 		</View>
 	)
 }

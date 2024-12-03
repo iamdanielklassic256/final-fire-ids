@@ -42,24 +42,26 @@ const GroupDashboardScreen = () => {
   }, []);
 
   const handleLogOut = async () => {
-		try {
-			await AsyncStorage.removeItem("group_information");
-			router.push("/group-login");
-		} catch (error) {
-			console.error("Error during logout:", error);
-		}
-	};
+    try {
+      await AsyncStorage.removeItem("group_information");
+      router.push("/group-login");
+    } catch (error) {
+      console.error("Error during logout:", error);
+    }
+  };
 
   const renderHeader = () => (
     <AkibaHeader
       message="Welcome to Akiba!"
       title="My Saving Groups"
       handleLogOut={handleLogOut}
+      icon="log-out"
+      color="white"
     />
   );
 
   const renderGroupCard = (group) => (
-    <GroupDashboardCard group={group} />
+    <GroupDashboardCard group={group} key={group.id} />
   );
 
   const renderGroups = () => (
