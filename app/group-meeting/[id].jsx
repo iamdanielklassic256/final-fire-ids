@@ -49,6 +49,8 @@ const SingleMeeting = () => {
 		);
 	}
 
+	console.log('Single Meeting Id', id)
+
 	return (
 		<View className="flex-1 bg-gray-50">
 			<StatusBar style="light" />

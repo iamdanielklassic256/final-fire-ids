@@ -14,8 +14,8 @@ const AkibaHeader = ({ title, message, icon, color, handlePress }) => {
 			</TouchableOpacity>
 			<View className="flex-row items-center gap-4">
 				<View className="ml-3 flex items-end">
-					<Text className="text-white font-bold text-[20px]">{title}</Text>
-					<Text className="text-white/70 text-end  text-[14px]">{message}</Text>
+					<Text className="text-white font-bold text-[18px]">{title}</Text>
+					<Text className="text-white/70 text-end  text-[13px]">{message}</Text>
 				</View>
 				
 				<View className="w-16 h-16 bg-[#028758] rounded-full items-center justify-center">
