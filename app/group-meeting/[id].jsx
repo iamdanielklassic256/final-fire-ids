@@ -5,20 +5,17 @@ import { group_meeting_url, saving_group_url } from '../../api/api';
 import { StatusBar } from 'expo-status-bar';
 import AkibaHeader from '../../components/AkibaHeader';
 import EnhancedLoader from '../../utils/EnhancedLoader';
+import MeetingSection from '../../components/meetings/MeetingSection';
 
 const SingleMeeting = () => {
 	const { id } = useLocalSearchParams();
 	const [meeting, setMeeting] = useState(null);
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(null);
-
 
 	useEffect(() => {
 		fetchSingleMeeting();
 	}, [id]);
-
-	console.log(id);
-
 
 	const fetchSingleMeeting = async () => {
 		try {
@@ -38,24 +35,35 @@ const SingleMeeting = () => {
 		}
 	};
 
-	// console.log(meeting?.name);
-
-
+	// If loading, return the loader
 	if (loading) {
-		<EnhancedLoader isLoading={loading} message='Loading meeting detail' />
-	  }
+		return <EnhancedLoader isLoading={loading} message='Loading meeting detail' />;
+	}
+
+	// Optional: Handle error state
+	if (error) {
+		return (
+			<View className="flex-1 justify-center items-center">
+				<Text className="text-red-500">{error}</Text>
+			</View>
+		);
+	}
 
 	return (
 		<View className="flex-1 bg-gray-50">
 			<StatusBar style="light" />
 			<AkibaHeader
-				title={`${meeting?.name}`}
+				title={meeting?.name || 'Meeting Details'}
 				message="Update your group meeting"
 				icon="arrow-back"
 				color="white"
 				handlePress={() => router.back()}
 			/>
-			
+			{meeting && (
+				<MeetingSection
+					meetingId={id}
+				/>
+			)}
 		</View>
 	)
 }
