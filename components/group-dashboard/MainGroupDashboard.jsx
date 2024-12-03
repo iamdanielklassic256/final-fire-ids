@@ -1,12 +1,11 @@
 import { View, Text } from 'react-native'
 import React from 'react'
+import SingleGroupSection from '../group-account/SingleGroupSection'
 
 const MainGroupDashboard = ({ group }) => {
 	return (
-		<View className="p-4">
-			<Text className="text-2xl font-bold">Group Dashboard</Text>
-			{/* Add dashboard specific content */}
-			<Text>{group?.name} Group Overview</Text>
+		<View className="p-0">
+			<SingleGroupSection groupId={group.id} />
 		</View>
 	)
 }
