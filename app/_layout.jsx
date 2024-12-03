@@ -4,6 +4,7 @@ import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -36,389 +37,392 @@ export default function RootLayout() {
 
   return (
     <>
-      {/* <Provider store={store}> */}
-      <Stack>
-        <Stack.Screen name="index" options={{ headerShown: false }} />
-        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-        <Stack.Screen
-          name="verify-phone"
-          options={{
-            headerTitle: "Phone Verification",
-            headerShown: false,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-
-        <Stack.Screen
-          name="verify-otp"
-          options={{
-            headerTitle: "Verify Code",
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group-wallet/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group-member/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group-officers/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group/invitation"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group/view-all"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="wallet/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="member-profile/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="officers/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#111827',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group-wallet"
-          options={{
-            headerTitle: "Group Wallet",
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'fullScreenModal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="dashboard"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              backgroundColor: '#111827', 
-            },
-          }}
-        />
+      <GestureHandlerRootView style={{ flex: 1 }}>
         
-        <Stack.Screen
-          name="add-group"
-          options={{
-            headerShown: false,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            // headerTintColor: '#ffffff',
-            presentation: 'fullScreenModal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              // backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="add-member"
-          options={{
-            headerTitle: "Create New Group Member",
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group-profile/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'slide_from_right',
-            contentStyle: {
-              backgroundColor: '#111827', 
-            },
-          }}
-        />
-        <Stack.Screen
-          name="group/[id]"
-          options={{
-            headerShown: false,
-            presentation: 'fullScreenModal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              backgroundColor: '#111827', 
-            },
-          }}
-        />
-        <Stack.Screen
-          name="meetings/[id]"
-          options={{
-            headerShown: true,
-            headerTitle: "GroupMeetings",
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="meetings/meeting/[id]"
-          options={{
-            headerTitle: "Meetings",
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
-        <Stack.Screen
-          name="meetings/meetings"
-          options={{
-            headerTitle: "Meetings",
-            headerShown: true,
-            headerTitleStyle: {
-              fontFamily: 'Poppins-SemiBold',
-              fontSize: 20,
-            },
-            headerLeft: () => (
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color="#ffffff"
-                style={{ marginLeft: 15 }}
-                onPress={() => {
-                  router.back();
-                  console.log("Go back");
-                }}
-              />
-            ),
-            headerStyle: {
-              backgroundColor: '#250048',
-            },
-            headerTintColor: '#ffffff',
-            presentation: 'modal',
-            animation: 'simple_push',
-            contentStyle: {
-              backgroundColor: '#FFFFFF',
-            },
-          }}
-        />
+        {/* <Provider store={store}> */}
+        <Stack>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
-      </Stack>
+          <Stack.Screen
+            name="verify-phone"
+            options={{
+              headerTitle: "Phone Verification",
+              headerShown: false,
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              headerStyle: {
+                backgroundColor: '#250048',
+              },
+              headerTintColor: '#ffffff',
+              presentation: 'modal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+
+          <Stack.Screen
+            name="verify-otp"
+            options={{
+              headerTitle: "Verify Code",
+              headerShown: true,
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              headerStyle: {
+                backgroundColor: '#250048',
+              },
+              headerTintColor: '#ffffff',
+              presentation: 'modal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group-wallet/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group-member/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group-officers/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group/invitation"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group/view-all"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="wallet/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="member-profile/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="officers/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group-wallet"
+            options={{
+              headerTitle: "Group Wallet",
+              headerShown: true,
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              headerStyle: {
+                backgroundColor: '#250048',
+              },
+              headerTintColor: '#ffffff',
+              presentation: 'fullScreenModal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="dashboard"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+
+          <Stack.Screen
+            name="add-group"
+            options={{
+              headerShown: false,
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              // headerTintColor: '#ffffff',
+              presentation: 'fullScreenModal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                // backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="add-member"
+            options={{
+              headerTitle: "Create New Group Member",
+              headerShown: true,
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              headerStyle: {
+                backgroundColor: '#250048',
+              },
+              headerTintColor: '#ffffff',
+              presentation: 'modal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group-profile/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'slide_from_right',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="group/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="meetings/[id]"
+            options={{
+              headerShown: true,
+              headerTitle: "GroupMeetings",
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              headerStyle: {
+                backgroundColor: '#250048',
+              },
+              headerTintColor: '#ffffff',
+              presentation: 'modal',
+              animation: 'slide_from_bottom',
+              contentStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="meetings/meeting/[id]"
+            options={{
+              headerTitle: "Meetings",
+              headerShown: true,
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              headerStyle: {
+                backgroundColor: '#250048',
+              },
+              headerTintColor: '#ffffff',
+              presentation: 'modal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+          <Stack.Screen
+            name="meetings/meetings"
+            options={{
+              headerTitle: "Meetings",
+              headerShown: true,
+              headerTitleStyle: {
+                fontFamily: 'Poppins-SemiBold',
+                fontSize: 20,
+              },
+              headerLeft: () => (
+                <Ionicons
+                  name="arrow-back"
+                  size={24}
+                  color="#ffffff"
+                  style={{ marginLeft: 15 }}
+                  onPress={() => {
+                    router.back();
+                    console.log("Go back");
+                  }}
+                />
+              ),
+              headerStyle: {
+                backgroundColor: '#250048',
+              },
+              headerTintColor: '#ffffff',
+              presentation: 'modal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#FFFFFF',
+              },
+            }}
+          />
+
+        </Stack>
+      </GestureHandlerRootView>
       {/* </Provider> */}
     </>
   );

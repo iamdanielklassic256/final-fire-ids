@@ -60,8 +60,10 @@ const SingleGroup = () => {
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
+    setLoading(true)
     await fetchGroupDetails();
     setRefreshing(false);
+    setLoading(false)
   }, [id]);
 
   const renderHeader = () => (
@@ -85,7 +87,7 @@ const SingleGroup = () => {
         );
       case 'meetings':
         return (
-          <GroupMeetingSection />
+          <GroupMeetingSection groupId={group.id} />
         );
       case 'group-profile':
         return (
