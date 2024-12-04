@@ -3,6 +3,7 @@ import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react
 import { group_join_request_url, join_request_url } from '../../api/api';
 import Loader from '../Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import EnhancedLoader from '../../utils/EnhancedLoader';
 
 const GroupJoinRequests = ({ groupId, group, currentMemberId }) => {
 	const [joinRequests, setJoinRequests] = useState([]);
@@ -12,8 +13,6 @@ const GroupJoinRequests = ({ groupId, group, currentMemberId }) => {
 
 	console.log('group creator: ', group)
 	// console.log('current member: ', currentMemberId)
-
-	const GroupCreatorId = group.created_by
 
 
 
@@ -117,7 +116,7 @@ const GroupJoinRequests = ({ groupId, group, currentMemberId }) => {
 					<Text style={styles.requestDate}>Requested: {formatDate(item.createdAt)}</Text>
 				</View>
 			</View>
-			{member?.id === GroupCreatorId && (
+		
 				<View style={styles.actionButtons}>
 					<TouchableOpacity style={[styles.button, styles.acceptButton]} onPress={() => handleAccept(item.id)}>
 						<Text style={styles.buttonText}>Accept</Text>
@@ -126,17 +125,15 @@ const GroupJoinRequests = ({ groupId, group, currentMemberId }) => {
 						<Text style={styles.buttonText}>Reject</Text>
 					</TouchableOpacity>
 				</View>
-			)}
+		
 		</View>
 	);
 
 	if (loading) {
-		return <Loader isLoading={loading} size={40} color="#007AFF" />;
+		return <EnhancedLoader isLoading={loading} message='Loading group join requests...' />;
 	}
-
 	return (
 		<View style={styles.container}>
-			<Text style={styles.title}>Join Requests</Text>
 			{joinRequests.length === 0 ? (
 				<Text style={styles.emptyText}>No pending join requests</Text>
 			) : (
