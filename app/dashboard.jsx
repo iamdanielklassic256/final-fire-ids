@@ -54,7 +54,7 @@ const GroupDashboardScreen = () => {
     <AkibaHeader
       message="Welcome to Akiba!"
       title="My Saving Groups"
-      handleLogOut={handleLogOut}
+      handlePress={handleLogOut}
       icon="log-out"
       color="white"
     />

@@ -24,7 +24,13 @@ const SingleGroupDashboard = ({ groupId }) => {
       label: 'Elect Officers', 
       icon: Award,
       route: `officers/${groupId}`,
-    }
+    },
+    { 
+      id: 'requestLoan', 
+      label: 'Transactions', 
+      icon: Award,
+      route: `loan-request/${groupId}`,
+    },
     
   ];
 

@@ -9,6 +9,7 @@ import { group_money_request_url, group_transaction_url, member_group_wallet_url
 import NoTransaction from '../../components/account/NoTransaction';
 import MoneyRequestModal from '../../components/account/MoneyRequestModal';
 import DepositModal from '../../components/account/DepositModal';
+import EnhancedLoader from '../../utils/EnhancedLoader';
 
 
 const AccountScreen = () => {
@@ -71,7 +72,6 @@ const AccountScreen = () => {
 	useEffect(() => {
 		if (member && member.id) {
 			fetchMemberTransactions(member.id);
-			fetchAllGroupWallets();
 			fetchGroupMoneyRequests()
 		}
 	}, [member]);
@@ -131,7 +131,8 @@ const AccountScreen = () => {
 	const fetchMemberTransactions = async (memberId) => {
 		try {
 			setIsLoading(true);
-			const response = await fetch(`${member_transaction_url}/${memberId}`);
+			const response = await fetch(`${member_transaction_url}/member/${memberId}/transactions`);
+			console.log('response', response)
 			if (response.ok) {
 				const data = await response.json();
 				setTransactions(data || []);
@@ -147,39 +148,20 @@ const AccountScreen = () => {
 	};
 
 	const renderTransactionItem = ({ item }) => {
-		const isDeposit = item.transType === 'deposit';
 		return (
-			<LinearGradient
-				colors={isDeposit ? ['#00E394', '#00B377'] : ['#FF6B6B', '#FF3E3E']}
-				style={[styles.transactionItem, styles.transactionShadow]}
-				className="mx-4"
-			>
-				<View style={styles.transactionHeader}>
-					<Text style={styles.transactionAmount}>
-						{isDeposit ? 'Deposit' : 'Withdraw'}{' '}
-						<Text style={styles.currencySymbol}>
-							{item?.wallet?.group?.group_currency || 'UGX'}
-						</Text>{' '}
-						{Math.abs(parseFloat(item.amount)).toFixed(2)}
-					</Text>
-					<Ionicons
-						name={isDeposit ? 'arrow-up-circle' : 'arrow-down-circle'}
-						size={28}
-						color="#fff"
-					/>
-				</View>
-				<Text style={styles.transactionReason}>{item.reason}</Text>
-				<View style={styles.transactionDetails}>
-					<Text style={styles.transactionDate}>
-						{new Date(item.createdAt).toLocaleDateString()}
-					</Text>
-					<Text style={styles.transactionWallet}>
-						{item.wallet?.group?.name || 'Unknown Wallet'}
-					</Text>
-				</View>
-			</LinearGradient>
+			<View className="bg-gray-100 rounded-lg p-4 shadow-md my-0.5 mx-4">
+                <View className="flex-row justify-between mb-2">
+                    <Text className="font-semibold text-gray-700">Wallet name:</Text>
+                    <Text className="text-gray-600">{item.wallet.name}</Text>
+                </View>
+                <View className="flex-row justify-between mb-2">
+                    <Text className="font-semibold text-gray-700">Amount:</Text>
+                    <Text className="text-gray-600">UGX {item.amount}</Text>
+                </View>
+            </View>
 		);
 	};
+	
 
 
 	const onRefresh = React.useCallback(() => {
@@ -237,61 +219,10 @@ const AccountScreen = () => {
 
 
 
-	const renderDepositModal = () => (
-		<Modal
-			animationType="slide"
-			transparent={true}
-			visible={isDepositModalVisible}
-			onRequestClose={() => setIsDepositModalVisible(false)}
-		>
-			<View style={styles.modalContainer}>
-				<View style={styles.modalContent}>
-					<Text style={styles.modalTitle}>Make a Deposit</Text>
-					<Picker
-						selectedValue={selectedWalletId}
-						style={styles.picker}
-						onValueChange={(itemValue) => setSelectedWalletId(itemValue)}
-					>
-						{wallets.map((wallet) => (
-							<Picker.Item key={wallet.id} label={wallet?.group.name} value={wallet.id} />
-						))}
-					</Picker>
-					<TextInput
-						style={styles.input}
-						placeholder="Amount"
-						keyboardType="numeric"
-						value={depositAmount}
-						onChangeText={setDepositAmount}
-					/>
-					<TextInput
-						style={styles.input}
-						placeholder="Reason"
-						value={depositReason}
-						onChangeText={setDepositReason}
-					/>
-					<TouchableOpacity
-						style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
-						onPress={submitDeposit}
-						disabled={isLoading}
-					>
-						{isLoading ? (
-							<ActivityIndicator size="small" color="#ffffff" />
-						) : (
-							<Text style={styles.submitButtonText}>Submit Deposit</Text>
-						)}
-					</TouchableOpacity>
-					<TouchableOpacity
-						style={styles.cancelButton}
-						onPress={() => setIsDepositModalVisible(false)}
-						className="bg-red-500"
-					>
-						<Text style={styles.cancelButtonText} >Cancel</Text>
-					</TouchableOpacity>
-				</View>
-			</View>
-		</Modal>
-	);
+	
+console.log('member transactions:', member?.id)
 
+console.log(transactions)
 
 
 
@@ -356,16 +287,6 @@ const AccountScreen = () => {
 
 	const renderHeader = () => (
 		<>
-			<LinearGradient
-				colors={['#00E394', '#00B377']}
-				style={styles.header}
-			>
-				<View>
-					<Text style={styles.balanceTitle}>Account Balance</Text>
-					<Text style={styles.balanceAmount}>UGX 1,000,000</Text>
-				</View>
-			</LinearGradient>
-
 			<View style={styles.cardContainer}>
 				<LinearGradient
 					colors={['#4c669f', '#3b5998', '#192f6a']}
@@ -390,6 +311,7 @@ const AccountScreen = () => {
 	const renderContent = () => {
 		if (activeTab === 'transactions') {
 			return (
+				<>
 				<FlatList
 					data={transactions}
 					renderItem={renderTransactionItem}
@@ -401,6 +323,7 @@ const AccountScreen = () => {
 					}
 					ListHeaderComponent={renderHeader}
 				/>
+				</>
 			);
 		} else {
 			return (
@@ -424,15 +347,15 @@ const AccountScreen = () => {
 
 	return (
 		<SafeAreaView style={styles.container}>
-			<Loader isLoading={isLoading} />
+		<EnhancedLoader isLoading={isLoading} message='Loading transaction...' />
 			{renderContent()}
-			<DepositModal
+			{/* <DepositModal
 				isVisible={isDepositModalVisible}
 				onClose={() => setIsDepositModalVisible(false)}
 				onSubmit={submitDeposit}
 				wallets={wallets}
 				isLoading={isLoading}
-			/>
+			/> */}
 			{/* {renderWithdrawModal()} */}
 			<MoneyRequestModal
 				isVisible={isMoneyRequestModalVisible}
