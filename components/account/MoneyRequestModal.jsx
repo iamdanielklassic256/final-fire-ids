@@ -11,21 +11,18 @@ import {
 } from 'react-native';
 import { Picker } from '@react-native-picker/picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
-import { all_savings_groups_by_member_id, groupid_payment_duration_url } from '../../api/api';
+import { all_savings_groups_by_member_id } from '../../api/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const MoneyRequestModal = ({ isVisible, onClose, onSubmit }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [member, setMember] = useState(null);
   const [groups, setGroups] = useState([]);
-  const [durations, setDurations] = useState([]);
   const [error, setError] = useState(null);
-  const [isEmpty, setIsEmpty] = useState(false);
 
   const [selectedGroup, setSelectedGroup] = useState('');
   const [reason, setReason] = useState('');
   const [amountRequested, setAmountRequested] = useState('');
-  const [selectedDuration, setSelectedDuration] = useState('');
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [showStartDatePicker, setShowStartDatePicker] = useState(false);
@@ -41,11 +38,6 @@ const MoneyRequestModal = ({ isVisible, onClose, onSubmit }) => {
     }
   }, [member]);
 
-  useEffect(() => {
-    if (selectedGroup) {
-      fetchDurations(selectedGroup);
-    }
-  }, [selectedGroup]);
 
  
 
@@ -62,31 +54,6 @@ const MoneyRequestModal = ({ isVisible, onClose, onSubmit }) => {
     }
   };
 
-  const fetchDurations = async (groupId) => {
-    setIsLoading(true);
-    setError(null);
-    setIsEmpty(false);
-    try {
-      const response = await fetch(`${groupid_payment_duration_url}/${groupId}`);
-      if (response.ok) {
-        const data = await response.json();
-        setDurations(data.data);
-        setIsEmpty(data.data.length === 0);
-      } else if (response.status === 404) {
-        const errorData = await response.json();
-        console.log('No durations found:', errorData.message);
-        setIsEmpty(true);
-        setDurations([]);
-      } else {
-        throw new Error('Failed to fetch payment durations');
-      }
-    } catch (error) {
-      console.error('Error fetching durations:', error);
-      setError('Failed to fetch payment durations. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const fetchAllSavingGroups = async () => {
     try {
@@ -110,7 +77,6 @@ const MoneyRequestModal = ({ isVisible, onClose, onSubmit }) => {
       reason,
       requestedBy: member?.id,
       amount_requested: amountRequested,
-      duration_id: selectedDuration,
       start_on: startDate.toISOString(),
       end_on: endDate.toISOString(),
       status: 'pending'
@@ -180,20 +146,10 @@ const MoneyRequestModal = ({ isVisible, onClose, onSubmit }) => {
             onChangeText={setAmountRequested}
           />
 
-          <Text style={styles.label}>Duration</Text>
-          <Picker
-            selectedValue={selectedDuration}
-            onValueChange={(itemValue) => setSelectedDuration(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Select a duration" value="" />
-            {durations.map((duration) => (
-              <Picker.Item key={duration.id} label={duration.name} value={duration.id} />
-            ))}
-          </Picker>
+         
 
-          {renderDatePicker(startDate, setStartDate, showStartDatePicker, setShowStartDatePicker, "Start Date")}
-          {renderDatePicker(endDate, setEndDate, showEndDatePicker, setShowEndDatePicker, "End Date")}
+          {/* {renderDatePicker(startDate, setStartDate, showStartDatePicker, setShowStartDatePicker, "Start Date")}
+          {renderDatePicker(endDate, setEndDate, showEndDatePicker, setShowEndDatePicker, "End Date")} */}
           <TouchableOpacity
             style={[styles.button, isLoading && styles.disabledButton]}
             onPress={handleSubmit}
@@ -280,7 +236,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
   },
   button: {
-    backgroundColor: '#6B46C1',
+    backgroundColor: '#028758',
     borderRadius: 8,
     paddingVertical: 16,
     marginBottom: 16,

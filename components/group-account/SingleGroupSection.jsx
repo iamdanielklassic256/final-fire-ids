@@ -36,8 +36,7 @@ const SingleGroupSection = ({ groupId }) => {
       label: 'Group Joint Request',
       icon: Award,
       route: `group-join-request/${groupId}`,
-    },
-
+    }
   ];
 
   return (

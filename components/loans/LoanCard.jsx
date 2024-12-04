@@ -5,6 +5,7 @@ import moment from 'moment';
 import { formatMemberName } from '../../utils/formatName';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { group_money_request_approval_url, group_money_request_url } from '../../api/api';
+import EnhancedLoader from '../../utils/EnhancedLoader';
 
 const LoanCard = ({ loan, onStatusUpdate }) => {
 	const [member, setMember] = useState(null);
@@ -92,7 +93,7 @@ const LoanCard = ({ loan, onStatusUpdate }) => {
 			<>
 				<TouchableOpacity style={styles.actionButton} onPress={handleApprove} disabled={isApproving}>
 					{isApproving ? (
-						<ActivityIndicator size="small" color="white" />
+						<EnhancedLoader isLoading={isApproving} message='Aproving loan request...' />
 					) : (
 						<>
 							<FontAwesome5 name="check" size={18} color="white" />
@@ -106,7 +107,7 @@ const LoanCard = ({ loan, onStatusUpdate }) => {
 					disabled={isRejecting}
 				>
 					{isRejecting ? (
-						<ActivityIndicator size="small" color="white" />
+						<EnhancedLoader isLoading={isRejecting} message='Declining loan request...' />
 					) : (
 						<>
 							<FontAwesome5 name="times" size={18} color="white" />
@@ -138,7 +139,7 @@ const LoanCard = ({ loan, onStatusUpdate }) => {
 			</View>
 			<View style={styles.body}>
 				<Text style={styles.details}>Reason: {loan.reason}</Text>
-				<Text style={styles.details}>Duration: {loan.duration.name}</Text>
+				{/* <Text style={styles.details}>Duration: {loan.duration.name}</Text> */}
 			</View>
 			<View style={styles.footer}>
 				{renderActionButtons()}

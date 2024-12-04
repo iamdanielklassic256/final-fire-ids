@@ -61,7 +61,6 @@ const GroupJoinRequestScreen = () => {
 				color="white"
 				handlePress={() => router.back()}
 			/>
-			{/* <GroupInvitation groupId={id}/> */}
 			<GroupJoinRequests groupId={id} group={group} />
 		</View>
   )

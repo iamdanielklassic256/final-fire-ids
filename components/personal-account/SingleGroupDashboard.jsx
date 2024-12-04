@@ -31,6 +31,12 @@ const SingleGroupDashboard = ({ groupId }) => {
       icon: Award,
       route: `loan-request/${groupId}`,
     },
+    { 
+      id: 'loanApproval', 
+      label: 'Loan Approval', 
+      icon: Award,
+      route: `loan-approval/${groupId}`,
+    },
     
   ];
 

@@ -4,6 +4,7 @@ import { group_money_request_url } from '../../api/api';
 import Loader from '../Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LoanCard from './LoanCard';
+import EnhancedLoader from '../../utils/EnhancedLoader';
 
 const GroupLoans = ({ groupId, group }) => {
 	const [requests, setRequests] = useState([]);
@@ -15,7 +16,7 @@ const GroupLoans = ({ groupId, group }) => {
 
 
 
-	// console.log('group creator: ', group)
+	// console.log('group creator: ', groupId)
 	// console.log('current member: ', currentMemberId)
 
 	const GroupCreatorId = group.created_by
@@ -45,12 +46,12 @@ const GroupLoans = ({ groupId, group }) => {
 		try {
 			setLoading(true);
 			const response = await fetch(`${group_money_request_url}/group/${groupId}`);
-			if (response.ok) {
+			// if (response.status === 200) {
 				const data = await response.json();
-				setRequests(data.data);
-			} else {
-				throw new Error('Failed to fetch join requests');
-			}
+				setRequests(data?.data);
+			// } else {
+			// 	throw new Error('Failed to fetch join requests');
+			// }
 		} catch (error) {
 			console.error('Error fetching join requests:', error);
 			Alert.alert('Error', 'Failed to load join requests');
@@ -59,13 +60,16 @@ const GroupLoans = ({ groupId, group }) => {
 		}
 	};
 
+	if (loading) {
+		<EnhancedLoader isLoading={loading} message='Loading loans...' />
+	  }
+
+	  console.log(requests)
+
 
 
 	return (
 		<View>
-			{loading ? (
-				<Loader />
-			) : (
 				<FlatList
 					data={requests}
 					keyExtractor={(item) => item.id}
@@ -76,7 +80,7 @@ const GroupLoans = ({ groupId, group }) => {
 					contentContainerStyle={styles.container}
 
 				/>
-			)}
+
 		</View>
 	)
 }

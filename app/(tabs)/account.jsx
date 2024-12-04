@@ -1,14 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal, TextInput, Alert, SafeAreaView, ActivityIndicator, FlatList } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl, Modal, TextInput, Alert, SafeAreaView, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
-import Loader from '../../components/Loader';
-import { Picker } from '@react-native-picker/picker';
 import { group_money_request_url, group_transaction_url, member_group_wallet_url, member_transaction_url } from '../../api/api';
 import NoTransaction from '../../components/account/NoTransaction';
 import MoneyRequestModal from '../../components/account/MoneyRequestModal';
-import DepositModal from '../../components/account/DepositModal';
 import EnhancedLoader from '../../utils/EnhancedLoader';
 
 
@@ -132,7 +129,7 @@ const AccountScreen = () => {
 		try {
 			setIsLoading(true);
 			const response = await fetch(`${member_transaction_url}/member/${memberId}/transactions`);
-			console.log('response', response)
+			// console.log('response', response)
 			if (response.ok) {
 				const data = await response.json();
 				setTransactions(data || []);
@@ -150,18 +147,18 @@ const AccountScreen = () => {
 	const renderTransactionItem = ({ item }) => {
 		return (
 			<View className="bg-gray-100 rounded-lg p-4 shadow-md my-0.5 mx-4">
-                <View className="flex-row justify-between mb-2">
-                    <Text className="font-semibold text-gray-700">Wallet name:</Text>
-                    <Text className="text-gray-600">{item.wallet.name}</Text>
-                </View>
-                <View className="flex-row justify-between mb-2">
-                    <Text className="font-semibold text-gray-700">Amount:</Text>
-                    <Text className="text-gray-600">UGX {item.amount}</Text>
-                </View>
-            </View>
+				<View className="flex-row justify-between mb-2">
+					<Text className="font-semibold text-gray-700">Wallet name:</Text>
+					<Text className="text-gray-600">{item.wallet.name}</Text>
+				</View>
+				<View className="flex-row justify-between mb-2">
+					<Text className="font-semibold text-gray-700">Amount:</Text>
+					<Text className="text-gray-600">UGX {item.amount}</Text>
+				</View>
+			</View>
 		);
 	};
-	
+
 
 
 	const onRefresh = React.useCallback(() => {
@@ -170,62 +167,6 @@ const AccountScreen = () => {
 			setRefreshing(false);
 		});
 	}, [member]);
-
-
-	const handleDeposit = () => {
-		if (wallets.length === 0) {
-			Alert.alert('Error', 'No wallets available. Please create a wallet first.');
-			return;
-		}
-		setIsDepositModalVisible(true);
-	};
-
-
-
-
-
-	const submitDeposit = async (depositData) => {
-		try {
-			setIsLoading(true);
-			const response = await fetch(group_transaction_url, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					walletId: depositData.walletId,
-					transType: 'deposit',
-					createdBy: member.id,
-					amount: depositData.amount,
-					reason: depositData.reason,
-				}),
-			});
-
-			if (response.ok) {
-				Alert.alert('Success', 'Deposit successful');
-				setIsDepositModalVisible(false);
-				fetchMemberTransactions(member.id);
-			} else {
-				throw new Error('Deposit failed');
-			}
-		} catch (error) {
-			console.error('Error making deposit:', error);
-			Alert.alert('Error', 'Failed to make deposit. Please try again.');
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
-
-
-
-	
-console.log('member transactions:', member?.id)
-
-console.log(transactions)
-
-
-
 
 	if (error) {
 		return (
@@ -236,8 +177,6 @@ console.log(transactions)
 	}
 
 
-
-
 	const renderMoneyRequestItem = ({ item }) => {
 		const statusColors = {
 			pending: '#FFA500',
@@ -246,10 +185,7 @@ console.log(transactions)
 		};
 
 		return (
-			<LinearGradient
-				colors={['#F0F0F0', '#E0E0E0']}
-				style={[styles.moneyRequestItem, styles.transactionShadow]}
-			>
+			<View className="bg-[#028758] mx-4 rounded-lg p-3">
 				<View style={styles.moneyRequestHeader}>
 					<Text style={styles.moneyRequestAmount}>
 						<Text style={styles.currencySymbol}>UGX </Text>
@@ -264,7 +200,7 @@ console.log(transactions)
 				<Text style={styles.moneyRequestDate}>
 					{new Date(item.createdAt).toLocaleDateString()}
 				</Text>
-			</LinearGradient>
+			</View>
 		);
 	};
 
@@ -287,22 +223,12 @@ console.log(transactions)
 
 	const renderHeader = () => (
 		<>
-			<View style={styles.cardContainer}>
-				<LinearGradient
-					colors={['#4c669f', '#3b5998', '#192f6a']}
-					style={styles.card}
-				>
-					<View style={styles.cardContent}>
-						<TouchableOpacity style={styles.actionButton} onPress={handleDeposit}>
-							<Ionicons name="arrow-up-circle-outline" size={24} color="#00B377" />
-							<Text style={styles.actionText}>Deposit</Text>
-						</TouchableOpacity>
-						<TouchableOpacity style={styles.actionButton} onPress={handleMoneyRequest}>
-							<Ionicons name="arrow-down-circle-outline" size={24} color="#FF3E3E" />
-							<Text style={styles.actionText}>Make  Request</Text>
-						</TouchableOpacity>
-					</View>
-				</LinearGradient>
+			<View className="bg-[#111827] mx-4 p-3 rounded-lg mt-5 mb-5">
+
+				<TouchableOpacity className="flex-row items-center justify-center gap-2" onPress={handleMoneyRequest}>
+					<Ionicons name="arrow-down-circle-outline" size={24} color="#fff" />
+					<Text className="text-lg text-white font-bold">Make  Request</Text>
+				</TouchableOpacity>
 			</View>
 			{renderTabs()}
 		</>
@@ -312,51 +238,45 @@ console.log(transactions)
 		if (activeTab === 'transactions') {
 			return (
 				<>
-				<FlatList
-					data={transactions}
-					renderItem={renderTransactionItem}
-					keyExtractor={(item) => item.id.toString()}
-					contentContainerStyle={styles.listContent}
-					ListEmptyComponent={<Text style={styles.noDataText}>No transactions found.</Text>}
-					refreshControl={
-						<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-					}
-					ListHeaderComponent={renderHeader}
-				/>
+					<FlatList
+						data={transactions}
+						renderItem={renderTransactionItem}
+						keyExtractor={(item) => item.id.toString()}
+						contentContainerStyle={styles.listContent}
+						ListEmptyComponent={<Text style={styles.noDataText}>No transactions found.</Text>}
+						refreshControl={
+							<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+						}
+						ListHeaderComponent={renderHeader}
+					/>
 				</>
 			);
 		} else {
 			return (
-				<FlatList
-					data={moneyRequests}
-					renderItem={renderMoneyRequestItem}
-					keyExtractor={(item) => item.id.toString()}
-					contentContainerStyle={styles.listContent}
-					ListEmptyComponent={<NoTransaction />}
-					refreshControl={
-						<RefreshControl
-							refreshing={refreshing}
-							onRefresh={onRefresh}
-						/>
-					}
-					ListHeaderComponent={renderHeader}
-				/>
+				<View className="space-y-4">
+					<FlatList
+						data={moneyRequests}
+						renderItem={renderMoneyRequestItem}
+						keyExtractor={(item) => item.id.toString()}
+						contentContainerStyle={styles.listContent}
+						ListEmptyComponent={<NoTransaction />}
+						refreshControl={
+							<RefreshControl
+								refreshing={refreshing}
+								onRefresh={onRefresh}
+							/>
+						}
+						ListHeaderComponent={renderHeader}
+					/>
+				</View>
 			);
 		}
 	};
 
 	return (
 		<SafeAreaView style={styles.container}>
-		<EnhancedLoader isLoading={isLoading} message='Loading transaction...' />
+			<EnhancedLoader isLoading={isLoading} message='Loading transaction...' />
 			{renderContent()}
-			{/* <DepositModal
-				isVisible={isDepositModalVisible}
-				onClose={() => setIsDepositModalVisible(false)}
-				onSubmit={submitDeposit}
-				wallets={wallets}
-				isLoading={isLoading}
-			/> */}
-			{/* {renderWithdrawModal()} */}
 			<MoneyRequestModal
 				isVisible={isMoneyRequestModalVisible}
 				onClose={() => setIsMoneyRequestModalVisible(false)}
@@ -401,7 +321,7 @@ const styles = StyleSheet.create({
 		shadowRadius: 3.84,
 	},
 	cardContent: {
-		flexDirection: 'row',
+		flexDirection: 'col',
 		justifyContent: 'space-around',
 	},
 	actionButton: {

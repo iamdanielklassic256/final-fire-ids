@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Alert, StyleSheet } from 'react-native';
 import { group_join_request_url, join_request_url } from '../../api/api';
-import Loader from '../Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import EnhancedLoader from '../../utils/EnhancedLoader';
 

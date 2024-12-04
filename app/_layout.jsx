@@ -188,6 +188,17 @@ export default function RootLayout() {
             }}
           />
           <Stack.Screen
+            name="loan-approval/[id]"
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',
+              animation: 'simple_push',
+              contentStyle: {
+                backgroundColor: '#111827',
+              },
+            }}
+          />
+          <Stack.Screen
             name="group-member/[id]"
             options={{
               headerShown: false,
