@@ -24,7 +24,13 @@ const SingleGroupSection = ({ groupId }) => {
       label: 'Elect Officers',
       icon: Award,
       route: `group-officers/${groupId}`,
-    }
+    },
+    {
+      id: 'groupInvitation',
+      label: 'Group Invitation',
+      icon: Award,
+      route: `group-invitation/${groupId}`,
+    },
 
   ];
 

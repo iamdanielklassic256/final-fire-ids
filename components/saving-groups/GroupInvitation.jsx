@@ -8,7 +8,7 @@ import Loader from '../Loader';
 import GroupMembersSection from '../savings/members';
 import InviteMemberModal from '../savings/InviteMemberModal';
 
-const GroupInvitation = ({ groupId, canEdit }) => {
+const GroupInvitation = ({ groupId }) => {
 	const [member, setMember] = useState(null);
 	const [allMembers, setAllMembers] = useState([]);
 	const [invitations, setInvitations] = useState([]); // State for group invitations
@@ -61,7 +61,7 @@ const GroupInvitation = ({ groupId, canEdit }) => {
 	};
 
 	const fetchGroupInvitations = async () => {
-		console.log('group Id', groupId)
+		// console.log('group Id', groupId)
 		try {
 			setIsLoading(true);
 			const response = await fetch(`${group_invitation_url}/group/${groupId}`);
@@ -77,7 +77,7 @@ const GroupInvitation = ({ groupId, canEdit }) => {
 		}
 	};
 
-	console.log(invitations)
+	console.log("invitations",invitations)
 
 	const formatMemberName = (member) => {
 		const names = [member.first_name, member.last_name, member.other_name].filter(Boolean);
@@ -87,11 +87,6 @@ const GroupInvitation = ({ groupId, canEdit }) => {
 	const validateData = () => {
 		if (!groupId) {
 			Alert.alert("Error", "Group ID is missing.");
-			return false;
-		}
-
-		if (!member?.id) {
-			Alert.alert("Error", "Your member information is missing.");
 			return false;
 		}
 
@@ -110,16 +105,20 @@ const GroupInvitation = ({ groupId, canEdit }) => {
 			setIsLoading(true);
 			const invitationData = {
 				groupId: groupId,
-				invited_by: member.id,
+				// invited_by: groupId,
 				status: "pending",
 				invited_member_id: selectedMemberId
 			};
+
+			// console.log(invitationData)
 
 			const response = await fetch(group_invitation_url, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify(invitationData),
 			});
+
+			// console.log(response)
 
 			if (!response.ok) throw new Error('Failed to create group invitation');
 
@@ -209,34 +208,33 @@ const GroupInvitation = ({ groupId, canEdit }) => {
 
 	return (
 		<View className="flex-1 bg-white">
-			{canEdit && (
-				<View>
-					<TouchableOpacity
-						onPress={openInviteModal}
-						className="bg-[#250048] mt-5  py-3 px-14 mx-4 mb-5 rounded-lg flex-row items-center justify-center"
-					>
-						<MaterialCommunityIcons name="account-plus" size={24} color="#ffffff" />
-						<Text className="ml-2 text-white font-semibold">Invite New Member</Text>
-					</TouchableOpacity>
-				</View>
-			)}
+
+			<View>
+				<TouchableOpacity
+					onPress={openInviteModal}
+					className="bg-[#111827] mt-5  py-3 px-14 mx-4 mb-5 rounded-lg flex-row items-center justify-center"
+				>
+					<MaterialCommunityIcons name="account-plus" size={24} color="#ffffff" />
+					<Text className="ml-2 text-white font-semibold">Invite New Member</Text>
+				</TouchableOpacity>
+			</View>
 
 
-			<View className="flex flex-row justify-around items-center p-4 bg-white rounded-t-md shadow-md">
+			<View className="flex flex-row justify-around items-center p-0 bg-white rounded-t-md shadow-md">
 				<TouchableOpacity
 					onPress={() => setActiveTab('members')}
-					className={`p-2 ${activeTab === 'members' ? 'border-b-4 border-purple-500' : ''}`}
+					className={`p-2  ${activeTab === 'members' ? ' border-b-4 border-[#028758]' : ''}`}
 				>
-					<Text className={`${activeTab === 'members' ? 'text-purple-800' : 'text-gray-500'} text-lg font-semibold`}>
+					<Text className={`${activeTab === 'members' ? 'text-[#111827] font-bold' : 'text-gray-500'} text-lg font-semibold`}>
 						Group Members
 					</Text>
 				</TouchableOpacity>
 
 				<TouchableOpacity
 					onPress={() => setActiveTab('invitations')}
-					className={`p-2 ${activeTab === 'invitations' ? 'border-b-4 border-purple-500' : ''}`}
+					className={`p-2 ${activeTab === 'invitations' ? 'border-b-4 border-[#028758]' : ''}`}
 				>
-					<Text className={`${activeTab === 'invitations' ? 'text-purple-800' : 'text-gray-500'} text-lg font-semibold`}>
+					<Text className={`${activeTab === 'invitations' ? 'text-[#111827] font-bold' : 'text-gray-500'} text-lg font-semibold`}>
 						Invitations
 					</Text>
 				</TouchableOpacity>
