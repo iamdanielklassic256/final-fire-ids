@@ -49,7 +49,7 @@ const SingleMeeting = () => {
 		);
 	}
 
-	console.log('Single Meeting Id', id)
+	console.log('Single Meeting Id', meeting.groupId)
 
 	return (
 		<View className="flex-1 bg-gray-50">
@@ -64,6 +64,7 @@ const SingleMeeting = () => {
 			{meeting && (
 				<MeetingSection
 					meetingId={id}
+					groupId={meeting.groupId}
 				/>
 			)}
 		</View>

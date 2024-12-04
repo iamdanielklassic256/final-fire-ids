@@ -72,8 +72,8 @@ export const member_group_wallet_type_url = `${akiba_api_url}/wallet_type/member
 
 
 //GROUP TRANSACTIONS
-export const group_transaction_url = `${akiba_api_url}/group-transactions`
-export const member_transaction_url = `${akiba_api_url}/group-transactions/member`
+export const group_transaction_url = `${akiba_api_url}/group-fund`
+export const member_transaction_url = `${akiba_api_url}/group-transactions/fund`
 
 
 //GROUP PAYMENT DURATION API

@@ -4,7 +4,7 @@ import { Users, BookOpen, Award, Wallet } from 'lucide-react-native'
 import { useRouter } from 'expo-router'
 import { CheckCircle, DollarSign } from 'lucide-react-native'
 
-const MeetingSection = ({ meetingId }) => {
+const MeetingSection = ({ meetingId, groupId }) => {
   const router = useRouter();
 
   const sections = [
@@ -19,7 +19,7 @@ const MeetingSection = ({ meetingId }) => {
       id: 'savings',
       label: 'Savings',
       icon: DollarSign,
-      route: `group-savings/${meetingId}`,
+      route: `group-savings/${groupId}`,
     },
     
 
