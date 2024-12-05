@@ -76,7 +76,7 @@ const SignUp = () => {
     }
   };
 
-   const formatPhoneNumber = (number) => {
+  const formatPhoneNumber = (number) => {
     let cleaned = number.replace(/\D/g, '');
     if (cleaned.startsWith('07')) {
       cleaned = '256' + cleaned.substring(1);
@@ -95,7 +95,7 @@ const SignUp = () => {
     let errorMessage = '';
 
     currentStepFields.forEach(field => {
-      if (!formData[field] && field !== 'other_name' && field !== 'contact_two' && field!== 'email') {
+      if (!formData[field] && field !== 'other_name' && field !== 'contact_two' && field !== 'email') {
         isValid = false;
         errorMessage = `Please fill in all required fields`;
       }
@@ -126,12 +126,12 @@ const SignUp = () => {
   const validateUgandanNIN = (nin) => {
     const ninRegex = /^(CM|CF)[A-Z0-9]{12}$/;
     if (!nin) return "NIN is required";
-    if (nin.length !== 14) return "NIN must be exactly 14 characters long";
+    if (nin.length !== 14) return "NIN must be exactly 14 characters long (e.g., CM1234567890AB)";
     if (!nin.startsWith("CM") && !nin.startsWith("CF")) {
-      return "NIN must start with either 'CM' or 'CF'";
+      return "NIN must start with either 'CM' or 'CF' (use CAPITAL letters)";
     }
     if (!ninRegex.test(nin)) {
-      return "Invalid NIN format";
+      return "Invalid NIN format. Use CAPITAL letters and numbers only";
     }
     return true;
   };
@@ -188,6 +188,20 @@ const SignUp = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+
+  const generateYears = () => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let year = currentYear - 100; year <= currentYear - 18; year++) {
+      years.push(year);
+    }
+    return years.reverse();
   };
 
   const renderField = (label, field, placeholder, options = {}) => {
@@ -275,15 +289,67 @@ const SignUp = () => {
           <>
             <View className="mb-4">
               <Text className="text-white text-sm mb-1">Date of Birth <Text className="text-red-400">*</Text></Text>
-              <TouchableOpacity
-                onPress={() => setShowIOSDatePicker(true)}
-                className="bg-white bg-opacity-20 rounded-lg p-3 flex-row justify-between items-center"
-              >
-                <Text className="text-black">
-                  {formData.date_of_birth.toLocaleDateString()}
-                </Text>
-                <Ionicons name="calendar-outline" size={24} color="white" />
-              </TouchableOpacity>
+              <View className="flex-row justify-between">
+                {/* Date Picker */}
+                <View className="flex-1 mr-2">
+                  <Text className="text-white text-xs mb-1">Date</Text>
+                  <View className="bg-white bg-opacity-20 rounded-lg">
+                    <Picker
+                      selectedValue={formData.date_of_birth.getDate()}
+                      onValueChange={(value) => {
+                        const newDate = new Date(formData.date_of_birth);
+                        newDate.setDate(value);
+                        handleInputChange('date_of_birth', newDate);
+                      }}
+                      style={{ color: 'black', height: 50 }}
+                    >
+                      {Array.from({ length: 31 }, (_, i) => i + 1).map(date => (
+                        <Picker.Item key={date} label={date.toString()} value={date} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                {/* Month Picker */}
+                <View className="flex-1 mx-2">
+                  <Text className="text-white text-xs mb-1">Month</Text>
+                  <View className="bg-white bg-opacity-20 rounded-lg">
+                    <Picker
+                      selectedValue={formData.date_of_birth.getMonth()}
+                      onValueChange={(value) => {
+                        const newDate = new Date(formData.date_of_birth);
+                        newDate.setMonth(value);
+                        handleInputChange('date_of_birth', newDate);
+                      }}
+                      style={{ color: 'black', height: 50 }}
+                    >
+                      {months.map((month, index) => (
+                        <Picker.Item key={month} label={month} value={index} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+
+                {/* Year Picker */}
+                <View className="flex-1 ml-2">
+                  <Text className="text-white text-xs mb-1">Year</Text>
+                  <View className="bg-white bg-opacity-20 rounded-lg">
+                    <Picker
+                      selectedValue={formData.date_of_birth.getFullYear()}
+                      onValueChange={(value) => {
+                        const newDate = new Date(formData.date_of_birth);
+                        newDate.setFullYear(value);
+                        handleInputChange('date_of_birth', newDate);
+                      }}
+                      style={{ color: 'black', height: 50 }}
+                    >
+                      {generateYears().map(year => (
+                        <Picker.Item key={year} label={year.toString()} value={year} />
+                      ))}
+                    </Picker>
+                  </View>
+                </View>
+              </View>
             </View>
 
             <View className="mb-4">
@@ -301,7 +367,9 @@ const SignUp = () => {
               </View>
             </View>
 
-            {renderField("National ID Number", "national_identification_number", "Enter your NIN")}
+            {renderField("National ID Number", "national_identification_number", "Enter your NIN (Capital Letters and Numbers only)", {
+              placeholder: "Must be 14 characters (capital letters/numbers)"
+            })}
           </>
         )}
 
