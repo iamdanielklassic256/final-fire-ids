@@ -19,24 +19,36 @@ To get started with the Akiba SACCO App, follow these steps:
 
 ---
 
-## 🏦 Creating a Saving Group Account
+Once you've registered, you can proceed to create a **Saving Group Account**. Here’s the information you’ll need to provide to set up your group:
 
-Once registered, you can create a saving group account. Provide the following information when setting up the account:
+### 1. **Group Name & Location**
 
-```json
-{
-  "name": "string",
-  "location": "string",
-  "country": "string",
-  "price_per_share": "string",
-  "minimum_share": 0,
-  "maximum_share": 0,
-  "interate_method": "one-time",
-  "oneTimeInterestMethod": "added",
-  "monthlyInterestMethod": "declining",
-  "interestRate": "string",
-  "saving_cycle_method": "daily",
-  "saving_starting_day": "Sunday",
-  "start_date": "string",
-  "shareout_date": "string"
-}
+- **Name**: Choose a **unique name** for your saving group. This will be used to identify the group.
+- **Location**: Specify where the group is based, whether it's a physical or virtual group.
+
+### 2. **Financial Details**
+
+- **Country**: Select the **country** where the group operates.
+- **Price per Share**: Define the **cost of a single share** in the group. This is the amount a member will pay for each share in the group.
+- **Minimum Share**: Set the **minimum number of shares** a member must purchase to be part of the group.
+- **Maximum Share**: Set the **maximum number of shares** a member can purchase.
+
+### 3. **Interest Calculation**
+   - **Interest Method**: Choose how interest will be calculated:
+     - **One-time**: Interest is calculated and applied once, at the end of the saving cycle.
+     - **Monthly Declining**: Interest is applied monthly and decreases as time goes on.
+   - **One-time Interest Application**: Choose whether interest will be **added** to the savings or handled differently.
+
+### 4. **Saving Cycle & Dates**
+   - **Saving Cycle Method**: Decide how often the group will contribute to the savings. Options include:
+     - **Daily**: Members contribute daily.
+     - **Weekly**, **Monthly**, etc.
+   - **Saving Starting Day**: Choose the **day of the week** the saving cycle will begin. For example, you can start on a **Sunday**.
+   - **Start Date**: Set the **start date** of the saving cycle.
+   - **Shareout Date**: Determine when the savings will be **distributed** among the members.
+
+---
+
+Once the saving group account is set up, members can start saving, track their contributions, and access other features based on the group’s settings.
+
+---
