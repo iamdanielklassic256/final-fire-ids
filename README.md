@@ -1,53 +1,42 @@
-# Welcome to your Expo app 👋
+# Welcome to Akiba SACCO App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Akiba SACCO App is a digital solution designed to simplify and enhance the operations of savings and credit cooperative organizations (SACCOs). It empowers groups to manage their savings, loans, and memberships efficiently through an intuitive and user-friendly mobile platform. With Akiba SACCO App, you can create saving groups, track contributions, manage loan applications, and much more.
 
-## Get started
+---
 
-1. Install dependencies
+## 📝 Registration
 
-   ```bash
-   npm install
-   ```
+To get started with the Akiba SACCO App, follow these steps:
 
-2. Start the app
+1. **Create an Account**  
+   Sign up for a new account by providing basic details such as your name, email address, and phone number. You’ll also set a pincode for secure access.
 
-   ```bash
-    npx expo start
-   ```
+2. **Personal Login**  
+   Log in to your account using your registered email or phone number and password to access your individual dashboard and features and make sure you verfiy your contact before creating a new saving group.
 
-In the output, you'll find options to open the app in a
+3. **Group Login**  
+   For group-related activities, at least **three members** of the same group must log in together. This ensures security and mutual accountability for group operations.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🏦 Creating a Saving Group Account
 
-## Get a fresh project
+Once registered, you can create a saving group account. Provide the following information when setting up the account:
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-
-
- eas build --profile preview --platform android
+```json
+{
+  "name": "string",
+  "location": "string",
+  "country": "string",
+  "price_per_share": "string",
+  "minimum_share": 0,
+  "maximum_share": 0,
+  "interate_method": "one-time",
+  "oneTimeInterestMethod": "added",
+  "monthlyInterestMethod": "declining",
+  "interestRate": "string",
+  "saving_cycle_method": "daily",
+  "saving_starting_day": "Sunday",
+  "start_date": "string",
+  "shareout_date": "string"
+}
