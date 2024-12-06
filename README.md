@@ -19,6 +19,8 @@ To get started with the Akiba SACCO App, follow these steps:
 
 ---
 
+## 🏦 Creating a Saving Group Account
+
 Once you've registered, you can proceed to create a **Saving Group Account**. Here’s the information you’ll need to provide to set up your group:
 
 ### 1. **Group Name & Location**
@@ -49,6 +51,6 @@ Once you've registered, you can proceed to create a **Saving Group Account**. He
 
 ---
 
-Once the saving group account is set up, members can start saving, track their contributions, and access other features based on the group’s settings.
+Once the saving group account is set up, you will be having three default wallets that is -saving wallet, social fund and loan wallet so members can start saving, track their contributions, and access other features based on the group’s settings.
 
 ---
