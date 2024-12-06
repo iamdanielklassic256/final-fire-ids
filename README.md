@@ -36,18 +36,20 @@ Once you've registered, you can proceed to create a **Saving Group Account**. He
 - **Maximum Share**: Set the **maximum number of shares** a member can purchase.
 
 ### 3. **Interest Calculation**
-   - **Interest Method**: Choose how interest will be calculated:
-     - **One-time**: Interest is calculated and applied once, at the end of the saving cycle.
-     - **Monthly Declining**: Interest is applied monthly and decreases as time goes on.
-   - **One-time Interest Application**: Choose whether interest will be **added** to the savings or handled differently.
+
+- **Interest Method**: Choose how interest will be calculated:
+- **One-time**: Interest is calculated and applied once, at the end of the saving cycle.
+- **Monthly Declining**: Interest is applied monthly and decreases as time goes on.
+- **One-time Interest Application**: Choose whether interest will be **added** to the savings or handled differently.
 
 ### 4. **Saving Cycle & Dates**
-   - **Saving Cycle Method**: Decide how often the group will contribute to the savings. Options include:
-     - **Daily**: Members contribute daily.
-     - **Weekly**, **Monthly**, etc.
-   - **Saving Starting Day**: Choose the **day of the week** the saving cycle will begin. For example, you can start on a **Sunday**.
-   - **Start Date**: Set the **start date** of the saving cycle.
-   - **Shareout Date**: Determine when the savings will be **distributed** among the members.
+
+- **Saving Cycle Method**: Decide how often the group will contribute to the savings. Options include:
+- **Daily**: Members contribute daily.
+- **Weekly**, **Monthly**, etc.
+- **Saving Starting Day**: Choose the **day of the week** the saving cycle will begin. For example, you can start on a **Sunday**.
+- **Start Date**: Set the **start date** of the saving cycle.
+- **Shareout Date**: Determine when the savings will be **distributed** among the members.
 
 ---
 
@@ -73,32 +75,40 @@ These wallets ensure that the group’s financial activities are well-organized,
 Once your saving group is set up, you can manage various aspects of the group. Here's a breakdown of the key features available:
 
 ### 1. **Group Wallet**  
-   - The **Group Wallet** holds all the funds contributed by the members. It tracks the total savings and allows for easy management of funds within the group. All transactions (deposits, withdrawals, loans) are recorded here.
 
-### 2. **Group Members**  
-   - As the group grows, you can manage all the **members** who have joined. You can view their profiles, track their contributions, and ensure they are actively participating in the saving cycle.
+- The **Group Wallet** holds all the funds contributed by the members. It tracks the total savings and allows for easy management of funds within the group. A member can be able to choose which wallet to deposit funds into.
+
+### 2. **Group Members**
+
+- As the group grows, you can manage all the **members** who have joined through adding them or inviting them or even group join request. You can view their profiles, track their contributions, and ensure they are actively participating in the saving cycle.
 
 ### 3. **Group Member Roles**  
-   - Every member can have a **role** within the group. Common roles include:
-     - **Admin**: The person who manages and oversees the group.
-     - **Member**: A participant in the saving group who contributes regularly.
-     - **Treasurer**: Responsible for managing the group wallet and financial records.
-   - You can assign and manage roles within the group based on members’ responsibilities.
+
+- Every member can have a **role** within the group. Common roles include:
+- **Admin**: The person who manages and oversees the group.
+- **Member**: A participant in the saving group who contributes regularly.
+- **Treasurer**: Responsible for managing the group wallet and financial records.
+- You can assign and manage roles within the group based on members’ responsibilities.
 
 ### 4. **Meetings**  
-   - The group can schedule **meetings** to discuss group matters, track progress, and address any concerns. You can manage meeting dates, agendas, and attendance, ensuring members stay informed and engaged.
 
-### 5. **Attendance**  
-   - **Attendance** tracking is important for monitoring which members are present for meetings, ensuring active participation. You can mark attendance for each meeting and review the records to track member involvement.
+- The group can schedule **meetings** to discuss group matters, track progress, and address any concerns. You can manage meeting dates, agendas, and attendance, ensuring members stay informed and engaged.
 
-### 6. **Saving Contributions**  
-   - Members can contribute their **savings** to the group based on the set schedule (e.g., daily, weekly, monthly). Each member’s contribution is tracked, and the group wallet balance is updated accordingly.
+#### 1. **Attendance**  
 
-### 7. **Invitations**  
-   - To expand your group, you can **invite new members** to join. Invitations are sent via email or SMS, and potential members can accept the invitation and join the group.
+- **Attendance** tracking is important for monitoring which members are present for meetings, ensuring active participation. You can mark attendance for each meeting and review the records to track member involvement per every meeting.
 
-### 8. **Group Join Requests**  
-   - When a new member wants to join the group, they must submit a **join request**. The group admin can approve or deny the request based on the group’s requirements and capacity.
+#### 2. **Saving Contributions**  
+
+- Members can contribute their **savings** to the group based on group wallet so each member can choose which wallet to deposit their savings.
+
+### 5. **Invitations**  
+
+- To expand your group, you can **invite new members** to join. Invitations are sent via email or SMS, and potential members can accept the invitation and join the group.
+
+### 6. **Group Join Requests**  
+
+- When a new member wants to join the group, they must submit a **join request**. The group admin can approve or deny the request based on the group’s requirements and capacity.
 
 ---
 
