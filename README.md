@@ -12,7 +12,7 @@ To get started with the Akiba SACCO App, follow these steps:
    Sign up for a new account by providing basic details such as your name, email address, and phone number. You’ll also set a pincode for secure access.
 
 2. **Personal Login**  
-   Log in to your account using your registered email or phone number and password to access your individual dashboard and features and make sure you verfiy your contact before creating a new saving group.
+   Log in to your account using your registered email or phone number and password to access your individual dashboard and features. Make sure you verify your contact before creating a new saving group.
 
 3. **Group Login**  
    For group-related activities, at least **three members** of the same group must log in together. This ensures security and mutual accountability for group operations.
@@ -51,6 +51,60 @@ Once you've registered, you can proceed to create a **Saving Group Account**. He
 
 ---
 
-Once the saving group account is set up, you will be having three default wallets that is -saving wallet, social fund and loan wallet so members can start saving, track their contributions, and access other features based on the group’s settings.
+## 🏦 Wallets and Contributions
+
+Once the saving group account is set up, the group will have three default wallets:
+
+1. **Saving Wallet**  
+   - This wallet is where members' contributions for savings will be stored. It keeps track of all deposits made by members and the group's total balance.
+
+2. **Social Fund**  
+   - The social fund wallet is used for community-focused initiatives, charitable contributions, and special group events. It helps members contribute to non-financial goals.
+
+3. **Loan Wallet**  
+   - This wallet is dedicated to managing the loans and their repayments. It tracks all loan applications, disbursements, and repayments made by the group members.
+
+These wallets ensure that the group’s financial activities are well-organized, with clear records of contributions, loans, and other transactions.
 
 ---
+
+## 💼 Group Management
+
+Once your saving group is set up, you can manage various aspects of the group. Here's a breakdown of the key features available:
+
+### 1. **Group Wallet**  
+   - The **Group Wallet** holds all the funds contributed by the members. It tracks the total savings and allows for easy management of funds within the group. All transactions (deposits, withdrawals, loans) are recorded here.
+
+### 2. **Group Members**  
+   - As the group grows, you can manage all the **members** who have joined. You can view their profiles, track their contributions, and ensure they are actively participating in the saving cycle.
+
+### 3. **Group Member Roles**  
+   - Every member can have a **role** within the group. Common roles include:
+     - **Admin**: The person who manages and oversees the group.
+     - **Member**: A participant in the saving group who contributes regularly.
+     - **Treasurer**: Responsible for managing the group wallet and financial records.
+   - You can assign and manage roles within the group based on members’ responsibilities.
+
+### 4. **Meetings**  
+   - The group can schedule **meetings** to discuss group matters, track progress, and address any concerns. You can manage meeting dates, agendas, and attendance, ensuring members stay informed and engaged.
+
+### 5. **Attendance**  
+   - **Attendance** tracking is important for monitoring which members are present for meetings, ensuring active participation. You can mark attendance for each meeting and review the records to track member involvement.
+
+### 6. **Saving Contributions**  
+   - Members can contribute their **savings** to the group based on the set schedule (e.g., daily, weekly, monthly). Each member’s contribution is tracked, and the group wallet balance is updated accordingly.
+
+### 7. **Invitations**  
+   - To expand your group, you can **invite new members** to join. Invitations are sent via email or SMS, and potential members can accept the invitation and join the group.
+
+### 8. **Group Join Requests**  
+   - When a new member wants to join the group, they must submit a **join request**. The group admin can approve or deny the request based on the group’s requirements and capacity.
+
+---
+
+## 🚀 Build the APK
+
+To build the APK for the Akiba SACCO App, follow these steps:
+
+```bash
+eas build --profile preview --platform android
