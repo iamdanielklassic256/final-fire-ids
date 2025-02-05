@@ -2,8 +2,6 @@
 
 Akiba SACCO App is a digital solution designed to simplify and enhance the operations of savings and credit cooperative organizations (SACCOs). It empowers groups to manage their savings, loans, and memberships efficiently through an intuitive and user-friendly mobile platform. With Akiba SACCO App, you can create saving groups, track contributions, manage loan applications, and much more.
 
----
-
 ## 📝 Registration
 
 To get started with the Akiba SACCO App, follow these steps:
