@@ -156,31 +156,6 @@ const GroupWallet = () => {
 					}
 				/>
 			</View>
-			{/* <Modal
-				visible={isModalVisible}
-				transparent={true}
-				animationType="slide"
-				onRequestClose={closeModal}
-			>
-				<View className="flex-1 justify-center items-center bg-black bg-opacity-50">
-					<View className="bg-white rounded-lg p-6 w-4/5 shadow-lg">
-						{selectedWallet && (
-							<>
-								<Text className="text-xl font-bold text-gray-800 mb-2">
-									{selectedWallet.name}
-								</Text>
-								<Text className="text-gray-600 mb-1">
-									Goal: {selectedWallet.goal}
-								</Text>
-								<Text className="text-gray-600 mb-4">
-									Total Balance: {selectedWallet.total_balance}
-								</Text>
-							</>
-						)}
-						<Button title="Close" onPress={closeModal} color="#689F38" />
-					</View>
-				</View>
-			</Modal> */}
 		</View>
 	)
 }

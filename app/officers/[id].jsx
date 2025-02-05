@@ -16,7 +16,6 @@ import EnhancedLoader from '../../utils/EnhancedLoader';
 import AkibaHeader from '../../components/AkibaHeader';
 import { StatusBar } from 'expo-status-bar';
 import { UserPlus, X, RefreshCw } from 'lucide-react-native';
-import MemberItem from '../../components/member-profile/renderMemberItem';
 import MemberSection from '../../components/member-profile/MemberSection';
 
 const ElectOfficerScreen = () => {
