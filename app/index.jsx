@@ -1,150 +1,194 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, Image, TouchableOpacity, Animated, Dimensions } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { LinearGradient } from 'expo-linear-gradient';
-import { StatusBar } from "expo-status-bar";
-import { Loader } from "../components";
-import Constants from 'expo-constants';
-import { router } from "expo-router";
-import { MaterialIcons } from '@expo/vector-icons';
-import logo from '../assets/icons/logo/logoname.png';
-import AppVersion from '../components/AppVersion';
+import { View, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import React, { useRef, useEffect, useState } from 'react';
+import logo from '../assets/logo/logo.png';
 
-const Welcome = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const appVersion = Constants.expoConfig?.version || "1.0.0";
-  const { width } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-  // Animation values
-  const logoScale = new Animated.Value(0);
-  const titleOpacity = new Animated.Value(0);
-  const buttonsTranslateY = new Animated.Value(50);
-  const buttonsFade = new Animated.Value(0);
+const slides = [
+  {
+    title: "Welcome to Pro Church",
+    description: "Your complete church management solution in one place"
+  },
+  {
+    title: "Streamline Ministry",
+    description: "Efficiently manage members, events, and resources"
+  },
+  {
+    title: "Grow Together",
+    description: "Build stronger connections in your church community"
+  }
+];
 
+const WelcomeScreen = ({ navigation }) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const scrollX = useRef(new Animated.Value(0)).current;
+  
   useEffect(() => {
-    // Sequence of animations
-    Animated.sequence([
-      Animated.spring(logoScale, {
-        toValue: 1,
-        tension: 10,
-        friction: 2,
-        useNativeDriver: true,
-      }),
-      Animated.timing(titleOpacity, {
-        toValue: 1,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.parallel([
-        Animated.spring(buttonsTranslateY, {
-          toValue: 0,
-          tension: 50,
-          friction: 7,
-          useNativeDriver: true,
-        }),
-        Animated.timing(buttonsFade, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ]),
-    ]).start();
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => 
+        prevIndex === slides.length - 1 ? 0 : prevIndex + 1
+      );
+    }, 3000);
+
+    return () => clearInterval(timer);
   }, []);
 
-  setTimeout(() => {
-    setIsLoading(false);
-  }, 3000);
-
-  const renderButton = (text, icon, onPress, bgColor, textColor) => (
-    <TouchableOpacity
-      onPress={onPress}
-      className={`p-4 rounded-xl flex-row items-center justify-center shadow-lg`}
-      style={{ backgroundColor: bgColor }}
-    >
-      <MaterialIcons name={icon} size={24} color={textColor} style={{ marginRight: 8 }} />
-      <Text className={`text-lg font-bold`} style={{ color: textColor }}>
-        {text}
-      </Text>
-    </TouchableOpacity>
-  );
+  useEffect(() => {
+    Animated.spring(scrollX, {
+      toValue: -currentIndex * width,
+      useNativeDriver: true,
+      speed: 1,
+      bounciness: 0,
+    }).start();
+  }, [currentIndex]);
 
   return (
-    <SafeAreaView className="flex-1">
-      <StatusBar style="light" />
-      <Loader isLoading={isLoading} />
-
-      <LinearGradient
-        colors={['#028758', '#016d46', '#004d32']}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        className="flex-1 px-6 py-8"
-      >
-        <View className="flex-1 justify-between">
-          {/* Logo and Title Section */}
-          <View className="items-center mt-[8%]">
-            <Animated.View style={{ transform: [{ scale: logoScale }] }}>
-              <Image
-                source={logo}
-                className="w-[120px] h-[120px] rounded-3xl"
-                resizeMode="contain"
-              />
-            </Animated.View>
-            
-            <Animated.View style={{ opacity: titleOpacity }} className="mt-6">
-              <Text className="text-white text-4xl font-bold text-center">
-                Welcome to Akiba
-              </Text>
-              <Text className="text-[#E0E0E0] text-lg text-center mt-3 px-4">
-                Your trusted partner in financial growth and success
-              </Text>
-            </Animated.View>
-          </View>
-
-          {/* Buttons Section */}
-          <Animated.View 
-            style={{
-              transform: [{ translateY: buttonsTranslateY }],
-              opacity: buttonsFade,
-            }}
-            className="space-y-4 w-full mt-8"
-          >
-            {renderButton(
-              "Personal Login",
-              "person",
-              () => router.push("/sign-in"),
-              "#250048",
-              "#ffffff"
-            )}
-            
-            {renderButton(
-              "Group Login",
-              "group",
-              () => router.push("/group-login"),
-              "#250048",
-              "#ffffff"
-            )}
-            
-            {renderButton(
-              "Create an Account",
-              "add-circle-outline",
-              () => router.push("/sign-up"),
-              "#250048",
-              "#ffffff"
-            )}
-          </Animated.View>
-          <Animated.View 
-            style={{ opacity: buttonsFade }}
-            className="mt-8"
-          >
-            <Text className="text-[#E0E0E0] text-center text-base font-medium mb-2">
-              Start your journey to financial independence today!
-            </Text>
-            <AppVersion />
-          </Animated.View>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.backgroundCircle} />
+      
+      <View style={styles.contentContainer}>
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={logo}
+            style={styles.logo}
+            resizeMode="contain"
+          />
         </View>
-      </LinearGradient>
+
+        {/* Slider */}
+        <View style={styles.sliderContainer}>
+          <Animated.View style={[
+            styles.slidesWrapper,
+            {
+              transform: [{ translateX: scrollX }]
+            }
+          ]}>
+            {slides.map((slide, index) => (
+              <View key={index} style={styles.slide}>
+                <Text style={styles.slideTitle}>{slide.title}</Text>
+                <Text style={styles.slideDescription}>{slide.description}</Text>
+              </View>
+            ))}
+          </Animated.View>
+
+          {/* Dots Indicator */}
+          <View style={styles.dotsContainer}>
+            {slides.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.dot,
+                  currentIndex === index && styles.activeDot
+                ]}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* Button */}
+        <TouchableOpacity 
+          style={styles.button}
+          onPress={() => navigation.navigate('Login')}
+        >
+          <Text style={styles.buttonText}>Get Started</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
 
-export default Welcome;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  backgroundCircle: {
+    position: 'absolute',
+    top: -200,
+    right: -100,
+    width: 400,
+    height: 400,
+    borderRadius: 200,
+    backgroundColor: '#4C51BF15',
+  },
+  contentContainer: {
+    flex: 1,
+    padding: 24,
+    justifyContent: 'space-between',
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginTop: 60,
+  },
+  logo: {
+    width: 150,
+    height: 150,
+  },
+  sliderContainer: {
+    height: 200,
+    overflow: 'hidden',
+  },
+  slidesWrapper: {
+    flexDirection: 'row',
+    width: width * slides.length,
+  },
+  slide: {
+    width: width,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+  },
+  slideTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#1A202C',
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  slideDescription: {
+    fontSize: 16,
+    color: '#4A5568',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  dotsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#CBD5E0',
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: '#4C51BF',
+    width: 24,
+  },
+  button: {
+    backgroundColor: '#4C51BF',
+    paddingVertical: 16,
+    borderRadius: 16,
+    marginTop: 40,
+    marginBottom: 40,
+    shadowColor: '#4C51BF',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    textAlign: 'center',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+});
+
+export default WelcomeScreen;

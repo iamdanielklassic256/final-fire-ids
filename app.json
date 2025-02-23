@@ -1,23 +1,23 @@
 {
   "expo": {
-    "name": "Akiba",
-    "slug": "akiba-app",
+    "name": "Pro Church Manager",
+    "slug": "pro-church-manager",
     "version": "0.1.1",
     "orientation": "portrait",
-    "icon": "./assets/icons/logo/sqlogo.png",
+    "icon": "./assets/logo/1.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/icons/logo/logoname.png",
+      "image": "./assets/logo/1.png",
       "resizeMode": "contain",
-      "backgroundColor": "#00E394"
+      "backgroundColor": "#fff"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icons/logo/sqlogo.png",
+        "foregroundImage": "./assets/logo/1.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.iamdanielklassic.akibaapp"
@@ -25,7 +25,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/icons/logo/sqlogo.png"
+      "favicon": "./assets/logo/1.png"
     },
     "plugins": [
       "expo-router",
