@@ -1,6 +1,7 @@
-import { View, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity, Dimensions, Animated } from 'react-native';
+import { View, Text, Image, SafeAreaView, TouchableOpacity, Dimensions, Animated } from 'react-native';
 import React, { useRef, useEffect, useState } from 'react';
 import logo from '../assets/logo/logo.png';
+import { router } from 'expo-router';
 
 const { width } = Dimensions.get('window');
 
@@ -42,45 +43,48 @@ const WelcomeScreen = ({ navigation }) => {
     }).start();
   }, [currentIndex]);
 
+  const handleRoute = () => {
+    router.push('/auth/sign-in')
+  }
+
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.backgroundCircle} />
+    <SafeAreaView className="bg-white flex-1">
+      <View className="absolute top-[-200] right-[-100] w-[400px] h-[400px] rounded-full bg-[#f27c22] bg-opacity-10" />
       
-      <View style={styles.contentContainer}>
+      <View className="flex-1 p-6 justify-between">
         {/* Logo */}
-        <View style={styles.logoContainer}>
+        <View className="items-center mt-16">
           <Image
             source={logo}
-            style={styles.logo}
+            className="w-64 h-80"
             resizeMode="contain"
           />
         </View>
 
         {/* Slider */}
-        <View style={styles.sliderContainer}>
-          <Animated.View style={[
-            styles.slidesWrapper,
-            {
-              transform: [{ translateX: scrollX }]
-            }
-          ]}>
+        <View className="h-48 overflow-hidden">
+          <Animated.View className="flex-row" style={{
+            width: width * slides.length,
+            transform: [{ translateX: scrollX }]
+          }}>
             {slides.map((slide, index) => (
-              <View key={index} style={styles.slide}>
-                <Text style={styles.slideTitle}>{slide.title}</Text>
-                <Text style={styles.slideDescription}>{slide.description}</Text>
+              <View key={index} className="px-6 items-center" style={{ width }}>
+                <Text className="text-3xl font-bold text-gray-900 text-center mb-3">{slide.title}</Text>
+                <Text className="text-base text-gray-600 text-center leading-6">{slide.description}</Text>
               </View>
             ))}
           </Animated.View>
 
           {/* Dots Indicator */}
-          <View style={styles.dotsContainer}>
+          <View className="flex-row justify-center items-center mt-5">
             {slides.map((_, index) => (
               <View
                 key={index}
-                style={[
-                  styles.dot,
-                  currentIndex === index && styles.activeDot
-                ]}
+                className={`rounded mx-1 ${
+                  currentIndex === index 
+                    ? "bg-[#f27c22] w-6 h-2" 
+                    : "bg-gray-300 w-2 h-2"
+                }`}
               />
             ))}
           </View>
@@ -88,107 +92,21 @@ const WelcomeScreen = ({ navigation }) => {
 
         {/* Button */}
         <TouchableOpacity 
-          style={styles.button}
-          onPress={() => navigation.navigate('Login')}
+          className="bg-[#f27c22] py-4 rounded-2xl mt-10 mb-10 shadow-lg"
+          style={{
+            shadowColor: '#f27c22',
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 5,
+          }}
+          onPress={handleRoute}
         >
-          <Text style={styles.buttonText}>Get Started</Text>
+          <Text className="text-white text-center text-lg font-semibold">Get Started</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  backgroundCircle: {
-    position: 'absolute',
-    top: -200,
-    right: -100,
-    width: 400,
-    height: 400,
-    borderRadius: 200,
-    backgroundColor: '#4C51BF15',
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'space-between',
-  },
-  logoContainer: {
-    alignItems: 'center',
-    marginTop: 60,
-  },
-  logo: {
-    width: 150,
-    height: 150,
-  },
-  sliderContainer: {
-    height: 200,
-    overflow: 'hidden',
-  },
-  slidesWrapper: {
-    flexDirection: 'row',
-    width: width * slides.length,
-  },
-  slide: {
-    width: width,
-    paddingHorizontal: 24,
-    alignItems: 'center',
-  },
-  slideTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1A202C',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  slideDescription: {
-    fontSize: 16,
-    color: '#4A5568',
-    textAlign: 'center',
-    lineHeight: 24,
-  },
-  dotsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#CBD5E0',
-    marginHorizontal: 4,
-  },
-  activeDot: {
-    backgroundColor: '#4C51BF',
-    width: 24,
-  },
-  button: {
-    backgroundColor: '#4C51BF',
-    paddingVertical: 16,
-    borderRadius: 16,
-    marginTop: 40,
-    marginBottom: 40,
-    shadowColor: '#4C51BF',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-});
 
 export default WelcomeScreen;
