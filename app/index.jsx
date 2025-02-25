@@ -2,23 +2,11 @@ import { View, Text, Image, SafeAreaView, TouchableOpacity, Dimensions, Animated
 import React, { useRef, useEffect, useState } from 'react';
 import logo from '../assets/logo/logo.png';
 import { router } from 'expo-router';
+import { slides } from '../data/slides';
 
 const { width } = Dimensions.get('window');
 
-const slides = [
-  {
-    title: "Welcome to Pro Church",
-    description: "Your complete church management solution in one place"
-  },
-  {
-    title: "Streamline Ministry",
-    description: "Efficiently manage members, events, and resources"
-  },
-  {
-    title: "Grow Together",
-    description: "Build stronger connections in your church community"
-  }
-];
+
 
 const WelcomeScreen = ({ navigation }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
