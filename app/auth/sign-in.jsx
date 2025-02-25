@@ -6,6 +6,7 @@ import { USER_AUTH_LOGIN_API } from '../../api/api';
 import { router } from 'expo-router';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ForgotPasswordModal from '../../components/authenication/ForgotPasswordModal';
 
 const LoginScreen = ({ navigation }) => {
 	const [email, setEmail] = useState('');
@@ -13,6 +14,7 @@ const LoginScreen = ({ navigation }) => {
 	const [error, setError] = useState('');
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [modalVisible, setModalVisible] = useState(false); // State for modal visibility
 
 	const handleLogin = async () => {
 		if (!email || !password) {
@@ -37,12 +39,7 @@ const LoginScreen = ({ navigation }) => {
 				}
 			  });
 
-			  console.log('response############################')
-			  console.log(response.status)
-		  
-
 			if (response.status === 200) {
-				// console.log('Login successful:', response.data);
 				await AsyncStorage.setItem("userEmail", email)
 				console.log(AsyncStorage.getItem("userEmail"));
 				// Proceed to OTP verification screen
@@ -58,14 +55,24 @@ const LoginScreen = ({ navigation }) => {
 		}
 	};
 
-
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
+	};
+
+	// Function to show the modal
+	const handleForgotPassword = () => {
+		setModalVisible(true);
 	};
 
 	return (
 		<SafeAreaView className="flex-1 bg-white">
 			<View className="absolute top-[-200] right-[-100] w-[400px] h-[400px] rounded-full bg-[#f27c22] bg-opacity-10" />
+
+			{/* Forgot Password Modal */}
+			<ForgotPasswordModal
+				visible={modalVisible} 
+				onClose={() => setModalVisible(false)} 
+			/>
 
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -134,10 +141,10 @@ const LoginScreen = ({ navigation }) => {
 								</View>
 							</View>
 
-							{/* Forgot Password */}
+							{/* Forgot Password - Modified to show modal */}
 							<TouchableOpacity
 								className="items-end mb-6"
-								onPress={() => navigation.navigate('ForgotPassword')}
+								onPress={handleForgotPassword}
 							>
 								<Text className="text-[#f27c22] text-sm font-semibold">Forgot Password?</Text>
 							</TouchableOpacity>
@@ -160,14 +167,6 @@ const LoginScreen = ({ navigation }) => {
 								) : (
 									<Text className="text-white text-center text-lg font-semibold">Sign In</Text>
 								)}
-							</TouchableOpacity>
-						</View>
-
-						{/* Sign Up Option */}
-						<View className="flex-row justify-center mt-6">
-							<Text className="text-gray-600 text-base">Don't have an account? </Text>
-							<TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-								<Text className="text-[#f27c22] text-base font-semibold">Sign Up</Text>
 							</TouchableOpacity>
 						</View>
 					</View>

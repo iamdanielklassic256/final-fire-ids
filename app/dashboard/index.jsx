@@ -69,7 +69,7 @@ const DashboardScreen = () => {
       await AsyncStorage.multiRemove(['accessToken', 'userData', 'userEmail']);
       
       // Navigate to login screen
-      router.replace('/auth/login');
+      router.replace('/auth/sign-in');
     } catch (error) {
       console.error('Error during logout:', error);
     }
