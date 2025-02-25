@@ -1,8 +1,11 @@
-import { View, Text, StyleSheet, Image, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, Image, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import React, { useState } from 'react';
-import { Ionicons } from '@expo/vector-icons'; // Make sure to install expo-vector-icons if not already
+import { Ionicons } from '@expo/vector-icons';
 import logo from '../../assets/logo/logo.png';
 import { USER_AUTH_LOGIN_API } from '../../api/api';
+import { router } from 'expo-router';
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const LoginScreen = ({ navigation }) => {
 	const [email, setEmail] = useState('');
@@ -12,99 +15,91 @@ const LoginScreen = ({ navigation }) => {
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleLogin = async () => {
-		// Simple validation
 		if (!email || !password) {
 			setError('Please enter both email and password');
 			return;
 		}
 
-		// Email format validation
 		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 		if (!emailRegex.test(email)) {
 			setError('Please enter a valid email address');
 			return;
 		}
 
-		// Reset error if validation passes
 		setError('');
 		setIsLoading(true);
 
 		try {
-			const response = await fetch(USER_AUTH_LOGIN_API, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					email,
-					password,
-				}),
-			});
+			const response = await axios.post(USER_AUTH_LOGIN_API, { email, password }, {
+				headers: { 
+				  'Content-Type': 'application/json',
+				  'Accept': 'application/json'
+				}
+			  });
 
-			console.log(response);
+			  console.log('response############################')
+			  console.log(response.status)
+		  
 
-			const data = await response.json();
-			
-
-			// if (response.ok) {
-			// 	// Store user email in AsyncStorage or Context for later use
-			// 	await AsyncStorage.setItem('userEmail', email);
-
-			// 	// Navigate to OTP verification screen
-			// 	router.push('/auth/verify-otp');
-			// } else {
-			// 	// Handle error response from API
-			// 	setError(data.message || 'Login failed. Please check your credentials.');
-			// }
+			if (response.status === 200) {
+				// console.log('Login successful:', response.data);
+				await AsyncStorage.setItem("userEmail", email)
+				console.log(AsyncStorage.getItem("userEmail"));
+				// Proceed to OTP verification screen
+				router.push('/auth/verify-otp');
+			} else {
+				setError(response.data.message || 'Login failed. Please try again.');
+			}
 		} catch (err) {
-			setError('Network error. Please try again later.');
+			setError(err.response?.data?.message || 'Network error. Please try again later.');
 			console.error('Login error:', err);
 		} finally {
 			setIsLoading(false);
 		}
 	};
 
+
 	const togglePasswordVisibility = () => {
 		setShowPassword(!showPassword);
 	};
 
 	return (
-		<SafeAreaView style={styles.container}>
-			<View style={styles.backgroundCircle} />
+		<SafeAreaView className="flex-1 bg-white">
+			<View className="absolute top-[-200] right-[-100] w-[400px] h-[400px] rounded-full bg-[#f27c22] bg-opacity-10" />
 
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={styles.keyboardAvoid}
+				className="flex-1"
 			>
-				<ScrollView contentContainerStyle={styles.scrollContent}>
-					<View style={styles.contentContainer}>
+				<ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+					<View className="flex-1 p-6 justify-between">
 						{/* Logo */}
-						<View style={styles.logoContainer}>
+						<View className="items-center mt-24">
 							<Image
 								source={logo}
-								style={styles.logo}
+								className="w-40 h-40"
 								resizeMode="contain"
 							/>
 						</View>
 
 						{/* Heading */}
-						<View style={styles.headingContainer}>
-							<Text style={styles.heading}>Welcome Back</Text>
-							<Text style={styles.subheading}>Sign in to continue</Text>
+						<View className="items-center mt-5 mb-10">
+							<Text className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</Text>
+							<Text className="text-base text-gray-600">Sign in to continue</Text>
 						</View>
 
 						{/* Login Form */}
-						<View style={styles.formContainer}>
+						<View className="mb-8">
 							{/* Error message if any */}
 							{error ? (
-								<Text style={styles.errorText}>{error}</Text>
+								<Text className="text-red-600 mb-4 text-center">{error}</Text>
 							) : null}
 
 							{/* Email Field */}
-							<View style={styles.inputContainer}>
-								<Text style={styles.inputLabel}>Email</Text>
+							<View className="mb-5">
+								<Text className="text-sm font-semibold text-gray-600 mb-2">Email</Text>
 								<TextInput
-									style={styles.input}
+									className="bg-gray-50 rounded-xl px-4 py-3.5 text-base text-gray-900 border border-gray-200"
 									placeholder="Enter your email"
 									placeholderTextColor="#A0AEC0"
 									keyboardType="email-address"
@@ -115,11 +110,11 @@ const LoginScreen = ({ navigation }) => {
 							</View>
 
 							{/* Password Field with toggle visibility */}
-							<View style={styles.inputContainer}>
-								<Text style={styles.inputLabel}>Password</Text>
-								<View style={styles.passwordContainer}>
+							<View className="mb-5">
+								<Text className="text-sm font-semibold text-gray-600 mb-2">Password</Text>
+								<View className="flex-row items-center bg-gray-50 rounded-xl border border-gray-200">
 									<TextInput
-										style={styles.passwordInput}
+										className="flex-1 px-4 py-3.5 text-base text-gray-900"
 										placeholder="Enter your password"
 										placeholderTextColor="#A0AEC0"
 										secureTextEntry={!showPassword}
@@ -127,7 +122,7 @@ const LoginScreen = ({ navigation }) => {
 										onChangeText={setPassword}
 									/>
 									<TouchableOpacity
-										style={styles.visibilityIcon}
+										className="p-3"
 										onPress={togglePasswordVisibility}
 									>
 										<Ionicons
@@ -141,31 +136,38 @@ const LoginScreen = ({ navigation }) => {
 
 							{/* Forgot Password */}
 							<TouchableOpacity
-								style={styles.forgotPasswordContainer}
+								className="items-end mb-6"
 								onPress={() => navigation.navigate('ForgotPassword')}
 							>
-								<Text style={styles.forgotPasswordText}>Forgot Password?</Text>
+								<Text className="text-[#f27c22] text-sm font-semibold">Forgot Password?</Text>
 							</TouchableOpacity>
 
 							{/* Login Button */}
 							<TouchableOpacity
-								style={styles.button}
+								className="bg-[#f27c22] py-4 rounded-2xl shadow-lg"
+								style={{
+									shadowColor: '#f27c22',
+									shadowOffset: { width: 0, height: 4 },
+									shadowOpacity: 0.3,
+									shadowRadius: 8,
+									elevation: 5,
+								}}
 								onPress={handleLogin}
 								disabled={isLoading}
 							>
 								{isLoading ? (
 									<ActivityIndicator color="#FFFFFF" />
 								) : (
-									<Text style={styles.buttonText}>Sign In</Text>
+									<Text className="text-white text-center text-lg font-semibold">Sign In</Text>
 								)}
 							</TouchableOpacity>
 						</View>
 
 						{/* Sign Up Option */}
-						<View style={styles.signupContainer}>
-							<Text style={styles.signupText}>Don't have an account? </Text>
+						<View className="flex-row justify-center mt-6">
+							<Text className="text-gray-600 text-base">Don't have an account? </Text>
 							<TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-								<Text style={styles.signupLink}>Sign Up</Text>
+								<Text className="text-[#f27c22] text-base font-semibold">Sign Up</Text>
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -174,142 +176,5 @@ const LoginScreen = ({ navigation }) => {
 		</SafeAreaView>
 	);
 };
-
-const styles = StyleSheet.create({
-	container: {
-		flex: 1,
-		backgroundColor: '#ffffff',
-	},
-	keyboardAvoid: {
-		flex: 1,
-	},
-	scrollContent: {
-		flexGrow: 1,
-	},
-	backgroundCircle: {
-		position: 'absolute',
-		top: -200,
-		right: -100,
-		width: 400,
-		height: 400,
-		borderRadius: 200,
-		backgroundColor: '#4C51BF15',
-	},
-	contentContainer: {
-		flex: 1,
-		padding: 24,
-		justifyContent: 'space-between',
-	},
-	logoContainer: {
-		alignItems: 'center',
-		marginTop: 40,
-	},
-	logo: {
-		width: 150,
-		height: 150,
-	},
-	headingContainer: {
-		alignItems: 'center',
-		marginTop: 20,
-		marginBottom: 40,
-	},
-	heading: {
-		fontSize: 28,
-		fontWeight: 'bold',
-		color: '#1A202C',
-		marginBottom: 8,
-	},
-	subheading: {
-		fontSize: 16,
-		color: '#4A5568',
-	},
-	formContainer: {
-		marginBottom: 30,
-	},
-	errorText: {
-		color: '#E53E3E',
-		marginBottom: 16,
-		textAlign: 'center',
-	},
-	inputContainer: {
-		marginBottom: 20,
-	},
-	inputLabel: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#4A5568',
-		marginBottom: 8,
-	},
-	input: {
-		backgroundColor: '#F7FAFC',
-		borderRadius: 12,
-		paddingHorizontal: 16,
-		paddingVertical: 14,
-		fontSize: 16,
-		color: '#1A202C',
-		borderWidth: 1,
-		borderColor: '#E2E8F0',
-	},
-	passwordContainer: {
-		flexDirection: 'row',
-		alignItems: 'center',
-		backgroundColor: '#F7FAFC',
-		borderRadius: 12,
-		borderWidth: 1,
-		borderColor: '#E2E8F0',
-	},
-	passwordInput: {
-		flex: 1,
-		paddingHorizontal: 16,
-		paddingVertical: 14,
-		fontSize: 16,
-		color: '#1A202C',
-	},
-	visibilityIcon: {
-		padding: 12,
-	},
-	forgotPasswordContainer: {
-		alignItems: 'flex-end',
-		marginBottom: 24,
-	},
-	forgotPasswordText: {
-		color: '#4C51BF',
-		fontSize: 14,
-		fontWeight: '600',
-	},
-	button: {
-		backgroundColor: '#4C51BF',
-		paddingVertical: 16,
-		borderRadius: 16,
-		shadowColor: '#4C51BF',
-		shadowOffset: {
-			width: 0,
-			height: 4,
-		},
-		shadowOpacity: 0.3,
-		shadowRadius: 8,
-		elevation: 5,
-	},
-	buttonText: {
-		color: '#FFFFFF',
-		textAlign: 'center',
-		fontSize: 18,
-		fontWeight: '600',
-	},
-	signupContainer: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		marginTop: 24,
-	},
-	signupText: {
-		color: '#4A5568',
-		fontSize: 16,
-	},
-	signupLink: {
-		color: '#4C51BF',
-		fontSize: 16,
-		fontWeight: '600',
-	},
-});
 
 export default LoginScreen;

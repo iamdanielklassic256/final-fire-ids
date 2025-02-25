@@ -1,16 +1,40 @@
-import { View, Text, StyleSheet, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator } from 'react-native';
 import React, { useState, useEffect, useRef } from 'react';
-import { USERS_VERFIY_OTP } from '../../api/api';
+import { USERS_VERFIY_OTP, USER_AUTH_LOGIN_API } from '../../api/api';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 const VerifyOTPPage = ({ route, navigation }) => {
-  const { email } = route.params;
-  const [otp, setOtp] = useState(['', '', '', '']);
+  // State to store the email retrieved from AsyncStorage
+  const [email, setEmail] = useState('');
+  const [otp, setOtp] = useState(['', '', '', '', '']);
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [timer, setTimer] = useState(30);
   const [canResend, setCanResend] = useState(false);
   
   const inputRefs = useRef([]);
+
+  // Fetch email from AsyncStorage when component mounts
+  useEffect(() => {
+    const getEmailFromStorage = async () => {
+      try {
+        const storedEmail = await AsyncStorage.getItem('userEmail');
+        if (storedEmail) {
+          setEmail(storedEmail);
+          console.log('userEmail from AsyncStorage:', storedEmail);
+        } else {
+          console.log('No email found in AsyncStorage');
+          setError('User email not found. Please login again.');
+        }
+      } catch (error) {
+        console.error('Error retrieving email from AsyncStorage:', error);
+        setError('Error retrieving user data');
+      }
+    };
+
+    getEmailFromStorage();
+  }, []);
 
   useEffect(() => {
     let interval = null;
@@ -31,7 +55,7 @@ const VerifyOTPPage = ({ route, navigation }) => {
     setOtp(newOtp);
     
     // Auto-focus to the next input
-    if (text && index < 3) {
+    if (text && index < 4) {
       inputRefs.current[index + 1].focus();
     }
   };
@@ -46,8 +70,13 @@ const VerifyOTPPage = ({ route, navigation }) => {
   const handleVerifyOtp = async () => {
     const otpCode = otp.join('');
     
-    if (otpCode.length !== 4) {
-      setError('Please enter the complete 4-digit OTP');
+    if (otpCode.length !== 5) {
+      setError('Please enter the complete 5-digit OTP');
+      return;
+    }
+    
+    if (!email) {
+      setError('User email not available. Please login again.');
       return;
     }
     
@@ -65,16 +94,26 @@ const VerifyOTPPage = ({ route, navigation }) => {
           otp: otpCode,
         }),
       });
+
+      console.log('OTP verification response status:', response.status);
       
-      const data = await response.json();
-      
-      if (response.ok) {
-        // Store auth token if provided by the API
-        // Example: await AsyncStorage.setItem('authToken', data.token);
+      if (response.status === 200) {
+        // Get response data
+        const responseData = await response.json();
+        console.log('Response data:', responseData);
         
-        // Navigate to the main app screen
-        navigation.replace('Dashboard');
+        // Store access token
+        await AsyncStorage.setItem('accessToken', responseData.accessToken);
+        
+        // Store user data as JSON string
+        await AsyncStorage.setItem('userData', JSON.stringify(responseData.data));
+        
+        console.log('Data stored successfully in AsyncStorage');
+        
+        // Navigate to the dashboard
+        router.push("/dashboard");
       } else {
+        const data = await response.json();
         setError(data.message || 'Invalid OTP. Please try again.');
       }
     } catch (err) {
@@ -85,62 +124,34 @@ const VerifyOTPPage = ({ route, navigation }) => {
     }
   };
 
-  const handleResendOtp = async () => {
-    if (!canResend) return;
-    
-    setCanResend(false);
-    setTimer(30);
-    
-    // Implement the API call to resend OTP
-    // This would typically call the same login API again
-    try {
-      const response = await fetch(USER_AUTH_LOGIN_API, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          resendOtp: true, // You might need to adjust based on your API
-        }),
-      });
-      
-      if (!response.ok) {
-        setError('Failed to resend OTP. Please try again.');
-      }
-    } catch (err) {
-      setError('Network error. Please try again later.');
-    }
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-white">
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardAvoid}
+        className="flex-1"
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.contentContainer}>
-            <View style={styles.headingContainer}>
-              <Text style={styles.heading}>Verify OTP</Text>
-              <Text style={styles.subheading}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+          <View className="flex-1 p-6 justify-center">
+            <View className="items-center mb-10">
+              <Text className="text-3xl font-bold text-gray-900 mb-4">Verify OTP</Text>
+              <Text className="text-base text-gray-600 text-center">
                 We've sent a verification code to
               </Text>
-              <Text style={styles.emailText}>{email}</Text>
+              <Text className="text-base font-semibold text-[#f27c22] mt-1">{email}</Text>
             </View>
 
             {/* Error message if any */}
             {error ? (
-              <Text style={styles.errorText}>{error}</Text>
+              <Text className="text-red-600 mb-4 text-center">{error}</Text>
             ) : null}
 
             {/* OTP Input */}
-            <View style={styles.otpContainer}>
+            <View className="flex-row justify-between mb-10">
               {otp.map((digit, index) => (
                 <TextInput
                   key={index}
                   ref={(ref) => (inputRefs.current[index] = ref)}
-                  style={styles.otpInput}
+                  className="w-16 h-16 rounded-xl bg-gray-50 border border-gray-200 text-2xl font-bold text-center"
                   value={digit}
                   onChangeText={(text) => handleOtpChange(text.replace(/[^0-9]/g, ''), index)}
                   onKeyPress={(e) => handleKeyPress(e, index)}
@@ -152,131 +163,28 @@ const VerifyOTPPage = ({ route, navigation }) => {
 
             {/* Verify Button */}
             <TouchableOpacity 
-              style={styles.button}
+              className="bg-[#f27c22] py-4 rounded-2xl mb-6 shadow-lg"
+              style={{
+                shadowColor: '#f27c22',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 5,
+              }}
               onPress={handleVerifyOtp}
               disabled={isLoading}
             >
               {isLoading ? (
                 <ActivityIndicator color="#FFFFFF" />
               ) : (
-                <Text style={styles.buttonText}>Verify</Text>
+                <Text className="text-white text-center text-lg font-semibold">Verify</Text>
               )}
             </TouchableOpacity>
-
-            {/* Resend OTP */}
-            <View style={styles.resendContainer}>
-              <Text style={styles.resendText}>Didn't receive the code? </Text>
-              {canResend ? (
-                <TouchableOpacity onPress={handleResendOtp}>
-                  <Text style={styles.resendLink}>Resend OTP</Text>
-                </TouchableOpacity>
-              ) : (
-                <Text style={styles.timerText}>Resend in {timer}s</Text>
-              )}
-            </View>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  keyboardAvoid: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-  },
-  contentContainer: {
-    flex: 1,
-    padding: 24,
-    justifyContent: 'center',
-  },
-  headingContainer: {
-    alignItems: 'center',
-    marginBottom: 40,
-  },
-  heading: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#1A202C',
-    marginBottom: 16,
-  },
-  subheading: {
-    fontSize: 16,
-    color: '#4A5568',
-    textAlign: 'center',
-  },
-  emailText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#4C51BF',
-    marginTop: 4,
-  },
-  errorText: {
-    color: '#E53E3E',
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  otpContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 40,
-  },
-  otpInput: {
-    width: 70,
-    height: 70,
-    borderRadius: 12,
-    backgroundColor: '#F7FAFC',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    fontSize: 24,
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  button: {
-    backgroundColor: '#4C51BF',
-    paddingVertical: 16,
-    borderRadius: 16,
-    shadowColor: '#4C51BF',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-    marginBottom: 24,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    textAlign: 'center',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  resendContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-  },
-  resendText: {
-    color: '#4A5568',
-    fontSize: 16,
-  },
-  resendLink: {
-    color: '#4C51BF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  timerText: {
-    color: '#A0AEC0',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-});
 
 export default VerifyOTPPage;
