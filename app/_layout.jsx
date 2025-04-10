@@ -41,10 +41,7 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="auth/sign-in" options={{ headerShown: false }} />
-          <Stack.Screen name="auth/verify-otp" options={{ headerShown: false }} />
           <Stack.Screen name="dashboard/index" options={{ headerShown: false }} />
-         
-
         </Stack>
       </GestureHandlerRootView>
       {/* </Provider> */}

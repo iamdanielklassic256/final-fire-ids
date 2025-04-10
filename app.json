@@ -4,11 +4,11 @@
     "slug": "pro-church-manager",
     "version": "0.1.1",
     "orientation": "portrait",
-    "icon": "./assets/logo/3.png",
+    "icon": "./assets/logo/4.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/logo/3.png",
+      "image": "./assets/logo/4.png",
       "resizeMode": "cover",
       "backgroundColor": "#f27c22"
     },
