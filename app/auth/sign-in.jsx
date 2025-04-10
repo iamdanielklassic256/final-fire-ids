@@ -17,6 +17,7 @@ import logo from '../../assets/logo/logo.png';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ForgotPasswordModal from '../../components/authenication/ForgotPasswordModal';
 import { USER_AUTH_PIN_LOGIN_API } from '../../api/api';
+import { router } from 'expo-router';
 
 const LoginScreen = ({ navigation }) => {
 	const [email, setEmail] = useState('');
@@ -103,7 +104,7 @@ const LoginScreen = ({ navigation }) => {
 				setPin('');
 
 				// Navigate to home screen
-				navigation.replace('Home');
+				 router.push('/dashboard')
 			}
 			else if (response.status === 406) {
 				// Invalid credentials
