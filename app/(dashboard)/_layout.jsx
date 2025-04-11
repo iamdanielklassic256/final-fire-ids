@@ -1,102 +1,55 @@
-import React from 'react';
-import { StatusBar } from "expo-status-bar";
-import { router, Tabs } from "expo-router";
-import { View, Text, Dimensions, TouchableOpacity } from "react-native";
-import { Ionicons } from '@expo/vector-icons';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { Tabs } from 'expo-router';
+import { StatusBar, Platform } from 'react-native';
 
-const TabIcon = ({ iconName, focused, name }) => (
-  <View style={{
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 70,
-  }}>
-    <Ionicons 
-      name={iconName} 
-      size={24} 
-      color={focused ? "#00E394" : "#666"} 
-    />
-    <Text style={{ 
-      color: focused ? "#00E394" : "#666",
-      fontSize: 12,
-      marginTop: 4 
-    }}>
-      {name}
-    </Text>
-  </View>
-);
-
-const TabLayout = () => {
+export default function TabLayout() {
   return (
     <>
+      <StatusBar backgroundColor="#f27c22" barStyle="light-content" />
+
       <Tabs
         screenOptions={{
-          tabBarStyle: { display: 'none' }
+          tabBarActiveTintColor: '#f27c22',
+          tabBarInactiveTintColor: '#A0AEC0', // muted gray for inactive
+          tabBarStyle: {
+            height: 70,
+            paddingBottom: Platform.OS === 'ios' ? 20 : 10,
+            paddingTop: 10,
+            borderTopLeftRadius: 20,
+            borderTopRightRadius: 20,
+            backgroundColor: '#ffffff',
+            shadowColor: '#000',
+            shadowOffset: { width: 0, height: -2 },
+            shadowOpacity: 0.05,
+            shadowRadius: 4,
+            elevation: 5, // for Android shadow
+          },
+          tabBarLabelStyle: {
+            fontSize: 12,
+            fontWeight: '600',
+          },
         }}
       >
         <Tabs.Screen
           name="dashboard"
           options={{
             headerShown: false,
+            title: 'Dashboard',
+            tabBarIcon: ({ color }) => (
+              <FontAwesome size={24} name="home" color={color} />
+            ),
           }}
         />
         <Tabs.Screen
-          name="profile"
+          name="settings"
           options={{
-            headerShown: false,
+            title: 'Settings',
+            tabBarIcon: ({ color }) => (
+              <FontAwesome size={24} name="cog" color={color} />
+            ),
           }}
         />
       </Tabs>
-
-      {/* Custom Tab Bar */}
-      <View style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        height: 60,
-        backgroundColor: '#fff',
-        borderTopWidth: 1,
-        borderTopColor: '#eee',
-      }}>
-        <View style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          paddingHorizontal: 30,
-          height: '100%',
-        }}>
-          {/* Home Tab */}
-          <TouchableOpacity
-            onPress={() => router.push('/app')}
-            style={{
-              justifyContent: 'center',
-            }}
-          >
-            <TabIcon
-              iconName="home"
-              focused={router.pathname === '/app'}
-              name="Home"
-            />
-          </TouchableOpacity>
-
-          {/* Settings Tab */}
-          <TouchableOpacity
-            onPress={() => router.push('/profile')}
-            style={{
-              justifyContent: 'center',
-            }}
-          >
-            <TabIcon
-              iconName="settings"
-              focused={router.pathname === '/profile'}
-              name="Settings"
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-      
-      <StatusBar style="dark" />
     </>
   );
-};
-
-export default TabLayout;
+}

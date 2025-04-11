@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { StatusBar } from 'react-native';
 
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
@@ -38,6 +39,7 @@ export default function RootLayout() {
   return (
     <>
       <GestureHandlerRootView style={{ flex: 1 }}>
+        <StatusBar backgroundColor="#f27c22" barStyle="light-content" />
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />

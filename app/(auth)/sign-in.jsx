@@ -41,7 +41,7 @@ const LoginScreen = ({ navigation }) => {
 
 	const handleLogin = async () => {
 		console.log('handling login')
-		router.push('/dashboard')
+		
 		// Reset previous errors
 		setError('');
 
@@ -81,7 +81,7 @@ const LoginScreen = ({ navigation }) => {
 				}),
 			});
 
-			console.log(response.status)
+			// console.log(response.status)
 
 			const data = await response.json();
 
@@ -91,22 +91,18 @@ const LoginScreen = ({ navigation }) => {
 			if (response.status === 201) {
 				// Success - store user data
 				await AsyncStorage.setItem('userEmail', email);
-
 				// Store auth token if present
-				if (data.token) {
-					await AsyncStorage.setItem('authToken', data.token);
+				if (data.accessToken) {
+					await AsyncStorage.setItem('authToken', data.accessToken);
 				}
-
 				// Store user data if available
-				if (data.user) {
-					await AsyncStorage.setItem('userData', JSON.stringify(data.user));
+				if (data.data) {
+					await AsyncStorage.setItem('userData', JSON.stringify(data.data));
 				}
-
 				// Clear PIN field for security
 				setPin('');
-
 				// Navigate to home screen
-
+				router.push('/dashboard')
 			}
 			else if (response.status === 406) {
 				// Invalid credentials
