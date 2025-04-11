@@ -43,6 +43,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="settings"
           options={{
+            headerShown: false,
             title: 'Settings',
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="cog" color={color} />

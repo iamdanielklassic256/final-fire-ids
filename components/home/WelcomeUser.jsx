@@ -8,8 +8,9 @@ import {
   import React, { useEffect, useState } from 'react';
   import { Ionicons } from '@expo/vector-icons';
   import { LinearGradient } from 'expo-linear-gradient';
+import { handleLogout } from '../../utils/logout';
   
-  const WelcomeUser = ({ user, handleLogout, loadingUser }) => {
+  const WelcomeUser = ({ user, loadingUser }) => {
 	const [greeting, setGreeting] = useState('');
 	const [greetingIcon, setGreetingIcon] = useState('');
 	const [gradientColors, setGradientColors] = useState(['#111827', '#111827']);

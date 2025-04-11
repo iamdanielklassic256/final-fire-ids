@@ -28,20 +28,12 @@ const DashboardScreen = () => {
     getUserData();
   }, []);
 
-  const handleLogout = async () => {
-    try {
-      await AsyncStorage.multiRemove(['authToken', 'userData', 'userEmail']);
-      router.replace('/sign-in');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
+ 
 
 
   return (
     <SafeAreaView className="flex-1 bg-gray-50">
       <WelcomeUser
-        handleLogout={handleLogout}
         user={user}
         loadingUser={loadingUser}
       />
