@@ -40,6 +40,8 @@ const LoginScreen = ({ navigation }) => {
 	}, []);
 
 	const handleLogin = async () => {
+		console.log('handling login')
+		router.push('/dashboard')
 		// Reset previous errors
 		setError('');
 
@@ -67,7 +69,7 @@ const LoginScreen = ({ navigation }) => {
 
 		try {
 			// Make API call to login
-			const response = await fetch('http://localhost:9000/api/v1/users/auth/login-with-pin', {
+			const response = await fetch(USER_AUTH_PIN_LOGIN_API, {
 				method: 'POST',
 				headers: {
 					'Accept': '*/*',
@@ -104,7 +106,7 @@ const LoginScreen = ({ navigation }) => {
 				setPin('');
 
 				// Navigate to home screen
-				 router.push('/dashboard')
+
 			}
 			else if (response.status === 406) {
 				// Invalid credentials

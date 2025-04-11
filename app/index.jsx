@@ -32,7 +32,7 @@ const WelcomeScreen = ({ navigation }) => {
   }, [currentIndex]);
 
   const handleRoute = () => {
-    router.push('/auth/sign-in')
+    router.push('/sign-in')
   }
 
   return (

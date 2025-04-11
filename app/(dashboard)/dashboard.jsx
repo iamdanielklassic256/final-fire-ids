@@ -51,7 +51,7 @@ const DashboardScreen = () => {
         } else {
           console.log('No user data found');
           // Redirect to login if no user data is found
-          router.replace('/auth/login');
+          // router.replace('/sign-in');
         }
       } catch (error) {
         console.error('Error retrieving user data:', error);
@@ -69,7 +69,7 @@ const DashboardScreen = () => {
       await AsyncStorage.multiRemove(['accessToken', 'userData', 'userEmail']);
       
       // Navigate to login screen
-      router.replace('/auth/sign-in');
+      router.replace('/sign-in');
     } catch (error) {
       console.error('Error during logout:', error);
     }
