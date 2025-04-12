@@ -1,8 +1,20 @@
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
+import {
+	View,
+	Text,
+	TextInput,
+	TouchableOpacity,
+	ActivityIndicator,
+	SafeAreaView,
+	KeyboardAvoidingView,
+	Platform,
+	ScrollView
+} from 'react-native';
 import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { USER_AUTH_PIN_CHANGE_API } from '../../api/api';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 const PinChangeScreen = () => {
 	const [currentPin, setCurrentPin] = useState('');
@@ -11,10 +23,12 @@ const PinChangeScreen = () => {
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
-
 	const [user, setUser] = useState(null);
 	const [loadingUser, setLoadingUser] = useState(true);
-	
+	const [showCurrentPin, setShowCurrentPin] = useState(false);
+	const [showNewPin, setShowNewPin] = useState(false);
+	const [showConfirmPin, setShowConfirmPin] = useState(false);
+
 	useEffect(() => {
 		const getUserData = async () => {
 			try {
@@ -29,7 +43,7 @@ const PinChangeScreen = () => {
 				setLoadingUser(false);
 			}
 		};
-	
+
 		getUserData();
 	}, []);
 
@@ -94,39 +108,28 @@ const PinChangeScreen = () => {
 			setConfirmPin('');
 		} catch (error) {
 			console.error('Change PIN error:', error);
-			
+
 			// Handle different types of errors
 			if (error.response) {
-				// The request was made and the server responded with a status code
-				// that falls out of the range of 2xx
 				const statusCode = error.response.status;
 				const errorData = error.response.data;
-				
+
 				if (statusCode === 400) {
-					// Bad request - usually validation errors
 					setError(errorData.message || 'Invalid PIN information provided');
 				} else if (statusCode === 401) {
-					// Unauthorized
 					setError('Your session has expired. Please log in again.');
-					// You might want to redirect to login screen here
 				} else if (statusCode === 403) {
-					// Forbidden
 					setError('You do not have permission to change this PIN');
 				} else if (statusCode === 404) {
-					// Not found
 					setError('User account not found');
 				} else if (statusCode === 409) {
-					// Conflict
 					setError('Current PIN is incorrect');
 				} else {
-					// Other server errors
 					setError(errorData.message || 'Server error. Please try again later.');
 				}
 			} else if (error.request) {
-				// The request was made but no response was received
 				setError('No response from server. Please check your internet connection.');
 			} else {
-				// Something happened in setting up the request
 				setError('Failed to send request. Please try again.');
 			}
 		} finally {
@@ -134,16 +137,15 @@ const PinChangeScreen = () => {
 		}
 	};
 
+	// Simple animation effect for PIN dots
 	const renderPinDots = (pin) => {
 		return (
-			<View style={styles.pinDotsContainer}>
+			<View className="flex-row justify-center space-x-3 mt-2">
 				{[...Array(4)].map((_, index) => (
 					<View
 						key={index}
-						style={[
-							styles.pinDot,
-							index < pin.length ? styles.pinDotFilled : {}
-						]}
+						className={`h-3 w-3 rounded-full ${index < pin.length ? 'bg-[#f27c22]' : 'bg-gray-200'
+							} ${index < pin.length ? 'scale-110' : 'scale-100'}`}
 					/>
 				))}
 			</View>
@@ -152,222 +154,177 @@ const PinChangeScreen = () => {
 
 	if (loadingUser) {
 		return (
-			<SafeAreaView style={styles.safeArea}>
-				<View style={styles.loadingContainer}>
-					<ActivityIndicator size="large" color="#3b82f6" />
-					<Text style={styles.loadingText}>Loading user data...</Text>
+			<SafeAreaView className="flex-1 bg-white">
+				<View className="flex-1 items-center justify-center">
+					<ActivityIndicator size="large" color="#f27c22" />
+					<Text className="mt-4 text-gray-600 font-medium">Loading your account...</Text>
 				</View>
 			</SafeAreaView>
 		);
 	}
 
+	const handleGoBack = () => {
+		router.back();
+	};
+
 	return (
-		<SafeAreaView style={styles.safeArea}>
+		<SafeAreaView className="flex-1 bg-white">
+			{/* Background gradients */}
+			<View className="absolute top-0 left-0 right-0 h-64 bg-indigo-50 rounded-b-3xl" />
+			<View className="absolute top-0 right-0 w-48 h-48 bg-[#f27c22] rounded-bl-full opacity-70" />
+
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-				style={styles.keyboardAvoid}
+				className="flex-1"
 			>
-				<View style={styles.container}>
-					<Text style={styles.title}>Change PIN</Text>
-					<Text style={styles.subtitle}>Update your secure 4-digit PIN</Text>
-
-					{/* Error message display with improved visibility */}
-					{error ? (
-						<View style={styles.errorContainer}>
-							<Text style={styles.errorText}>{error}</Text>
-						</View>
-					) : null}
-
-					{/* Success message display with improved visibility */}
-					{success ? (
-						<View style={styles.successContainer}>
-							<Text style={styles.successText}>{success}</Text>
-						</View>
-					) : null}
-
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>Current PIN</Text>
-						<TextInput
-							style={styles.input}
-							value={currentPin}
-							onChangeText={setCurrentPin}
-							keyboardType="numeric"
-							secureTextEntry
-							maxLength={4}
-							placeholder="Enter current PIN"
-						/>
-						{renderPinDots(currentPin)}
-					</View>
-
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>New PIN</Text>
-						<TextInput
-							style={styles.input}
-							value={newPin}
-							onChangeText={setNewPin}
-							keyboardType="numeric"
-							secureTextEntry
-							maxLength={4}
-							placeholder="Enter new PIN"
-						/>
-						{renderPinDots(newPin)}
-					</View>
-
-					<View style={styles.inputGroup}>
-						<Text style={styles.label}>Confirm New PIN</Text>
-						<TextInput
-							style={styles.input}
-							value={confirmPin}
-							onChangeText={setConfirmPin}
-							keyboardType="numeric"
-							secureTextEntry
-							maxLength={4}
-							placeholder="Confirm new PIN"
-						/>
-						{renderPinDots(confirmPin)}
-					</View>
-
+				<ScrollView
+					showsVerticalScrollIndicator={false}
+					contentContainerStyle={{ flexGrow: 1 }}
+					className="px-6"
+				>
 					<TouchableOpacity
-						style={[styles.button, loading && styles.buttonDisabled]}
-						onPress={handleChangePin}
-						disabled={loading}
+						onPress={handleGoBack}
+						className="mt-4"
 					>
-						{loading ? (
-							<ActivityIndicator color="#fff" size="small" />
-						) : (
-							<Text style={styles.buttonText}>Update PIN</Text>
-						)}
+						<View className="flex-row items-center">
+							<Ionicons name="arrow-back" size={24} color="#f27c22" />
+						</View>
 					</TouchableOpacity>
+					<View className="mt-12 mb-4">
+						<View className="flex-row items-center">
+							<Ionicons name="shield-checkmark" size={32} color="#f27c22" />
+							<Text className="text-3xl font-bold text-gray-800 ml-3">Security Center</Text>
+						</View>
+						<Text className="text-lg text-gray-600 mt-2">Update your PIN for secure access</Text>
+					</View>
 
-					<Text style={styles.securityNote}>
-						For security reasons, choose a PIN that you don't use elsewhere.
-					</Text>
-				</View>
+					{/* Error & Success Messages */}
+					{error ? (
+						<View className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
+							<View className="flex-row items-center">
+								<Ionicons name="alert-circle" size={20} color="#dc2626" />
+								<Text className="text-red-700 font-medium ml-2">{error}</Text>
+							</View>
+						</View>
+					) : null}
+
+					{success ? (
+						<View className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6">
+							<View className="flex-row items-center">
+								<Ionicons name="checkmark-circle" size={20} color="#059669" />
+								<Text className="text-green-700 font-medium ml-2">{success}</Text>
+							</View>
+						</View>
+					) : null}
+
+					<View className="mt-6">
+						{/* Current PIN Field */}
+						<View className="mb-6">
+							<Text className="text-sm font-semibold text-gray-700 mb-2">Current PIN</Text>
+							<View className="flex-row items-center border border-gray-300 bg-gray-50 rounded-xl overflow-hidden">
+								<TextInput
+									className="flex-1 px-4 py-3 text-gray-800"
+									value={currentPin}
+									onChangeText={setCurrentPin}
+									keyboardType="numeric"
+									secureTextEntry={!showCurrentPin}
+									maxLength={4}
+									placeholder="Enter current PIN"
+									placeholderTextColor="#9ca3af"
+								/>
+								<TouchableOpacity
+									className="px-4"
+									onPress={() => setShowCurrentPin(!showCurrentPin)}
+								>
+									<Ionicons
+										name={showCurrentPin ? "eye-off-outline" : "eye-outline"}
+										size={22}
+										color="#6b7280"
+									/>
+								</TouchableOpacity>
+							</View>
+							{renderPinDots(currentPin)}
+						</View>
+
+						{/* New PIN Field */}
+						<View className="mb-6">
+							<Text className="text-sm font-semibold text-gray-700 mb-2">New PIN</Text>
+							<View className="flex-row items-center border border-gray-300 bg-gray-50 rounded-xl overflow-hidden">
+								<TextInput
+									className="flex-1 px-4 py-3 text-gray-800"
+									value={newPin}
+									onChangeText={setNewPin}
+									keyboardType="numeric"
+									secureTextEntry={!showNewPin}
+									maxLength={4}
+									placeholder="Enter new PIN"
+									placeholderTextColor="#9ca3af"
+								/>
+								<TouchableOpacity
+									className="px-4"
+									onPress={() => setShowNewPin(!showNewPin)}
+								>
+									<Ionicons
+										name={showNewPin ? "eye-off-outline" : "eye-outline"}
+										size={22}
+										color="#6b7280"
+									/>
+								</TouchableOpacity>
+							</View>
+							{renderPinDots(newPin)}
+						</View>
+
+						{/* Confirm New PIN Field */}
+						<View className="mb-8">
+							<Text className="text-sm font-semibold text-gray-700 mb-2">Confirm New PIN</Text>
+							<View className="flex-row items-center border border-gray-300 bg-gray-50 rounded-xl overflow-hidden">
+								<TextInput
+									className="flex-1 px-4 py-3 text-gray-800"
+									value={confirmPin}
+									onChangeText={setConfirmPin}
+									keyboardType="numeric"
+									secureTextEntry={!showConfirmPin}
+									maxLength={4}
+									placeholder="Confirm new PIN"
+									placeholderTextColor="#9ca3af"
+								/>
+								<TouchableOpacity
+									className="px-4"
+									onPress={() => setShowConfirmPin(!showConfirmPin)}
+								>
+									<Ionicons
+										name={showConfirmPin ? "eye-off-outline" : "eye-outline"}
+										size={22}
+										color="#6b7280"
+									/>
+								</TouchableOpacity>
+							</View>
+							{renderPinDots(confirmPin)}
+						</View>
+
+						{/* Update PIN Button */}
+						<TouchableOpacity
+							className={`${loading ? 'bg-indigo-400' : 'bg-[#f27c22]'} py-4 rounded-xl shadow-md flex-row justify-center items-center mb-6`}
+							onPress={handleChangePin}
+							disabled={loading}
+						>
+							{loading ? (
+								<>
+									<ActivityIndicator color="#ffffff" size="small" />
+									<Text className="text-white font-semibold ml-2">Updating...</Text>
+								</>
+							) : (
+								<>
+									<Ionicons name="shield-checkmark" size={20} color="#ffffff" />
+									<Text className="text-white text-center text-lg font-semibold ml-2">Update PIN</Text>
+								</>
+							)}
+						</TouchableOpacity>
+					</View>
+				</ScrollView>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
 };
-
-const styles = StyleSheet.create({
-	safeArea: {
-		flex: 1,
-		backgroundColor: '#f9fafb',
-	},
-	keyboardAvoid: {
-		flex: 1,
-	},
-	container: {
-		flex: 1,
-		padding: 24,
-		justifyContent: 'center',
-	},
-	loadingContainer: {
-		flex: 1,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	loadingText: {
-		marginTop: 12,
-		fontSize: 16,
-		color: '#64748b',
-	},
-	title: {
-		fontSize: 28,
-		fontWeight: 'bold',
-		color: '#1e293b',
-		marginBottom: 8,
-	},
-	subtitle: {
-		fontSize: 16,
-		color: '#64748b',
-		marginBottom: 32,
-	},
-	errorContainer: {
-		backgroundColor: '#fee2e2',
-		borderRadius: 8,
-		padding: 12,
-		marginBottom: 20,
-	},
-	successContainer: {
-		backgroundColor: '#d1fae5',
-		borderRadius: 8,
-		padding: 12,
-		marginBottom: 20,
-	},
-	inputGroup: {
-		marginBottom: 24,
-	},
-	label: {
-		fontSize: 14,
-		fontWeight: '600',
-		color: '#475569',
-		marginBottom: 8,
-	},
-	input: {
-		height: 54,
-		borderWidth: 1,
-		borderColor: '#e2e8f0',
-		borderRadius: 12,
-		paddingHorizontal: 16,
-		fontSize: 16,
-		backgroundColor: '#fff',
-		color: '#1e293b',
-		marginBottom: 12,
-	},
-	pinDotsContainer: {
-		flexDirection: 'row',
-		justifyContent: 'center',
-		marginTop: 4,
-	},
-	pinDot: {
-		width: 12,
-		height: 12,
-		borderRadius: 6,
-		backgroundColor: '#e2e8f0',
-		marginHorizontal: 8,
-	},
-	pinDotFilled: {
-		backgroundColor: '#3b82f6',
-	},
-	button: {
-		height: 56,
-		backgroundColor: '#3b82f6',
-		borderRadius: 12,
-		justifyContent: 'center',
-		alignItems: 'center',
-		marginTop: 16,
-		shadowColor: '#3b82f6',
-		shadowOffset: { width: 0, height: 4 },
-		shadowOpacity: 0.2,
-		shadowRadius: 8,
-		elevation: 4,
-	},
-	buttonDisabled: {
-		backgroundColor: '#93c5fd',
-	},
-	buttonText: {
-		color: '#fff',
-		fontSize: 16,
-		fontWeight: '600',
-	},
-	errorText: {
-		color: '#b91c1c',
-		fontSize: 14,
-		fontWeight: '500',
-		textAlign: 'center',
-	},
-	successText: {
-		color: '#047857',
-		fontSize: 14,
-		fontWeight: '500',
-		textAlign: 'center',
-	},
-	securityNote: {
-		color: '#64748b',
-		fontSize: 12,
-		textAlign: 'center',
-		marginTop: 24,
-	},
-});
 
 export default PinChangeScreen;
