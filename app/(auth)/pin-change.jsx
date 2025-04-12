@@ -1,5 +1,5 @@
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, StyleSheet, SafeAreaView, KeyboardAvoidingView, Platform } from 'react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { USER_AUTH_PIN_CHANGE_API } from '../../api/api';
@@ -12,12 +12,40 @@ const PinChangeScreen = () => {
 	const [error, setError] = useState('');
 	const [success, setSuccess] = useState('');
 
+	const [user, setUser] = useState(null);
+	const [loadingUser, setLoadingUser] = useState(true);
+	
+	useEffect(() => {
+		const getUserData = async () => {
+			try {
+				const userData = await AsyncStorage.getItem('userData');
+				if (userData) {
+					setUser(JSON.parse(userData));
+				}
+			} catch (error) {
+				console.error('Failed to load user data:', error);
+				setError('Failed to load user data. Please restart the app.');
+			} finally {
+				setLoadingUser(false);
+			}
+		};
+	
+		getUserData();
+	}, []);
+
+	const userId = user?.id;
+
 	const handleChangePin = async () => {
 		// Reset states
 		setError('');
 		setSuccess('');
 
 		// Validation
+		if (!userId) {
+			setError('User information not found. Please log in again.');
+			return;
+		}
+
 		if (currentPin.length !== 4) {
 			setError('Current PIN must be exactly 4 digits');
 			return;
@@ -33,6 +61,11 @@ const PinChangeScreen = () => {
 			return;
 		}
 
+		if (currentPin === newPin) {
+			setError('New PIN must be different from current PIN');
+			return;
+		}
+
 		try {
 			setLoading(true);
 			const token = await AsyncStorage.getItem('authToken');
@@ -43,12 +76,14 @@ const PinChangeScreen = () => {
 			const response = await axios.post(
 				USER_AUTH_PIN_CHANGE_API,
 				{
+					userId,
 					currentPin,
 					newPin,
 				},
 				{
 					headers: {
 						Authorization: `Bearer ${token}`,
+						'Content-Type': 'application/json',
 					},
 				}
 			);
@@ -58,8 +93,42 @@ const PinChangeScreen = () => {
 			setNewPin('');
 			setConfirmPin('');
 		} catch (error) {
-			console.error('Change PIN error:', error?.response?.data || error.message);
-			setError(error?.response?.data?.message || 'Failed to change PIN');
+			console.error('Change PIN error:', error);
+			
+			// Handle different types of errors
+			if (error.response) {
+				// The request was made and the server responded with a status code
+				// that falls out of the range of 2xx
+				const statusCode = error.response.status;
+				const errorData = error.response.data;
+				
+				if (statusCode === 400) {
+					// Bad request - usually validation errors
+					setError(errorData.message || 'Invalid PIN information provided');
+				} else if (statusCode === 401) {
+					// Unauthorized
+					setError('Your session has expired. Please log in again.');
+					// You might want to redirect to login screen here
+				} else if (statusCode === 403) {
+					// Forbidden
+					setError('You do not have permission to change this PIN');
+				} else if (statusCode === 404) {
+					// Not found
+					setError('User account not found');
+				} else if (statusCode === 409) {
+					// Conflict
+					setError('Current PIN is incorrect');
+				} else {
+					// Other server errors
+					setError(errorData.message || 'Server error. Please try again later.');
+				}
+			} else if (error.request) {
+				// The request was made but no response was received
+				setError('No response from server. Please check your internet connection.');
+			} else {
+				// Something happened in setting up the request
+				setError('Failed to send request. Please try again.');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -81,6 +150,17 @@ const PinChangeScreen = () => {
 		);
 	};
 
+	if (loadingUser) {
+		return (
+			<SafeAreaView style={styles.safeArea}>
+				<View style={styles.loadingContainer}>
+					<ActivityIndicator size="large" color="#3b82f6" />
+					<Text style={styles.loadingText}>Loading user data...</Text>
+				</View>
+			</SafeAreaView>
+		);
+	}
+
 	return (
 		<SafeAreaView style={styles.safeArea}>
 			<KeyboardAvoidingView
@@ -90,6 +170,20 @@ const PinChangeScreen = () => {
 				<View style={styles.container}>
 					<Text style={styles.title}>Change PIN</Text>
 					<Text style={styles.subtitle}>Update your secure 4-digit PIN</Text>
+
+					{/* Error message display with improved visibility */}
+					{error ? (
+						<View style={styles.errorContainer}>
+							<Text style={styles.errorText}>{error}</Text>
+						</View>
+					) : null}
+
+					{/* Success message display with improved visibility */}
+					{success ? (
+						<View style={styles.successContainer}>
+							<Text style={styles.successText}>{success}</Text>
+						</View>
+					) : null}
 
 					<View style={styles.inputGroup}>
 						<Text style={styles.label}>Current PIN</Text>
@@ -133,9 +227,6 @@ const PinChangeScreen = () => {
 						{renderPinDots(confirmPin)}
 					</View>
 
-					{error ? <Text style={styles.errorText}>{error}</Text> : null}
-					{success ? <Text style={styles.successText}>{success}</Text> : null}
-
 					<TouchableOpacity
 						style={[styles.button, loading && styles.buttonDisabled]}
 						onPress={handleChangePin}
@@ -170,6 +261,16 @@ const styles = StyleSheet.create({
 		padding: 24,
 		justifyContent: 'center',
 	},
+	loadingContainer: {
+		flex: 1,
+		justifyContent: 'center',
+		alignItems: 'center',
+	},
+	loadingText: {
+		marginTop: 12,
+		fontSize: 16,
+		color: '#64748b',
+	},
 	title: {
 		fontSize: 28,
 		fontWeight: 'bold',
@@ -180,6 +281,18 @@ const styles = StyleSheet.create({
 		fontSize: 16,
 		color: '#64748b',
 		marginBottom: 32,
+	},
+	errorContainer: {
+		backgroundColor: '#fee2e2',
+		borderRadius: 8,
+		padding: 12,
+		marginBottom: 20,
+	},
+	successContainer: {
+		backgroundColor: '#d1fae5',
+		borderRadius: 8,
+		padding: 12,
+		marginBottom: 20,
 	},
 	inputGroup: {
 		marginBottom: 24,
@@ -238,15 +351,15 @@ const styles = StyleSheet.create({
 		fontWeight: '600',
 	},
 	errorText: {
-		color: '#ef4444',
+		color: '#b91c1c',
 		fontSize: 14,
-		marginBottom: 16,
+		fontWeight: '500',
 		textAlign: 'center',
 	},
 	successText: {
-		color: '#10b981',
+		color: '#047857',
 		fontSize: 14,
-		marginBottom: 16,
+		fontWeight: '500',
 		textAlign: 'center',
 	},
 	securityNote: {

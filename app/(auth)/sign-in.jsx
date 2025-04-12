@@ -74,8 +74,8 @@ const LoginScreen = () => {
 		}
 
 		// PIN validation
-		if (pin.length < 4 || pin.length > 6) {
-			setError('PIN must be between 4-6 digits');
+		if (pin.length === 4) {
+			setError('PIN must be between 4 digits');
 			return;
 		}
 
@@ -231,11 +231,11 @@ const LoginScreen = () => {
 								<View className="flex-row items-center bg-gray-50 rounded-xl border border-gray-200">
 									<TextInput
 										className="flex-1 px-4 py-3.5 text-base text-gray-900"
-										placeholder="Enter your PIN (4-6 digits)"
+										placeholder="Enter your PIN (4 digits)"
 										placeholderTextColor="#A0AEC0"
 										secureTextEntry={!showPin}
 										keyboardType="numeric"
-										maxLength={6}
+										maxLength={4}
 										value={pin}
 										onChangeText={setPin}
 										style={{ minHeight: 48 }}
