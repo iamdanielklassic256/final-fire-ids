@@ -74,10 +74,10 @@ const LoginScreen = () => {
 		}
 
 		// PIN validation
-		if (pin.length === 4) {
-			setError('PIN must be between 4 digits');
-			return;
-		}
+		// if (pin.length == 4) {
+		// 	setError('PIN must be 4 digits');
+		// 	return;
+		// }
 
 		// Start loading
 		setIsLoading(true);
