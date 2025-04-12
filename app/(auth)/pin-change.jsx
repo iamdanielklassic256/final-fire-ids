@@ -9,12 +9,13 @@ import {
 	Platform,
 	ScrollView
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 import { USER_AUTH_PIN_CHANGE_API } from '../../api/api';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { ThemeContext } from '../../context/ThemeContext'; // Import ThemeContext
 
 const PinChangeScreen = () => {
 	const [currentPin, setCurrentPin] = useState('');
@@ -28,6 +29,10 @@ const PinChangeScreen = () => {
 	const [showCurrentPin, setShowCurrentPin] = useState(false);
 	const [showNewPin, setShowNewPin] = useState(false);
 	const [showConfirmPin, setShowConfirmPin] = useState(false);
+
+	// Get theme from context
+	const { theme } = useContext(ThemeContext);
+	const darkMode = theme === 'dark';
 
 	useEffect(() => {
 		const getUserData = async () => {
@@ -144,8 +149,9 @@ const PinChangeScreen = () => {
 				{[...Array(4)].map((_, index) => (
 					<View
 						key={index}
-						className={`h-3 w-3 rounded-full ${index < pin.length ? 'bg-[#f27c22]' : 'bg-gray-200'
-							} ${index < pin.length ? 'scale-110' : 'scale-100'}`}
+						className={`h-3 w-3 rounded-full ${
+							index < pin.length ? 'bg-[#f27c22]' : darkMode ? 'bg-gray-600' : 'bg-gray-200'
+						} ${index < pin.length ? 'scale-110' : 'scale-100'}`}
 					/>
 				))}
 			</View>
@@ -154,10 +160,12 @@ const PinChangeScreen = () => {
 
 	if (loadingUser) {
 		return (
-			<SafeAreaView className="flex-1 bg-white">
+			<SafeAreaView className={`flex-1 ${darkMode ? 'bg-gray-900' : 'bg-white'}`}>
 				<View className="flex-1 items-center justify-center">
 					<ActivityIndicator size="large" color="#f27c22" />
-					<Text className="mt-4 text-gray-600 font-medium">Loading your account...</Text>
+					<Text className={`mt-4 ${darkMode ? 'text-gray-300' : 'text-gray-600'} font-medium`}>
+						Loading your account...
+					</Text>
 				</View>
 			</SafeAreaView>
 		);
@@ -167,11 +175,20 @@ const PinChangeScreen = () => {
 		router.back();
 	};
 
+	// Theme-based styles
+	const bgColor = darkMode ? 'bg-gray-900' : 'bg-white';
+	const textColor = darkMode ? 'text-gray-100' : 'text-gray-800';
+	const subTextColor = darkMode ? 'text-gray-300' : 'text-gray-600';
+	const inputBgColor = darkMode ? 'bg-gray-800' : 'bg-gray-50';
+	const inputBorderColor = darkMode ? 'border-gray-700' : 'border-gray-300';
+	const headerGradient = darkMode ? 'bg-gray-800' : 'bg-indigo-50';
+	const accentCorner = darkMode ? 'bg-[#d26418]' : 'bg-[#f27c22]';
+
 	return (
-		<SafeAreaView className="flex-1 bg-white">
+		<SafeAreaView className={`flex-1 ${bgColor}`}>
 			{/* Background gradients */}
-			<View className="absolute top-0 left-0 right-0 h-64 bg-indigo-50 rounded-b-3xl" />
-			<View className="absolute top-0 right-0 w-48 h-48 bg-[#f27c22] rounded-bl-full opacity-70" />
+			<View className={`absolute top-0 left-0 right-0 h-64 ${headerGradient} rounded-b-3xl`} />
+			<View className={`absolute top-0 right-0 w-48 h-48 ${accentCorner} rounded-bl-full opacity-70`} />
 
 			<KeyboardAvoidingView
 				behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -193,9 +210,9 @@ const PinChangeScreen = () => {
 					<View className="mt-12 mb-4">
 						<View className="flex-row items-center">
 							<Ionicons name="shield-checkmark" size={32} color="#f27c22" />
-							<Text className="text-3xl font-bold text-gray-800 ml-3">Security Center</Text>
+							<Text className={`text-3xl font-bold ${textColor} ml-3`}>Security Center</Text>
 						</View>
-						<Text className="text-lg text-gray-600 mt-2">Update your PIN for secure access</Text>
+						<Text className={`text-lg ${subTextColor} mt-2`}>Update your PIN for secure access</Text>
 					</View>
 
 					{/* Error & Success Messages */}
@@ -220,17 +237,17 @@ const PinChangeScreen = () => {
 					<View className="mt-6">
 						{/* Current PIN Field */}
 						<View className="mb-6">
-							<Text className="text-sm font-semibold text-gray-700 mb-2">Current PIN</Text>
-							<View className="flex-row items-center border border-gray-300 bg-gray-50 rounded-xl overflow-hidden">
+							<Text className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Current PIN</Text>
+							<View className={`flex-row items-center border ${inputBorderColor} ${inputBgColor} rounded-xl overflow-hidden`}>
 								<TextInput
-									className="flex-1 px-4 py-3 text-gray-800"
+									className={`flex-1 px-4 py-3 ${textColor}`}
 									value={currentPin}
 									onChangeText={setCurrentPin}
 									keyboardType="numeric"
 									secureTextEntry={!showCurrentPin}
 									maxLength={4}
 									placeholder="Enter current PIN"
-									placeholderTextColor="#9ca3af"
+									placeholderTextColor={darkMode ? "#9ca3af" : "#9ca3af"}
 								/>
 								<TouchableOpacity
 									className="px-4"
@@ -239,7 +256,7 @@ const PinChangeScreen = () => {
 									<Ionicons
 										name={showCurrentPin ? "eye-off-outline" : "eye-outline"}
 										size={22}
-										color="#6b7280"
+										color={darkMode ? "#9ca3af" : "#6b7280"}
 									/>
 								</TouchableOpacity>
 							</View>
@@ -248,17 +265,17 @@ const PinChangeScreen = () => {
 
 						{/* New PIN Field */}
 						<View className="mb-6">
-							<Text className="text-sm font-semibold text-gray-700 mb-2">New PIN</Text>
-							<View className="flex-row items-center border border-gray-300 bg-gray-50 rounded-xl overflow-hidden">
+							<Text className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>New PIN</Text>
+							<View className={`flex-row items-center border ${inputBorderColor} ${inputBgColor} rounded-xl overflow-hidden`}>
 								<TextInput
-									className="flex-1 px-4 py-3 text-gray-800"
+									className={`flex-1 px-4 py-3 ${textColor}`}
 									value={newPin}
 									onChangeText={setNewPin}
 									keyboardType="numeric"
 									secureTextEntry={!showNewPin}
 									maxLength={4}
 									placeholder="Enter new PIN"
-									placeholderTextColor="#9ca3af"
+									placeholderTextColor={darkMode ? "#9ca3af" : "#9ca3af"}
 								/>
 								<TouchableOpacity
 									className="px-4"
@@ -267,7 +284,7 @@ const PinChangeScreen = () => {
 									<Ionicons
 										name={showNewPin ? "eye-off-outline" : "eye-outline"}
 										size={22}
-										color="#6b7280"
+										color={darkMode ? "#9ca3af" : "#6b7280"}
 									/>
 								</TouchableOpacity>
 							</View>
@@ -276,17 +293,17 @@ const PinChangeScreen = () => {
 
 						{/* Confirm New PIN Field */}
 						<View className="mb-8">
-							<Text className="text-sm font-semibold text-gray-700 mb-2">Confirm New PIN</Text>
-							<View className="flex-row items-center border border-gray-300 bg-gray-50 rounded-xl overflow-hidden">
+							<Text className={`text-sm font-semibold ${darkMode ? 'text-gray-300' : 'text-gray-700'} mb-2`}>Confirm New PIN</Text>
+							<View className={`flex-row items-center border ${inputBorderColor} ${inputBgColor} rounded-xl overflow-hidden`}>
 								<TextInput
-									className="flex-1 px-4 py-3 text-gray-800"
+									className={`flex-1 px-4 py-3 ${textColor}`}
 									value={confirmPin}
 									onChangeText={setConfirmPin}
 									keyboardType="numeric"
 									secureTextEntry={!showConfirmPin}
 									maxLength={4}
 									placeholder="Confirm new PIN"
-									placeholderTextColor="#9ca3af"
+									placeholderTextColor={darkMode ? "#9ca3af" : "#9ca3af"}
 								/>
 								<TouchableOpacity
 									className="px-4"
@@ -295,7 +312,7 @@ const PinChangeScreen = () => {
 									<Ionicons
 										name={showConfirmPin ? "eye-off-outline" : "eye-outline"}
 										size={22}
-										color="#6b7280"
+										color={darkMode ? "#9ca3af" : "#6b7280"}
 									/>
 								</TouchableOpacity>
 							</View>
