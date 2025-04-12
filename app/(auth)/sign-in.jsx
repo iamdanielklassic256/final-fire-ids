@@ -9,7 +9,6 @@ import {
 	Platform,
 	ScrollView,
 	ActivityIndicator,
-	Alert,
 } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
@@ -19,8 +18,9 @@ import ForgotPasswordModal from '../../components/authenication/ForgotPasswordMo
 import { USER_AUTH_PIN_LOGIN_API } from '../../api/api';
 import { router } from 'expo-router';
 
-const LoginScreen = ({ navigation }) => {
-	const [email, setEmail] = useState('');
+const LoginScreen = () => {
+	const [identifier, setIdentifier] = useState('');
+	const [identifierType, setIdentifierType] = useState('email'); // 'email' or 'phone'
 	const [pin, setPin] = useState('');
 	const [error, setError] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
@@ -28,34 +28,49 @@ const LoginScreen = ({ navigation }) => {
 	const [showPin, setShowPin] = useState(false);
 
 	useEffect(() => {
-		const getSavedEmail = async () => {
+		const getSavedIdentifier = async () => {
 			try {
-				const userEmail = await AsyncStorage.getItem("userEmail");
-				if (userEmail) setEmail(userEmail);
+				const savedIdentifier = await AsyncStorage.getItem("userIdentifier");
+				const savedType = await AsyncStorage.getItem("identifierType");
+				
+				if (savedIdentifier) setIdentifier(savedIdentifier);
+				if (savedType) setIdentifierType(savedType);
 			} catch (error) {
-				console.error('Error retrieving saved email:', error);
+				console.error('Error retrieving saved identifier:', error);
 			}
 		};
-		getSavedEmail();
+		getSavedIdentifier();
 	}, []);
 
 	const handleLogin = async () => {
-		console.log('handling login')
+		console.log('handling login');
 		
 		// Reset previous errors
 		setError('');
 
 		// Input validation
-		if (!email || !pin) {
-			setError('Email and PIN are required');
+		if (!identifier || !pin) {
+			setError('Email/Phone and PIN are required');
 			return;
 		}
 
-		// Email validation
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-		if (!emailRegex.test(email)) {
-			setError('Please enter a valid email address');
-			return;
+		// Email validation if using email
+		if (identifierType === 'email') {
+			const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+			if (!emailRegex.test(identifier)) {
+				setError('Please enter a valid email address');
+				return;
+			}
+		}
+
+		// Phone validation if using phone
+		if (identifierType === 'phone') {
+			// Basic phone validation - adjust as needed for your requirements
+			const phoneRegex = /^\d{10,15}$/;
+			if (!phoneRegex.test(identifier.replace(/[^0-9]/g, ''))) {
+				setError('Please enter a valid phone number');
+				return;
+			}
 		}
 
 		// PIN validation
@@ -68,6 +83,17 @@ const LoginScreen = ({ navigation }) => {
 		setIsLoading(true);
 
 		try {
+			// Prepare the request body based on identifier type
+			const requestBody = {
+				pin
+			};
+			
+			if (identifierType === 'email') {
+				requestBody.email = identifier;
+			} else {
+				requestBody.phoneNumber = identifier;
+			}
+
 			// Make API call to login
 			const response = await fetch(USER_AUTH_PIN_LOGIN_API, {
 				method: 'POST',
@@ -75,22 +101,19 @@ const LoginScreen = ({ navigation }) => {
 					'Accept': '*/*',
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({
-					email,
-					pin,
-				}),
+				body: JSON.stringify(requestBody),
 			});
-
-			// console.log(response.status)
 
 			const data = await response.json();
 
-			console.log(data)
+			console.log(data);
 
 			// Handle response based on status code
 			if (response.status === 201) {
 				// Success - store user data
-				await AsyncStorage.setItem('userEmail', email);
+				await AsyncStorage.setItem('userIdentifier', identifier);
+				await AsyncStorage.setItem('identifierType', identifierType);
+				
 				// Store auth token if present
 				if (data.accessToken) {
 					await AsyncStorage.setItem('authToken', data.accessToken);
@@ -102,11 +125,11 @@ const LoginScreen = ({ navigation }) => {
 				// Clear PIN field for security
 				setPin('');
 				// Navigate to home screen
-				router.push('/dashboard')
+				router.push('/dashboard');
 			}
 			else if (response.status === 406) {
 				// Invalid credentials
-				setError('Invalid email or PIN. Please try again.');
+				setError('Invalid credentials or PIN. Please try again.');
 			}
 			else {
 				// Other errors
@@ -123,6 +146,11 @@ const LoginScreen = ({ navigation }) => {
 	const togglePinVisibility = () => setShowPin(!showPin);
 
 	const handleForgotPassword = () => setModalVisible(true);
+
+	const toggleIdentifierType = () => {
+		setIdentifierType(prevType => prevType === 'email' ? 'phone' : 'email');
+		setIdentifier(''); // Clear the identifier field when switching
+	};
 
 	return (
 		<SafeAreaView className="flex-1 bg-white">
@@ -163,22 +191,36 @@ const LoginScreen = ({ navigation }) => {
 						<View className="mb-8">
 							{error ? (
 								<View className="mb-4">
-									<Text className="text-red-600 text-center">{error}
-									</Text>
-
+									<Text className="text-red-600 text-center">{error}</Text>
 								</View>
 							) : null}
-							{/* Email Field */}
+							
+							{/* Toggle Button for Email/Phone */}
+							<View className="mb-5 flex-row justify-end">
+								<TouchableOpacity 
+									className="flex-row items-center" 
+									onPress={toggleIdentifierType}
+								>
+									<Text className="text-[#f27c22] text-sm font-semibold mr-2">
+										Use {identifierType === 'email' ? 'Phone' : 'Email'} Instead
+									</Text>
+									<Ionicons name="swap-horizontal" size={16} color="#f27c22" />
+								</TouchableOpacity>
+							</View>
+
+							{/* Identifier Field (Email or Phone) */}
 							<View className="mb-5">
-								<Text className="text-sm font-semibold text-gray-600 mb-2">Email</Text>
+								<Text className="text-sm font-semibold text-gray-600 mb-2">
+									{identifierType === 'email' ? 'Email' : 'Phone Number'}
+								</Text>
 								<TextInput
 									className="bg-gray-50 rounded-xl px-4 py-3.5 text-base text-gray-900 border border-gray-200"
-									placeholder="Enter your email"
+									placeholder={identifierType === 'email' ? "Enter your email" : "Enter your phone number"}
 									placeholderTextColor="#A0AEC0"
-									keyboardType="email-address"
+									keyboardType={identifierType === 'email' ? "email-address" : "phone-pad"}
 									autoCapitalize="none"
-									value={email}
-									onChangeText={setEmail}
+									value={identifier}
+									onChangeText={setIdentifier}
 									style={{ minHeight: 48 }}
 								/>
 							</View>

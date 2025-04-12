@@ -17,6 +17,7 @@ export default function RootLayout() {
       <GestureHandlerRootView style={{ flex: 1 }}>
         <Stack screenOptions={{headerShown: false}}>
           <Stack.Screen name="sign-in" options={{ headerShown: false }} />
+          <Stack.Screen name="pin-change" options={{ headerShown: false }} />
         </Stack>
       </GestureHandlerRootView>
       {/* </Provider> */}

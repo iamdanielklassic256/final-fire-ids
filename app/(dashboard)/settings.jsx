@@ -11,8 +11,13 @@ const SettingScreen = () => {
 
 
 	const handlePersonalDetails = () => {
-		console.log('handling route to personal details')
+		// console.log('handling route to personal details')
 		router.push('/profile')
+	}
+
+	const handlePinChange = () => {
+		// console.log('handling pin change path')
+		router.push('/pin-change')
 	}
 
 
@@ -31,9 +36,10 @@ const SettingScreen = () => {
 					/>
 					<SettingItem
 						icon="key-outline"
-						title="Change Password"
+						title="Change PINCODE"
 						description="Update your security credentials"
 						action={<SettingArrow />}
+						handlePath={handlePinChange}
 					/>
 				</SettingSection>
 

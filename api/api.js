@@ -4,6 +4,7 @@ const API_BASE_URL = 'https://apiv1.gulubcc.org/api/v1'
 
 // ########### AUTHENTICATION #########
 export const USER_AUTH_PIN_LOGIN_API = `${API_BASE_URL}/users/auth/login-with-pin`;
+export const USER_AUTH_PIN_CHANGE_API = `${API_BASE_URL}/users/auth/change-pin	`;
 
 
 

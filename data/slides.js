@@ -1,6 +1,6 @@
 export const slides = [
   {
-	title: "Welcome to Pro Church",
+	title: "Welcome",
 	description: "Your complete church management solution in one place"
   },
   {
