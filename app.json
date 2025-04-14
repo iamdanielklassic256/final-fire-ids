@@ -1,23 +1,23 @@
 {
   "expo": {
-    "name": "Pro Church Manager",
-    "slug": "pro-church-manager",
+    "name": "Bible Church Connect",
+    "slug": "bible-church-connect",
     "version": "0.1.1",
     "orientation": "portrait",
-    "icon": "./assets/logo/4.png",
+    "icon": "./assets/logo/logo.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/logo/4.png",
+      "image": "./assets/logo/logo.png",
       "resizeMode": "cover",
-      "backgroundColor": "#f27c22"
+      "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo/3.png",
+        "foregroundImage": "./assets/logo/logo.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.iamdanielklassic.akibaapp"
@@ -25,7 +25,7 @@
     "web": {
       "bundler": "metro",
       "output": "static",
-      "favicon": "./assets/logo/3.png"
+      "favicon": "./assets/logo/logo.png"
     },
     "plugins": [
       "expo-router",
