@@ -41,10 +41,9 @@ export default function RootLayout() {
     <>
     <ThemeProvider>
       <GestureHandlerRootView style={{ flex: 1 }}>
-        <StatusBar backgroundColor="#f27c22" barStyle="light-content" />
+        <StatusBar backgroundColor="#000000" barStyle="light-content" />
         <Stack screenOptions={{headerShown: false}}>
           <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
         </Stack>
       </GestureHandlerRootView>
