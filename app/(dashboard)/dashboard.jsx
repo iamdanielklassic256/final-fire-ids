@@ -5,6 +5,7 @@ import logo from '../../assets/logo/logo.png';
 import bibledata from '../../data/bible/bible.json';
 import AppHeader from '../../components/home/AppHeader';
 import DashboardSection from '../../components/bible/DashboardSection';
+import VersionSection from '../../components/bible/VersionSection';
 
 const DashboardScreen = () => {
   const [currentDate] = useState(new Date());
@@ -81,23 +82,9 @@ const DashboardScreen = () => {
 
   // Render Bible versions
   const renderVersions = () => (
-    <FlatList
-      className="flex-1"
-      contentContainerStyle={{ padding: 24 }}
-      data={bibledata.versions}
-      keyExtractor={(item, index) => index.toString()}
-      ListHeaderComponent={
-        <Text className="text-white text-xl font-bold mb-4">Select Bible Version</Text>
-      }
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          className="bg-gray-800 p-4 rounded-xl mb-3"
-          onPress={() => handleVersionSelect(item)}
-        >
-          <Text className="text-white text-lg">{item.name}</Text>
-          <Text className="text-gray-400">{item.full_name}</Text>
-        </TouchableOpacity>
-      )}
+    <VersionSection
+      handleVersionSelect={handleVersionSelect}
+      bibledata={bibledata}
     />
   );
 
