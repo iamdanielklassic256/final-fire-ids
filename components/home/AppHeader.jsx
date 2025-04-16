@@ -1,8 +1,7 @@
-import { View, Text, TouchableOpacity, Image, Animated } from 'react-native'
-import React, { useContext, useRef, useEffect } from 'react'
-import logo from '../../assets/logo/logo.png'
+import { View, Text, TouchableOpacity } from 'react-native'
+import React, { useContext, useEffect, useState } from 'react'
 import { ThemeContext } from '../../context/ThemeContext'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import Reanimated, { 
   useAnimatedStyle, 
   useSharedValue, 
@@ -12,52 +11,52 @@ import Reanimated, {
   Easing as ReanimatedEasing
 } from 'react-native-reanimated'
 
-const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
 const ReanimatedView = Reanimated.View;
 
-const AppHeader = ({ formattedDate, handleBack, activeSection }) => {
+const AppHeader = ({ formattedDate, handleBack, activeSection, }) => {
   const { theme, toggleTheme } = useContext(ThemeContext)
   const opacity = useSharedValue(0);
   const translateY = useSharedValue(-20);
   const iconRotation = useSharedValue(0);
+  const [greeting, setGreeting] = useState('Hello');
+  const [greetingIcon, setGreetingIcon] = useState('sunny-outline');
   
-  // Define theme colors directly in component to avoid import issues
-  const themeColors = {
-    light: {
-      background: '#FFFFFF',
-      text: '#000000',
-      primary: '#007AFF',
-      secondary: '#5856D6',
-      border: '#E5E5EA',
-      card: '#F2F2F7',
-    },
-    dark: {
-      background: '#121212',
-      text: '#FFFFFF',
-      primary: '#0A84FF',
-      secondary: '#5E5CE6',
-      border: '#38383A',
-      card: '#1C1C1E',
-    }
-  }
-  
-  const colors = themeColors[theme] || themeColors.light;
+  const isDark = theme === 'dark';
 
   useEffect(() => {
     // Initial animation
-    opacity.value = withTiming(1, { duration: 500 });
-    translateY.value = withTiming(0, { duration: 500 });
+    opacity.value = withTiming(1, { duration: 600 });
+    translateY.value = withTiming(0, { duration: 600, easing: ReanimatedEasing.bezier(0.25, 0.1, 0.25, 1) });
     
     // Theme toggle animation
-    iconRotation.value = theme === 'dark' ? withTiming(1, { duration: 300 }) : withTiming(0, { duration: 300 });
+    iconRotation.value = withSpring(isDark ? 1 : 0, { damping: 12 });
+    
+    // Set time-based greeting
+    updateGreeting();
+    
+    // Update greeting every minute
+    const intervalId = setInterval(updateGreeting, 60000);
+    
+    return () => clearInterval(intervalId);
   }, [theme]);
 
-  const headerStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [{ translateY: translateY.value }],
-    };
-  });
+  const updateGreeting = () => {
+    const currentHour = new Date().getHours();
+    
+    if (currentHour >= 5 && currentHour < 12) {
+      setGreeting('Good morning');
+      setGreetingIcon('sunny-outline');
+    } else if (currentHour >= 12 && currentHour < 17) {
+      setGreeting('Good afternoon');
+      setGreetingIcon('partly-sunny-outline');
+    } else if (currentHour >= 17 && currentHour < 22) {
+      setGreeting('Good evening');
+      setGreetingIcon('moon-outline');
+    } else {
+      setGreeting('Good night');
+      setGreetingIcon('cloudy-night-outline');
+    }
+  };
 
   const iconStyle = useAnimatedStyle(() => {
     return {
@@ -67,97 +66,87 @@ const AppHeader = ({ formattedDate, handleBack, activeSection }) => {
     };
   });
 
+  const getGreetingColor = () => {
+    const currentHour = new Date().getHours();
+    
+    if (currentHour >= 5 && currentHour < 12) {
+      return isDark ? 'text-yellow-400' : 'text-yellow-500'; // Morning - Yellow
+    } else if (currentHour >= 12 && currentHour < 17) {
+      return isDark ? 'text-blue-400' : 'text-blue-500'; // Afternoon - Blue
+    } else if (currentHour >= 17 && currentHour < 22) {
+      return isDark ? 'text-orange-400' : 'text-orange-500'; // Evening - Orange
+    } else {
+      return isDark ? 'text-indigo-400' : 'text-indigo-500'; // Night - Purple
+    }
+  };
+
   return (
-    <ReanimatedView style={[
-      { backgroundColor: colors.background },
-      { padding: 16, paddingTop: 20, paddingBottom: 24 },
-      headerStyle
-    ]}>
-      <View style={{ 
-  flexDirection: 'row', 
-  justifyContent: 'space-between', 
-  alignItems: 'center',
-  marginTop: 10 // Add some spacing from status bar
-}}>
-        <View>
+    <>
+      <View className="mx-2 p-3 rounded-lg bg-gray-900 h-[100px] mb-5 flex-row justify-between items-center mt-2">
+        <View className="max-w-[60%]">
           {activeSection === 'dashboard' ? (
             <View>
-              <Text style={{ 
-                color: colors.text, 
-                fontFamily: 'Poppins-Bold',
-                fontSize: 20,
-                marginBottom: 4
-              }}>
-                Welcome back
-              </Text>
-              <Text style={{ 
-                color: colors.secondary, 
-                fontFamily: 'Poppins-Regular',
-                opacity: 0.7
-              }}>
-                {formattedDate}
-              </Text>
+              <View className="flex-row items-center mb-1">
+                <Ionicons
+                  name={greetingIcon}
+                  size={18}
+                  color="#f3f4f6"
+                  style={{ marginRight: 6 }}
+                />
+                <Text className={`${getGreetingColor()} font-bold text-xl`}>
+                  {greeting}
+                </Text>
+              </View>
+             
+              <View className="flex-row items-center">
+                <MaterialCommunityIcons 
+                  name="calendar-outline" 
+                  size={16} 
+                  color={isDark ? "#a78bfa" : "#6366f1"} 
+                  style={{ marginRight: 4 }} 
+                />
+                <Text className="text-indigo-400 text-sm">
+                  {formattedDate}
+                </Text>
+              </View>
             </View>
           ) : (
             <TouchableOpacity 
               onPress={handleBack} 
-              style={{ flexDirection: 'row', alignItems: 'center' }}
+              className="flex-row items-center bg-gray-800 py-2 px-3 rounded-xl"
             >
-              <Ionicons name="chevron-back" size={22} color={colors.primary} />
-              <Text style={{ 
-                color: colors.primary, 
-                fontFamily: 'Poppins-Medium',
-                fontSize: 16,
-              }}>
+              <Ionicons 
+                name="chevron-back" 
+                size={20} 
+                color="#60a5fa" 
+              />
+              <Text className="text-blue-400 font-medium text-base ml-1">
                 Back
               </Text>
             </TouchableOpacity>
           )}
         </View>
 
-        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <View className="flex-row items-center">
+          {/* Theme toggle button */}
           <TouchableOpacity 
             onPress={toggleTheme} 
-            style={{ marginRight: 16 }}
+            className="mr-3"
             activeOpacity={0.7}
           >
-            <View style={{ 
-              backgroundColor: colors.card,
-              width: 48, 
-              height: 48, 
-              borderRadius: 24,
-              alignItems: 'center',
-              justifyContent: 'center',
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 3,
-              elevation: 3
-            }}>
+            <View className="bg-gray-800 w-11 h-11 rounded-xl items-center justify-center shadow-sm">
               <ReanimatedView style={iconStyle}>
-                {theme === 'dark' ? (
-                  <Ionicons name="sunny" size={22} color={colors.text} />
+                {isDark ? (
+                  <Ionicons name="sunny" size={22} color="#fcd34d" />
                 ) : (
-                  <Ionicons name="moon" size={22} color={colors.text} />
+                  <Ionicons name="moon" size={22} color="#6366f1" />
                 )}
               </ReanimatedView>
             </View>
           </TouchableOpacity>
-          
-          <TouchableOpacity activeOpacity={0.8}>
-            <Image
-              source={logo}
-              style={{
-                width: 48,
-                height: 48,
-                borderRadius: 24
-              }}
-              resizeMode="contain"
-            />
-          </TouchableOpacity>
         </View>
       </View>
-    </ReanimatedView>
+    </>
   );
 };
 
