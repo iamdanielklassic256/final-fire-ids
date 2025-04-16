@@ -1,269 +1,94 @@
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Switch, Image, StyleSheet, Linking } from 'react-native';
-import React, { useState } from 'react';
+import React from 'react';
+import { View, Text, SafeAreaView, ScrollView, Image, TouchableOpacity, Linking } from 'react-native';
 import logo from '../../assets/logo/logo.png';
+import { ChevronRight, MailCheck, PhoneCall } from 'lucide-react-native';
 
-const SettingScreen = () => {
-  const [darkMode, setDarkMode] = useState(true);
-  const [notifications, setNotifications] = useState(true);
-  const [largeText, setLargeText] = useState(false);
-  
-  const appVersion = "1.0.0";
-  
-  const handleDarkModeToggle = () => setDarkMode(!darkMode);
-  const handleNotificationsToggle = () => setNotifications(!notifications);
-  const handleLargeTextToggle = () => setLargeText(!largeText);
-  
-  const openPrivacyPolicy = () => {
-    Linking.openURL('https://bible.prochurchmanager.com/privacy-policy');
-  };
-  
-  const openTermsOfService = () => {
-    Linking.openURL('https:/bible.prochurchmanager.com/terms-of-service');
-  };
-  
-  const openSupportPage = () => {
-    Linking.openURL('https://bible.prochurchmanager.com/support');
+const AboutScreen = () => {
+  // Function to handle contact links
+  const handleContact = (type, value) => {
+    switch (type) {
+      case 'phone':
+        Linking.openURL(`tel:${value}`);
+        break;
+      case 'email':
+        Linking.openURL(`mailto:${value}`);
+        break;
+    }
   };
 
   return (
-    <SafeAreaView style={[styles.container, darkMode ? styles.darkContainer : styles.lightContainer]}>
-      <ScrollView>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.headerTitle, darkMode ? styles.darkText : styles.lightText]}>Settings</Text>
+    <SafeAreaView className="flex-1 bg-gray-50">
+      <ScrollView className="flex-1">
+        {/* Header Section */}
+        <View className="items-center pt-10 pb-6 bg-white">
+          <Image 
+            source={logo} 
+            className="h-24 w-24 rounded-xl shadow-md mb-4" 
+            resizeMode="contain"
+          />
+          <Text className="text-2xl font-bold text-gray-800">Church Bible Connect</Text>
+          <Text className="text-sm text-gray-500 mt-1">Version 1.0.0</Text>
         </View>
         
-        {/* App Info Section */}
-        <View style={styles.aboutSection}>
-          <Image source={logo} style={styles.logo} />
-          <Text style={[styles.appName, darkMode ? styles.darkText : styles.lightText]}>Bible App</Text>
-          <Text style={[styles.appVersion, darkMode ? styles.greyText : styles.darkGreyText]}>Version {appVersion}</Text>
-          <Text style={[styles.appDescription, darkMode ? styles.greyText : styles.darkGreyText]}>
-            Your daily companion for Bible study and spiritual growth
+        {/* Description Card */}
+        <View className="mx-5 mt-6 bg-white rounded-xl shadow-sm p-5">
+          <Text className="text-gray-700 text-base leading-6 text-center">
+            Church Bible Connect is a mobile application designed to help believers grow in their faith
+            by providing easy access to the Word of God, Bible tools, and spiritual resources.
           </Text>
         </View>
-
-        {/* Preferences Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, darkMode ? styles.darkText : styles.lightText]}>Preferences</Text>
-          
-          <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Dark Mode</Text>
-            <Switch
-              value={darkMode}
-              onValueChange={handleDarkModeToggle}
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={darkMode ? '#f5dd4b' : '#f4f3f4'}
-            />
+        
+        {/* Developer Info */}
+        <View className="mx-5 mt-6 bg-white rounded-xl shadow-sm overflow-hidden">
+          <View className="px-5 py-4 border-b border-gray-100">
+            <Text className="text-gray-500 font-medium text-sm">DEVELOPER</Text>
           </View>
           
-          <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Notifications</Text>
-            <Switch
-              value={notifications}
-              onValueChange={handleNotificationsToggle}
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={notifications ? '#f5dd4b' : '#f4f3f4'}
-            />
-          </View>
-          
-          <View style={styles.settingRow}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Large Text</Text>
-            <Switch
-              value={largeText}
-              onValueChange={handleLargeTextToggle}
-              trackColor={{ false: '#767577', true: '#81b0ff' }}
-              thumbColor={largeText ? '#f5dd4b' : '#f4f3f4'}
-            />
+          <View className="px-5 py-4">
+            <Text className="text-gray-800 font-medium text-lg">Okumu Daniel Comboni</Text>
+            <Text className="text-gray-600 text-sm">CEO and Founder of Pro Church Manager</Text>
           </View>
         </View>
         
-        {/* Bible Settings Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, darkMode ? styles.darkText : styles.lightText]}>Bible Settings</Text>
+        {/* Contact Info */}
+        <View className="mx-5 mt-6 bg-white rounded-xl shadow-sm overflow-hidden">
+          <View className="px-5 py-4 border-b border-gray-100">
+            <Text className="text-gray-500 font-medium text-sm">CONTACT</Text>
+          </View>
           
-          <TouchableOpacity style={styles.settingButton}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Default Bible Version</Text>
-            <View style={styles.settingValue}>
-              <Text style={[styles.valueText, darkMode ? styles.greyText : styles.darkGreyText]}>ESV</Text>
-              <Text style={[styles.chevron, darkMode ? styles.darkText : styles.lightText]}>›</Text>
+          <TouchableOpacity 
+            className="flex-row items-center px-5 py-4 border-b border-gray-100"
+            onPress={() => handleContact('phone', '+256772837541')}
+          >
+            <PhoneCall width={20} height={20} stroke="#4b5563" className="mr-3" />
+            <View className="flex-1">
+              <Text className="text-gray-800">+256 772 837 541</Text>
             </View>
+            <ChevronRight width={20} height={20} stroke="#9ca3af" />
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.settingButton}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Font Size</Text>
-            <View style={styles.settingValue}>
-              <Text style={[styles.valueText, darkMode ? styles.greyText : styles.darkGreyText]}>Medium</Text>
-              <Text style={[styles.chevron, darkMode ? styles.darkText : styles.lightText]}>›</Text>
+          <TouchableOpacity 
+            className="flex-row items-center px-5 py-4"
+            onPress={() => handleContact('email', 'okumucomboni@gmail.com')}
+          >
+            <MailCheck width={20} height={20} stroke="#4b5563" className="mr-3" />
+            <View className="flex-1">
+              <Text className="text-gray-800">okumucomboni@gmail.com</Text>
             </View>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingButton}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Verse Display</Text>
-            <View style={styles.settingValue}>
-              <Text style={[styles.valueText, darkMode ? styles.greyText : styles.darkGreyText]}>Paragraph</Text>
-              <Text style={[styles.chevron, darkMode ? styles.darkText : styles.lightText]}>›</Text>
-            </View>
+            <ChevronRight width={20} height={20} stroke="#9ca3af" />
           </TouchableOpacity>
         </View>
         
-        {/* Support Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, darkMode ? styles.darkText : styles.lightText]}>Support</Text>
-          
-          <TouchableOpacity style={styles.settingButton} onPress={openPrivacyPolicy}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Privacy Policy</Text>
-            <Text style={[styles.chevron, darkMode ? styles.darkText : styles.lightText]}>›</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingButton} onPress={openTermsOfService}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Terms of Service</Text>
-            <Text style={[styles.chevron, darkMode ? styles.darkText : styles.lightText]}>›</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity style={styles.settingButton} onPress={openSupportPage}>
-            <Text style={[styles.settingLabel, darkMode ? styles.darkText : styles.lightText]}>Help & Support</Text>
-            <Text style={[styles.chevron, darkMode ? styles.darkText : styles.lightText]}>›</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Social Media */}
         
-        {/* About App Section */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, darkMode ? styles.darkText : styles.lightText]}>About</Text>
-          
-          <View style={styles.aboutContent}>
-            <Text style={[styles.aboutText, darkMode ? styles.greyText : styles.darkGreyText]}>
-              This Bible app was created to help you study God's Word daily, with features for reading, 
-              searching, and studying the Bible. With multiple translations, devotionals, and study tools, 
-              we hope this app helps deepen your faith journey.
-            </Text>
-            
-            <Text style={[styles.aboutText, darkMode ? styles.greyText : styles.darkGreyText, {marginTop: 10}]}>
-              All Bible content is provided with permission from respective copyright holders. 
-              Bible text is not to be used for commercial purposes without explicit permission.
-            </Text>
-          </View>
-        </View>
         
-        {/* Credits */}
-        <View style={styles.footer}>
-          <Text style={[styles.footerText, darkMode ? styles.greyText : styles.darkGreyText]}>
-            © 2025 Bible App. All rights reserved.
-          </Text>
+        {/* Footer */}
+        <View className="py-8 items-center">
+          <Text className="text-gray-400 text-xs">© 2025 Church Bible Connect. All rights reserved.</Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
-  darkContainer: {
-    backgroundColor: '#121212',
-  },
-  lightContainer: {
-    backgroundColor: '#f8f8f8',
-  },
-  header: {
-    marginTop: 20,
-    marginBottom: 30,
-  },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-  },
-  darkText: {
-    color: '#ffffff',
-  },
-  lightText: {
-    color: '#212121',
-  },
-  greyText: {
-    color: '#a0a0a0',
-  },
-  darkGreyText: {
-    color: '#707070',
-  },
-  aboutSection: {
-    alignItems: 'center',
-    marginBottom: 30,
-    paddingVertical: 20,
-  },
-  logo: {
-    width: 80,
-    height: 80,
-    borderRadius: 15,
-    marginBottom: 15,
-  },
-  appName: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  appVersion: {
-    fontSize: 14,
-    marginBottom: 10,
-  },
-  appDescription: {
-    fontSize: 14,
-    textAlign: 'center',
-    paddingHorizontal: 20,
-  },
-  section: {
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 15,
-  },
-  settingRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(150, 150, 150, 0.2)',
-  },
-  settingButton: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(150, 150, 150, 0.2)',
-  },
-  settingLabel: {
-    fontSize: 16,
-  },
-  settingValue: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  valueText: {
-    fontSize: 16,
-    marginRight: 8,
-  },
-  chevron: {
-    fontSize: 20,
-  },
-  aboutContent: {
-    padding: 10,
-  },
-  aboutText: {
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  footer: {
-    paddingVertical: 20,
-    alignItems: 'center',
-  },
-  footerText: {
-    fontSize: 12,
-  },
-});
-
-export default SettingScreen;
+export default AboutScreen;

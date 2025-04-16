@@ -82,7 +82,7 @@ const AppHeader = ({ formattedDate, handleBack, activeSection, }) => {
 
   return (
     <>
-      <View className="mx-2 p-3 rounded-lg bg-gray-900 h-[100px] mb-5 flex-row justify-between items-center mt-2">
+      <View className="mx-2 p-3 rounded-lg bg-gray-900 h-[100px]  flex-row justify-between items-center mt-2">
         <View className="max-w-[60%]">
           {activeSection === 'dashboard' ? (
             <View>

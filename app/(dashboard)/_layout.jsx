@@ -5,11 +5,11 @@ import { StatusBar, Platform } from 'react-native';
 export default function TabLayout() {
   return (
     <>
-      <StatusBar backgroundColor="#f27c22" barStyle="light-content" />
+      {/* <StatusBar backgroundColor="#000000" barStyle="light-content" /> */}
 
       <Tabs
         screenOptions={{
-          tabBarActiveTintColor: '#f27c22',
+          tabBarActiveTintColor: '#191818',
           tabBarInactiveTintColor: '#A0AEC0', // muted gray for inactive
           tabBarStyle: {
             height: 70,

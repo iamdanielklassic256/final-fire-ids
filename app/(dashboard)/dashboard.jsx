@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import logo from '../../assets/logo/logo.png';
 import bibledata from '../../data/bible/bible.json';
 import AppHeader from '../../components/home/AppHeader';
+import DashboardSection from '../../components/bible/DashboardSection';
 
 const DashboardScreen = () => {
   const [currentDate] = useState(new Date());
@@ -26,17 +27,7 @@ const DashboardScreen = () => {
     text: "I can do all things through Christ who strengthens me."
   };
 
-  const devotionals = [
-    { id: 1, title: "Finding Peace", verse: "John 14:27", duration: "5 min" },
-    { id: 2, title: "Faith Over Fear", verse: "Isaiah 41:10", duration: "7 min" },
-    { id: 3, title: "Daily Strength", verse: "Psalm 46:1", duration: "4 min" }
-  ];
 
-  const readingPlans = [
-    { id: 1, title: "21 Days of Prayer", progress: 60, days: "12/21" },
-    { id: 2, title: "Psalms of Comfort", progress: 30, days: "9/30" },
-    { id: 3, title: "New Testament Journey", progress: 15, days: "27/180" }
-  ];
 
   // Navigate to Bible reading
   const handleReadBible = () => {
@@ -83,24 +74,9 @@ const DashboardScreen = () => {
 
   // Render dashboard content
   const renderDashboard = () => (
-    <ScrollView className="flex-1">
-      {/* Daily Verse Card */}
-      <View className="mx-6 mb-6 p-4 bg-gray-800 rounded-xl">
-        <Text className="text-gray-400 mb-2">VERSE OF THE DAY</Text>
-        <Text className="text-white text-lg mb-2">{dailyVerse.text}</Text>
-        <Text className="text-blue-400">{dailyVerse.reference}</Text>
-      </View>
-
-      {/* Quick Actions */}
-      <View className="mx-6 mb-6 flex-row justify-between">
-        <TouchableOpacity
-          className="bg-blue-600 rounded-xl p-4 flex-1 mr-2 items-center"
-          onPress={handleReadBible}
-        >
-          <Text className="text-white text-base font-medium">Read Bible</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+    <DashboardSection
+      handleReadBible={handleReadBible}
+    />
   );
 
   // Render Bible versions
@@ -215,7 +191,7 @@ const DashboardScreen = () => {
   return (
     <>
       <StatusBar barStyle="light-content" />
-      <SafeAreaView className="flex-1 bg-black/40">
+      <SafeAreaView className="flex-1 bg-gray-900">
         {/* AppHeader */}
         <AppHeader
           activeSection={activeSection}
