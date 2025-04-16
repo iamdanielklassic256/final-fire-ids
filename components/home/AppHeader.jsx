@@ -127,8 +127,7 @@ const AppHeader = ({ formattedDate, handleBack, activeSection, }) => {
           )}
         </View>
 
-        <View className="flex-row items-center">
-          {/* Theme toggle button */}
+        {/* <View className="flex-row items-center">
           <TouchableOpacity 
             onPress={toggleTheme} 
             className="mr-3"
@@ -144,7 +143,7 @@ const AppHeader = ({ formattedDate, handleBack, activeSection, }) => {
               </ReanimatedView>
             </View>
           </TouchableOpacity>
-        </View>
+        </View> */}
       </View>
     </>
   );

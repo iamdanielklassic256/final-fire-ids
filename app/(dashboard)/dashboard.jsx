@@ -6,6 +6,7 @@ import bibledata from '../../data/bible/bible.json';
 import AppHeader from '../../components/home/AppHeader';
 import DashboardSection from '../../components/bible/DashboardSection';
 import VersionSection from '../../components/bible/VersionSection';
+import BookSection from '../../components/bible/BookSection';
 
 const DashboardScreen = () => {
   const [currentDate] = useState(new Date());
@@ -90,24 +91,9 @@ const DashboardScreen = () => {
 
   // Render Bible books
   const renderBooks = () => (
-    <FlatList
-      className="flex-1"
-      contentContainerStyle={{ padding: 24 }}
-      data={selectedVersion.books}
-      keyExtractor={(item, index) => index.toString()}
-      ListHeaderComponent={
-        <Text className="text-white text-xl font-bold mb-2">
-          {selectedVersion.name}: Select Book
-        </Text>
-      }
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          className="bg-gray-800 p-4 rounded-xl mb-3"
-          onPress={() => handleBookSelect(item)}
-        >
-          <Text className="text-white text-lg">{item.name}</Text>
-        </TouchableOpacity>
-      )}
+    <BookSection
+      handleBookSelect={handleBookSelect}
+      selectedVersion={selectedVersion}
     />
   );
 
