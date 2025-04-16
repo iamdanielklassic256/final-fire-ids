@@ -7,6 +7,7 @@ import AppHeader from '../../components/home/AppHeader';
 import DashboardSection from '../../components/bible/DashboardSection';
 import VersionSection from '../../components/bible/VersionSection';
 import BookSection from '../../components/bible/BookSection';
+import ChapterSection from '../../components/bible/ChapterSection';
 
 const DashboardScreen = () => {
   const [currentDate] = useState(new Date());
@@ -15,6 +16,7 @@ const DashboardScreen = () => {
   const [selectedBook, setSelectedBook] = useState(null);
   const [selectedChapter, setSelectedChapter] = useState(null);
   const [currentVerses, setCurrentVerses] = useState([]);
+  const [currentBookIndex, setCurrentBookIndex] = useState(0); // Track book index for navigation
 
   // Format date: Monday, April 14
   const formattedDate = currentDate.toLocaleDateString('en-US', {
@@ -29,8 +31,6 @@ const DashboardScreen = () => {
     text: "I can do all things through Christ who strengthens me."
   };
 
-
-
   // Navigate to Bible reading
   const handleReadBible = () => {
     setActiveSection('versions');
@@ -44,9 +44,41 @@ const DashboardScreen = () => {
 
   // Handle book selection
   const handleBookSelect = (book) => {
+    // Find the index of the selected book in the version's books array
+    if (selectedVersion && selectedVersion.books) {
+      const bookIndex = selectedVersion.books.findIndex(b => b.name === book.name);
+      setCurrentBookIndex(bookIndex >= 0 ? bookIndex : 0);
+    }
+    
     setSelectedBook(book);
     setActiveSection('chapters');
   };
+
+  // Navigate to previous book
+  const navigateToPreviousBook = () => {
+    if (selectedVersion && currentBookIndex > 0) {
+      const prevBook = selectedVersion.books[currentBookIndex - 1];
+      setCurrentBookIndex(currentBookIndex - 1);
+      setSelectedBook(prevBook);
+      // Reset chapter selection
+      setSelectedChapter(null);
+    }
+  };
+
+  // Navigate to next book
+  const navigateToNextBook = () => {
+    if (selectedVersion && currentBookIndex < selectedVersion.books.length - 1) {
+      const nextBook = selectedVersion.books[currentBookIndex + 1];
+      setCurrentBookIndex(currentBookIndex + 1);
+      setSelectedBook(nextBook);
+      // Reset chapter selection
+      setSelectedChapter(null);
+    }
+  };
+
+  // Check if there are previous/next books available
+  const hasPreviousBook = selectedVersion && currentBookIndex > 0;
+  const hasNextBook = selectedVersion && currentBookIndex < selectedVersion.books.length - 1;
 
   // Handle chapter selection
   const handleChapterSelect = (chapter) => {
@@ -103,22 +135,15 @@ const DashboardScreen = () => {
     const chapterNumbers = selectedBook.chapters.map(chapter => ({ number: chapter.number }));
 
     return (
-      <ScrollView className="flex-1" contentContainerStyle={{ padding: 24 }}>
-        <Text className="text-white text-xl font-bold mb-2">
-          {selectedBook.name}: Select Chapter
-        </Text>
-        <View className="flex-row flex-wrap justify-between">
-          {chapterNumbers.map((chapter) => (
-            <TouchableOpacity
-              key={chapter.number}
-              className="bg-gray-800 rounded-xl mb-3 w-16 h-16 items-center justify-center"
-              onPress={() => handleChapterSelect(chapter)}
-            >
-              <Text className="text-white text-xl">{chapter.number}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </ScrollView>
+      <ChapterSection
+        chapterNumbers={chapterNumbers}
+        handleChapterSelect={handleChapterSelect}
+        selectedBook={selectedBook}
+        navigateToPreviousBook={navigateToPreviousBook}
+        navigateToNextBook={navigateToNextBook}
+        hasPreviousBook={hasPreviousBook}
+        hasNextBook={hasNextBook}
+      />
     );
   };
 
@@ -172,7 +197,7 @@ const DashboardScreen = () => {
           handleBack={handleBack}
         />
 
-        {/* Main Content - No outer ScrollView wrapping the entire screen */}
+        {/* Main Content */}
         {renderContent()}
       </SafeAreaView>
     </>
