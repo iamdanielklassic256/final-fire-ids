@@ -35,7 +35,7 @@ export default function TabLayout() {
           name="dashboard"
           options={{
             headerShown: false,
-            title: 'Dashboard',
+            title: 'Home',
             tabBarIcon: ({ color }) => (
               <FontAwesome size={24} name="home" color={color} />
             ),
@@ -45,9 +45,9 @@ export default function TabLayout() {
           name="settings"
           options={{
             headerShown: false,
-            title: 'Settings',
+            title: 'About',
             tabBarIcon: ({ color }) => (
-              <FontAwesome size={24} name="cog" color={color} />
+              <FontAwesome size={24} name="info-circle" color={color} />
             ),
           }}
         />
