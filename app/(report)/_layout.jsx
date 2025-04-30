@@ -21,6 +21,8 @@ export default function RootLayout() {
 				<StatusBar backgroundColor="#000000" barStyle="light-content" />
 				<Stack screenOptions={{ headerShown: false }}>
 					<Stack.Screen name="report" options={{ headerShown: false }} />
+					<Stack.Screen name="safety" options={{ headerShown: false }} />
+					<Stack.Screen name="emergency" options={{ headerShown: false }} />
 				</Stack>
 			</GestureHandlerRootView>
 		</>
