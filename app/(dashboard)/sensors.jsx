@@ -1,12 +1,10 @@
-import { View, Text, StyleSheet, SafeAreaView, ScrollView, TouchableOpacity, StatusBar, Dimensions } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, StatusBar, Dimensions } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { AlertTriangle, Bell, ChevronLeft, Map, Phone, RefreshCw, Shield, Sun, User } from 'lucide-react-native';
+import { AlertTriangle, Battery, Bell, Check, ChevronLeft, Droplet, Map, Phone, RefreshCw, Shield, Sun, Thermometer, User, Wind } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
 const { width } = Dimensions.get('window');
-
-
 
 const SensorScreen = () => {
   const insets = useSafeAreaInsets();
@@ -130,7 +128,7 @@ const SensorScreen = () => {
   };
 
   // Get icon based on sensor type
-  const getSensorIcon = (type)=> {
+  const getSensorIcon = (type) => {
     switch (type) {
       case 'temperature':
         return <Thermometer width={24} height={24} color="#F44336" />;
@@ -147,24 +145,40 @@ const SensorScreen = () => {
     }
   };
 
+  // Get background color based on sensor type
+  const getIconBgColor = (type, status) => {
+    switch (type) {
+      case 'temperature':
+        return 'bg-red-100';
+      case 'humidity':
+        return 'bg-blue-100';
+      case 'smoke':
+        return 'bg-yellow-100';
+      case 'co':
+        return 'bg-purple-100';
+      case 'aqi':
+        return 'bg-green-100';
+      default:
+        return 'bg-gray-100';
+    }
+  };
+
   // Battery indicator component
   const BatteryIndicator = ({ level }) => {
-    let color = '#4CAF50';
-    if (level < 30) color = '#F44336';
-    else if (level < 60) color = '#FF9800';
+    let bgColor = 'bg-green-500';
+    if (level < 30) bgColor = 'bg-red-500';
+    else if (level < 60) bgColor = 'bg-yellow-500';
     
     return (
-      <View style={styles.batteryContainer}>
+      <View className="flex-row items-center">
         <Battery width={14} height={14} color="#666" />
-        <View style={styles.batteryBar}>
+        <View className="w-10 h-2 bg-gray-200 rounded-full mx-1 overflow-hidden">
           <View 
-            style={[
-              styles.batteryLevel, 
-              { width: `${level}%`, backgroundColor: color }
-            ]} 
+            className={`h-full rounded-full ${bgColor}`} 
+            style={{ width: `${level}%` }} 
           />
         </View>
-        <Text style={styles.batteryText}>{level}%</Text>
+        <Text className="text-xs text-gray-500">{level}%</Text>
       </View>
     );
   };
@@ -174,31 +188,34 @@ const SensorScreen = () => {
     return (
       <TouchableOpacity 
         key={sensor.id}
-        style={styles.sensorCard}
+        className="bg-white rounded-xl p-4 mb-3 shadow-sm"
         activeOpacity={0.8}
         accessibilityLabel={`${sensor.name} in ${sensor.location}, value: ${sensor.value}${sensor.unit}, status: ${sensor.status}`}
         accessibilityRole="button"
       >
-        <View style={styles.sensorHeader}>
-          <View style={[styles.sensorIconContainer, { backgroundColor: `${getStatusColor(sensor.status)}20` }]}>
+        <View className="flex-row items-center mb-3">
+          <View className={`w-12 h-12 rounded-lg items-center justify-center mr-3 ${getIconBgColor(sensor.type)}`}>
             {getSensorIcon(sensor.type)}
           </View>
-          <View style={styles.sensorInfo}>
-            <Text style={styles.sensorName}>{sensor.name}</Text>
-            <Text style={styles.sensorLocation}>{sensor.location}</Text>
+          <View className="flex-1">
+            <Text className="text-base font-semibold text-gray-800">{sensor.name}</Text>
+            <Text className="text-sm text-gray-500 mt-0.5">{sensor.location}</Text>
           </View>
-          <View style={[styles.statusIndicator, { backgroundColor: getStatusColor(sensor.status) }]} />
+          <View 
+            className="w-3 h-3 rounded-full"
+            style={{ backgroundColor: getStatusColor(sensor.status) }} 
+          />
         </View>
         
-        <View style={styles.sensorDataContainer}>
-          <View style={styles.sensorValue}>
-            <Text style={styles.valueText}>{sensor.value}</Text>
-            <Text style={styles.unitText}>{sensor.unit}</Text>
+        <View className="flex-row justify-between items-center">
+          <View className="flex-row items-end">
+            <Text className="text-3xl font-bold text-gray-800">{sensor.value}</Text>
+            <Text className="text-sm text-gray-500 ml-1 mb-1">{sensor.unit}</Text>
           </View>
           
-          <View style={styles.sensorMeta}>
+          <View className="items-end">
             <BatteryIndicator level={sensor.battery} />
-            <Text style={styles.updateTime}>Updated: {sensor.lastUpdate}</Text>
+            <Text className="text-xs text-gray-400 mt-1">Updated: {sensor.lastUpdate}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -212,21 +229,21 @@ const SensorScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView className="flex-1 bg-gray-50">
       <StatusBar barStyle="dark-content" />
       
       {/* Header */}
-      <View style={[styles.header, { paddingTop: insets.top > 0 ? 0 : 10 }]}>
+      <View className={`flex-row items-center justify-between px-4 h-14 bg-white shadow-sm ${insets.top > 0 ? '' : 'pt-2.5'}`}>
         <TouchableOpacity 
-          style={styles.backButton}
+          className="w-10 h-10 rounded-full bg-gray-100 justify-center items-center"
           accessibilityLabel="Go back"
           accessibilityRole="button"
         >
           <ChevronLeft width={24} height={24} color="#333" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Sensors</Text>
+        <Text className="text-xl font-bold text-gray-800">Sensors</Text>
         <TouchableOpacity 
-          style={[styles.refreshButton, refreshing && styles.refreshingButton]}
+          className={`w-10 h-10 rounded-full bg-gray-100 justify-center items-center ${refreshing ? 'opacity-50' : ''}`}
           onPress={refreshSensors}
           disabled={refreshing}
           accessibilityLabel="Refresh sensor data"
@@ -238,29 +255,29 @@ const SensorScreen = () => {
       
       {/* Content */}
       <ScrollView 
-        style={styles.contentContainer}
-        contentContainerStyle={styles.contentInner}
+        className="flex-1"
+        contentContainerClassName="p-4"
         showsVerticalScrollIndicator={false}
       >
         {isLoading ? (
-          <View style={styles.loadingContainer}>
-            <Text style={styles.loadingText}>Loading sensors...</Text>
+          <View className="flex-1 justify-center items-center py-10">
+            <Text className="text-base text-gray-500">Loading sensors...</Text>
           </View>
         ) : (
           <>
             {/* Sensor Status Summary */}
-            <View style={styles.summaryContainer}>
+            <View className="mb-4 rounded-xl overflow-hidden shadow-sm">
               <LinearGradient
                 colors={['#f5f7fa', '#e8edf5']}
-                style={styles.summaryGradient}
+                className="rounded-xl"
               >
-                <View style={styles.summaryContent}>
-                  <View style={styles.summaryIconContainer}>
+                <View className="p-4 flex-row items-center">
+                  <View className="w-12 h-12 rounded-full bg-yellow-100 items-center justify-center mr-4">
                     <Sun width={24} height={24} color="#FF9800" />
                   </View>
-                  <View style={styles.summaryTextContainer}>
-                    <Text style={styles.summaryTitle}>Sensor Status</Text>
-                    <Text style={styles.summaryText}>
+                  <View className="flex-1">
+                    <Text className="text-base font-semibold text-gray-800 mb-1">Sensor Status</Text>
+                    <Text className="text-sm text-gray-500">
                       {groupedSensors.warning.length === 0 
                         ? "All sensors functioning normally" 
                         : `${groupedSensors.warning.length} sensor${groupedSensors.warning.length > 1 ? 's' : ''} need${groupedSensors.warning.length === 1 ? 's' : ''} attention`}
@@ -272,23 +289,23 @@ const SensorScreen = () => {
             
             {/* Sensors needing attention */}
             {groupedSensors.warning.length > 0 && (
-              <View style={styles.sensorSection}>
-                <Text style={styles.sectionTitle}>Needs Attention</Text>
+              <View className="mb-4">
+                <Text className="text-base font-semibold text-gray-800 mb-3 ml-0.5">Needs Attention</Text>
                 {groupedSensors.warning.map(renderSensorCard)}
               </View>
             )}
             
             {/* Normal functioning sensors */}
-            <View style={styles.sensorSection}>
-              <Text style={styles.sectionTitle}>
+            <View className="mb-4">
+              <Text className="text-base font-semibold text-gray-800 mb-3 ml-0.5">
                 {groupedSensors.warning.length > 0 ? "Functioning Normally" : "All Sensors"}
               </Text>
               {groupedSensors.normal.map(renderSensorCard)}
             </View>
             
             {/* Add new sensor button */}
-            <TouchableOpacity style={styles.addSensorButton} activeOpacity={0.8}>
-              <Text style={styles.addSensorText}>+ Add New Sensor</Text>
+            <TouchableOpacity className="bg-gray-100 rounded-xl p-4 items-center mt-2 mb-4" activeOpacity={0.8}>
+              <Text className="text-base text-gray-500 font-medium">+ Add New Sensor</Text>
             </TouchableOpacity>
           </>
         )}
@@ -296,218 +313,5 @@ const SensorScreen = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    height: 56,
-    backgroundColor: '#FFF',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  refreshButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-  },
-  refreshingButton: {
-    opacity: 0.5,
-  },
-  contentContainer: {
-    flex: 1,
-  },
-  contentInner: {
-    padding: 16,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  loadingText: {
-    fontSize: 16,
-    color: '#666',
-  },
-  summaryContainer: {
-    marginBottom: 16,
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-  },
-  summaryGradient: {
-    borderRadius: 12,
-  },
-  summaryContent: {
-    padding: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  summaryIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,152,0,0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 16,
-  },
-  summaryTextContainer: {
-    flex: 1,
-  },
-  summaryTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 4,
-  },
-  summaryText: {
-    fontSize: 14,
-    color: '#666',
-  },
-  sensorSection: {
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-    marginBottom: 12,
-    marginLeft: 2,
-  },
-  sensorCard: {
-    backgroundColor: '#FFF',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-  },
-  sensorHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sensorIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  sensorInfo: {
-    flex: 1,
-  },
-  sensorName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#333',
-  },
-  sensorLocation: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 2,
-  },
-  statusIndicator: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-  },
-  sensorDataContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  sensorValue: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  valueText: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#333',
-  },
-  unitText: {
-    fontSize: 14,
-    color: '#666',
-    marginLeft: 4,
-    marginBottom: 4,
-  },
-  sensorMeta: {
-    alignItems: 'flex-end',
-  },
-  batteryContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  batteryBar: {
-    width: 40,
-    height: 8,
-    backgroundColor: '#f0f0f0',
-    borderRadius: 4,
-    marginHorizontal: 4,
-    overflow: 'hidden',
-  },
-  batteryLevel: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  batteryText: {
-    fontSize: 12,
-    color: '#666',
-  },
-  updateTime: {
-    fontSize: 12,
-    color: '#999',
-  },
-  addSensorButton: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginTop: 8,
-    marginBottom: 16,
-  },
-  addSensorText: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '500',
-  },
-});
 
 export default SensorScreen;
