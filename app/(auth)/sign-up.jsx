@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   View, 
   Text, 
-  StyleSheet, 
   TextInput, 
   TouchableOpacity, 
   SafeAreaView, 
@@ -12,10 +11,12 @@ import {
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
-  ScrollView
+  ScrollView,
+  Animated
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const SignUpScreen = () => {
   const [fullName, setFullName] = useState('');
@@ -33,6 +34,29 @@ const SignUpScreen = () => {
     { id: 3, label: 'Contains number', met: false },
     { id: 4, label: 'Contains special character', met: false },
   ];
+
+  // Animation values
+  const fadeAnim = new Animated.Value(0);
+  const slideAnim = new Animated.Value(30);
+  
+  // Safe area insets
+  const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    // Start animations when component mounts
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
 
   const checkPasswordStrength = (pass) => {
     let strength = 0;
@@ -74,12 +98,12 @@ const SignUpScreen = () => {
     // Simulate account creation process
     setTimeout(() => {
       setIsLoading(false);
-    //   router.push('/dashboard');
+      router.push('/dashboard');
     }, 1500);
   };
 
   const navigateToSignIn = () => {
-    // router.push('/signin');
+    router.push('/sign-in');
   };
 
   const navigateBack = () => {
@@ -98,38 +122,51 @@ const SignUpScreen = () => {
     if (passwordStrength === 0) return '#ccc';
     if (passwordStrength === 1) return '#ff4d4d';
     if (passwordStrength === 2) return '#ffa64d';
-    if (passwordStrength === 3) return '#4dabff';
+    if (passwordStrength === 3) return '#cb4523'; // Match our brand color for "Good"
     if (passwordStrength === 4) return '#4cd964';
   };
 
   return (
     <KeyboardAvoidingView 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      className="flex-1 bg-white"
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <SafeAreaView style={styles.container}>
-          <StatusBar barStyle="dark-content" backgroundColor="#f8f9fa" />
+        <SafeAreaView className="flex-1">
+          <StatusBar barStyle="light-content" backgroundColor="#cb4523" />
           
-          <TouchableOpacity style={styles.backButton} onPress={navigateBack}>
-            <Ionicons name="arrow-back" size={24} color="#333" />
+          <TouchableOpacity 
+            className="mt-4 ml-4 w-10 h-10 rounded-full bg-white items-center justify-center shadow-sm"
+            onPress={navigateBack}
+            style={{ marginTop: insets.top > 20 ? 0 : 16 }}
+          >
+            <Ionicons name="arrow-back" size={24} color="#cb4523" />
           </TouchableOpacity>
           
-          <ScrollView contentContainerStyle={styles.scrollContainer}>
-            <View style={styles.headerContainer}>
+          <ScrollView 
+            contentContainerStyle={{ flexGrow: 1 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <Animated.View 
+              className="items-center mt-2 mb-6"
+              style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
+            >
               <Image 
                 source={require('../../assets/logo/logo.png')} 
-                style={styles.logo}
+                className="w-16 h-16 mb-4 rounded-full"
               />
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Join FireSense for smart fire detection</Text>
-            </View>
+              <Text className="text-2xl font-bold text-gray-900 mb-2">Create Account</Text>
+              <Text className="text-base text-gray-700">Join Fire Sentinel for smart fire detection</Text>
+            </Animated.View>
             
-            <View style={styles.formContainer}>
-              <View style={styles.inputContainer}>
-                <Ionicons name="person-outline" size={20} color="#999" style={styles.inputIcon} />
+            <Animated.View 
+              className="px-6"
+              style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
+            >
+              <View className="flex-row items-center bg-white rounded-xl px-4 mb-4 h-14 shadow-sm border border-gray-100">
+                <Ionicons name="person-outline" size={20} color="#999" className="mr-3" />
                 <TextInput
-                  style={styles.input}
+                  className="flex-1 text-base text-gray-800"
                   placeholder="Full Name"
                   placeholderTextColor="#999"
                   value={fullName}
@@ -137,10 +174,10 @@ const SignUpScreen = () => {
                 />
               </View>
               
-              <View style={styles.inputContainer}>
-                <Ionicons name="mail-outline" size={20} color="#999" style={styles.inputIcon} />
+              <View className="flex-row items-center bg-white rounded-xl px-4 mb-4 h-14 shadow-sm border border-gray-100">
+                <Ionicons name="mail-outline" size={20} color="#999" className="mr-3" />
                 <TextInput
-                  style={styles.input}
+                  className="flex-1 text-base text-gray-800"
                   placeholder="Email Address"
                   placeholderTextColor="#999"
                   keyboardType="email-address"
@@ -150,10 +187,10 @@ const SignUpScreen = () => {
                 />
               </View>
               
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#999" style={styles.inputIcon} />
+              <View className="flex-row items-center bg-white rounded-xl px-4 mb-3 h-14 shadow-sm border border-gray-100">
+                <Ionicons name="lock-closed-outline" size={20} color="#999" className="mr-3" />
                 <TextInput
-                  style={styles.input}
+                  className="flex-1 text-base text-gray-800"
                   placeholder="Password"
                   placeholderTextColor="#999"
                   secureTextEntry={!showPassword}
@@ -161,7 +198,7 @@ const SignUpScreen = () => {
                   onChangeText={handlePasswordChange}
                 />
                 <TouchableOpacity 
-                  style={styles.passwordToggle}
+                  className="p-2"
                   onPress={() => setShowPassword(!showPassword)}
                 >
                   <Ionicons 
@@ -173,44 +210,33 @@ const SignUpScreen = () => {
               </View>
               
               {password.length > 0 && (
-                <View style={styles.passwordStrengthContainer}>
-                  <View style={styles.strengthBarContainer}>
+                <View className="flex-row items-center mb-3 px-1">
+                  <View className="flex-row flex-1 mr-3">
                     {[1, 2, 3, 4].map((index) => (
                       <View 
                         key={index}
-                        style={[
-                          styles.strengthBar, 
-                          { 
-                            backgroundColor: index <= passwordStrength 
-                              ? getPasswordStrengthColor() 
-                              : '#e0e0e0'
-                          }
-                        ]} 
+                        className="flex-1 h-1 rounded mx-0.5"
+                        style={{ backgroundColor: index <= passwordStrength 
+                          ? getPasswordStrengthColor() : '#e0e0e0' }} 
                       />
                     ))}
                   </View>
-                  <Text style={[
-                    styles.passwordStrengthText, 
-                    { color: getPasswordStrengthColor() }
-                  ]}>
+                  <Text style={{ color: getPasswordStrengthColor() }} className="text-sm font-medium">
                     {getPasswordStrengthLabel()}
                   </Text>
                 </View>
               )}
               
               {password.length > 0 && (
-                <View style={styles.passwordCriteriaContainer}>
+                <View className="mb-4 px-1">
                   {passwordCriteria.map((criterion) => (
-                    <View key={criterion.id} style={styles.criterionRow}>
+                    <View key={criterion.id} className="flex-row items-center mb-1.5">
                       <Ionicons 
                         name={criterion.met ? "checkmark-circle" : "ellipse-outline"} 
                         size={16} 
                         color={criterion.met ? "#4cd964" : "#999"} 
                       />
-                      <Text style={[
-                        styles.criterionText,
-                        criterion.met && styles.criterionMetText
-                      ]}>
+                      <Text className={`text-sm ml-2 ${criterion.met ? 'text-gray-700 font-medium' : 'text-gray-500'}`}>
                         {criterion.label}
                       </Text>
                     </View>
@@ -218,10 +244,10 @@ const SignUpScreen = () => {
                 </View>
               )}
               
-              <View style={styles.inputContainer}>
-                <Ionicons name="lock-closed-outline" size={20} color="#999" style={styles.inputIcon} />
+              <View className="flex-row items-center bg-white rounded-xl px-4 mb-2 h-14 shadow-sm border border-gray-100">
+                <Ionicons name="lock-closed-outline" size={20} color="#999" className="mr-3" />
                 <TextInput
-                  style={styles.input}
+                  className="flex-1 text-base text-gray-800"
                   placeholder="Confirm Password"
                   placeholderTextColor="#999"
                   secureTextEntry={!showConfirmPassword}
@@ -229,7 +255,7 @@ const SignUpScreen = () => {
                   onChangeText={setConfirmPassword}
                 />
                 <TouchableOpacity 
-                  style={styles.passwordToggle}
+                  className="p-2"
                   onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                 >
                   <Ionicons 
@@ -241,35 +267,35 @@ const SignUpScreen = () => {
               </View>
               
               {confirmPassword.length > 0 && password !== confirmPassword && (
-                <Text style={styles.passwordMismatchText}>
+                <Text className="text-red-500 text-sm mb-4 px-1">
                   Passwords do not match
                 </Text>
               )}
               
               <TouchableOpacity 
-                style={[styles.signUpButton, isLoading && styles.signUpButtonDisabled]} 
+                className={`bg-[#cb4523] rounded-xl h-14 items-center justify-center shadow-lg mt-2 ${isLoading ? 'opacity-80' : ''}`}
                 onPress={handleSignUp}
                 disabled={isLoading}
               >
                 {isLoading ? (
-                  <View style={styles.loadingContainer}>
-                    <Text style={styles.signUpButtonText}>Creating Account</Text>
-                    <View style={styles.loadingDots}>
-                      <View style={[styles.loadingDot, styles.loadingDot1]} />
-                      <View style={[styles.loadingDot, styles.loadingDot2]} />
-                      <View style={[styles.loadingDot, styles.loadingDot3]} />
+                  <View className="flex-row items-center">
+                    <Text className="text-white text-lg font-semibold">Creating Account</Text>
+                    <View className="flex-row ml-2 items-center justify-center">
+                      <View className="w-2 h-2 rounded-full bg-white mx-0.5 opacity-80 animate-bounce" />
+                      <View className="w-2 h-2 rounded-full bg-white mx-0.5 opacity-80 animate-bounce delay-100" />
+                      <View className="w-2 h-2 rounded-full bg-white mx-0.5 opacity-80 animate-bounce delay-200" />
                     </View>
                   </View>
                 ) : (
-                  <Text style={styles.signUpButtonText}>Create Account</Text>
+                  <Text className="text-white text-lg font-semibold">Create Account</Text>
                 )}
               </TouchableOpacity>
-            </View>
+            </Animated.View>
             
-            <View style={styles.footer}>
-              <Text style={styles.footerText}>Already have an account?</Text>
+            <View className="flex-row justify-center items-center mt-auto mb-6">
+              <Text className="text-sm text-gray-600 mr-1">Already have an account?</Text>
               <TouchableOpacity onPress={navigateToSignIn}>
-                <Text style={styles.signInText}>Sign In</Text>
+                <Text className="text-sm font-semibold text-[#cb4523]">Sign In</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>
@@ -278,199 +304,5 @@ const SignUpScreen = () => {
     </KeyboardAvoidingView>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-  },
-  backButton: {
-    marginTop: 16,
-    marginLeft: 16,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  headerContainer: {
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 30,
-  },
-  logo: {
-    width: 60,
-    height: 60,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 8,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-  },
-  formContainer: {
-    paddingHorizontal: 24,
-  },
-  inputContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    marginBottom: 16,
-    height: 56,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#333',
-  },
-  passwordToggle: {
-    padding: 8,
-  },
-  passwordStrengthContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 4,
-  },
-  strengthBarContainer: {
-    flexDirection: 'row',
-    flex: 1,
-    marginRight: 12,
-  },
-  strengthBar: {
-    flex: 1,
-    height: 4,
-    borderRadius: 2,
-    marginHorizontal: 2,
-  },
-  passwordStrengthText: {
-    fontSize: 14,
-    fontWeight: '500',
-  },
-  passwordCriteriaContainer: {
-    marginBottom: 16,
-    paddingHorizontal: 4,
-  },
-  criterionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  criterionText: {
-    fontSize: 14,
-    color: '#999',
-    marginLeft: 8,
-  },
-  criterionMetText: {
-    color: '#666',
-    fontWeight: '500',
-  },
-  passwordMismatchText: {
-    color: '#ff4d4d',
-    fontSize: 14,
-    marginTop: -8,
-    marginBottom: 16,
-    paddingHorizontal: 4,
-  },
-  signUpButton: {
-    backgroundColor: '#0074D9',
-    borderRadius: 12,
-    height: 56,
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#0074D9',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 5,
-    marginTop: 8,
-  },
-  signUpButtonDisabled: {
-    backgroundColor: '#84b6e0',
-  },
-  signUpButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-  loadingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  loadingDots: {
-    flexDirection: 'row',
-    marginLeft: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#fff',
-    marginHorizontal: 2,
-    opacity: 0.8,
-  },
-  loadingDot1: {
-    animationName: 'bounce',
-    animationDuration: '0.6s',
-    animationIterationCount: 'infinite',
-    animationDelay: '0s',
-  },
-  loadingDot2: {
-    animationName: 'bounce',
-    animationDuration: '0.6s',
-    animationIterationCount: 'infinite',
-    animationDelay: '0.2s',
-  },
-  loadingDot3: {
-    animationName: 'bounce',
-    animationDuration: '0.6s',
-    animationIterationCount: 'infinite',
-    animationDelay: '0.4s',
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 'auto',
-    marginBottom: 24,
-    paddingTop: 16,
-  },
-  footerText: {
-    fontSize: 14,
-    color: '#666',
-    marginRight: 4,
-  },
-  signInText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#F24E1E',
-  },
-});
 
 export default SignUpScreen;
