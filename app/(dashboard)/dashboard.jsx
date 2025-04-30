@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, SafeAreaView } from 'react-native';
-import { Bell, AlertTriangle, Shield, Phone, User } from 'lucide-react-native';
+import { Bell, AlertTriangle, Shield, Phone, User, User2 } from 'lucide-react-native';
 import { router } from 'expo-router';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
-import HeaderSection from '../../components/home/HeaderSection';
 
 export default function Dashboard() {
   // Animation state
@@ -19,16 +18,31 @@ export default function Dashboard() {
     }, 150);
   };
 
+
   // Card animation styles
   const getCardStyle = (index) => {
     return activeCardIndex === index ? { transform: [{ scale: 0.95 }] } : {};
   };
 
+  const handleRoute = () => {
+    router.push('/settings')
+  }
+
   return (
     <SafeAreaView className="flex-1 bg-blue-600">
-      {/* HeaderSection */}
 
-      <HeaderSection />
+
+      <View className="px-4">
+        <Text className="text-4xl font-bold text-white">Fire Sentinel</Text>
+        <Text className="text-white/80 mt-1">Stay informed • Stay safe</Text>
+        <TouchableOpacity
+          className="w-10 h-10 rounded-full bg-white/20 items-center justify-center"
+          onPress={handleRoute}
+          accessibilityLabel="User profile"
+        >
+          <User2 size={24} color="white" />
+        </TouchableOpacity>
+      </View>
       {/* Main Content */}
       <View className="flex-1 bg-gray-50 rounded-t-xl -mt-5">
         <ScrollView className="flex-1 p-3">
@@ -98,9 +112,8 @@ export default function Dashboard() {
             </Animated.View>
 
             {/* Emergency Contacts Card */}
-            <Animated.View
+            <View
               className="w-[48%] mb-4"
-              entering={FadeInDown.delay(400).duration(500)}
             >
               <TouchableOpacity
                 className="bg-purple-50 p-5 rounded-xl shadow-md flex-col justify-between h-36"
@@ -116,7 +129,7 @@ export default function Dashboard() {
                   <Text className="text-sm text-gray-600">Emergency services</Text>
                 </View>
               </TouchableOpacity>
-            </Animated.View>
+            </View>
           </View>
 
           {/* Emergency Call Banner */}
