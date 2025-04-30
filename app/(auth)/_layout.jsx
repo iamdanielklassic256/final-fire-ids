@@ -20,7 +20,7 @@ export default function RootLayout() {
 			<GestureHandlerRootView style={{ flex: 1 }}>
 				<StatusBar backgroundColor="#000000" barStyle="light-content" />
 				<Stack screenOptions={{ headerShown: false }}>
-					<Stack.Screen name="(dashboard)" options={{ headerShown: false }} />
+					
 					<Stack.Screen name="sign-up" options={{ headerShown: false }} />
 					<Stack.Screen name="sign-in" options={{ headerShown: false }} />
 				</Stack>

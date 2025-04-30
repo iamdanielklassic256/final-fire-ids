@@ -91,12 +91,9 @@ const WelcomeScreen = () => {
               />
               <Text className="text-[#cb4523] font-bold text-lg mt-2">Fire Sentinel</Text>
             </View>
-
             {/* Hero Text */}
-            <View className="mb-8">
-              <Text className="text-gray-900 text-center text-3xl font-extrabold leading-tight mb-4">
-                Smart Fire{"\n"}Detection System
-              </Text>
+            <View className="mb-6">
+             
               <Text className="text-gray-700 text-center text-base leading-6 px-4">
                 Monitor fire hazards in real-time, receive instant alerts, and protect your property with our advanced IoT fire detection system.
               </Text>
@@ -131,18 +128,13 @@ const WelcomeScreen = () => {
               </Animated.View>
               
               <TouchableOpacity
-                onPress={() => router.push('/sign-in')}
+                onPress={() => router.push('/dashboard')}
                 className="border border-[#cb4523] py-4 rounded-xl"
                 activeOpacity={0.8}
               >
                 <Text className="text-[#cb4523] text-center text-lg font-bold">I Already Have an Account</Text>
               </TouchableOpacity>
             </View>
-            
-            {/* Version info */}
-            <Text className="text-gray-400 text-center text-xs mt-6">
-              Version 1.0.0
-            </Text>
           </Animated.View>
         </ScrollView>
       </SafeAreaView>

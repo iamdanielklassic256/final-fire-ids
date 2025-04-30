@@ -107,7 +107,6 @@ const SignInScreen = () => {
               <Ionicons name="mail-outline" size={20} color="#999" className="mr-3" />
               <TextInput
                 className="flex-1 text-base text-gray-800"
-                placeholder="Email Address"
                 placeholderTextColor="#999"
                 keyboardType="email-address"
                 autoCapitalize="none"
