@@ -4,8 +4,10 @@ import { LinearGradient } from 'expo-linear-gradient';
 // Import from lucide-react-native instead of lucide-react
 import { AlertTriangle, Bell, ChevronLeft, Filter, MapPin, Calendar, Info, X } from 'lucide-react-native';
 import { router } from 'expo-router';
+import { useTheme } from '../context/ThemeContext';
 
 const AlertScreen = () => {
+  const { theme, isDarkMode } = useTheme();
   const [activeTab, setActiveTab] = useState('active');
   const [alerts, setAlerts] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -90,13 +92,13 @@ const AlertScreen = () => {
   const getSeverityColor = (severity) => {
     switch (severity) {
       case 'low':
-        return styles.severityLow;
+        return { backgroundColor: '#4CAF50' };
       case 'moderate':
-        return styles.severityModerate;
+        return { backgroundColor: theme.primary };
       case 'high':
-        return styles.severityHigh;
+        return { backgroundColor: theme.primary };
       default:
-        return styles.severityDefault;
+        return { backgroundColor: theme.textSecondary };
     }
   };
 
@@ -104,49 +106,59 @@ const AlertScreen = () => {
   const getAlertIcon = (type) => {
     switch (type) {
       case 'warning':
-        return <AlertTriangle size={20} color="#f97316" />; // orange-500
+        return <AlertTriangle size={20} color={theme.primary} />;
       case 'emergency':
-        return <Bell size={20} color="#ef4444" />; // red-500
+        return <Bell size={20} color={theme.primary} />;
       case 'advisory':
-        return <Info size={20} color="#3b82f6" />; // blue-500
+        return <Info size={20} color={theme.primary} />;
       case 'resolved':
-        return <X size={20} color="#22c55e" />; // green-500
+        return <X size={20} color="#4CAF50" />;
       case 'ended':
-        return <Info size={20} color="#6b7280" />; // gray-500
+        return <Info size={20} color={theme.textSecondary} />;
       default:
-        return <Info size={20} color="#6b7280" />; // gray-500
+        return <Info size={20} color={theme.textSecondary} />;
     }
   };
 
   const renderAlertCard = (alert) => {
     return (
-      <TouchableOpacity 
-        key={alert.id} 
-        style={styles.alertCard}
+      <TouchableOpacity
+        key={alert.id}
+        style={[{
+          backgroundColor: theme.surface,
+          shadowColor: theme.text,
+          shadowOffset: { width: 0, height: 1 },
+          shadowOpacity: 0.1,
+          shadowRadius: 3,
+          elevation: 2,
+          borderRadius: 12,
+          padding: 16,
+          marginBottom: 12,
+        }]}
         accessibilityLabel={`${alert.title} alert, ${alert.severity} severity, ${alert.location}, ${alert.distance}`}
       >
         <View style={styles.alertHeader}>
           <View style={styles.alertTitleContainer}>
-            <View style={styles.iconContainer}>
+            <View style={[styles.iconContainer, { backgroundColor: theme.primaryLight }]}>
               {getAlertIcon(alert.type)}
             </View>
-            <Text style={styles.alertTitle}>{alert.title}</Text>
+            <Text style={[styles.alertTitle, { color: theme.text }]}>{alert.title}</Text>
           </View>
           <View style={[styles.severityDot, getSeverityColor(alert.severity)]} />
         </View>
-        
-        <Text style={styles.alertDescription}>
+
+        <Text style={[styles.alertDescription, { color: theme.textSecondary }]}>
           {alert.description}
         </Text>
-        
+
         <View style={styles.alertFooter}>
           <View style={styles.footerInfo}>
-            <MapPin size={14} color="#6b7280" />
-            <Text style={styles.footerText}>{alert.location} • {alert.distance}</Text>
+            <MapPin size={14} color={theme.textSecondary} />
+            <Text style={[styles.footerText, { color: theme.textSecondary }]}>{alert.location} • {alert.distance}</Text>
           </View>
           <View style={styles.footerInfo}>
-            <Calendar size={14} color="#6b7280" />
-            <Text style={styles.footerText}>{alert.timestamp}</Text>
+            <Calendar size={14} color={theme.textSecondary} />
+            <Text style={[styles.footerText, { color: theme.textSecondary }]}>{alert.timestamp}</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -154,92 +166,100 @@ const AlertScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <LinearGradient
-          colors={['rgba(0,0,0,0.5)', 'rgba(0,0,0,0.7)']}
-          style={styles.headerGradient}
-        >
-          <View style={styles.headerContent}>
-            <TouchableOpacity 
-              style={styles.headerButton}
-              accessibilityLabel="Go back"
-			  onPress={() => router.back()}
-            >
-              <ChevronLeft size={24} color="white" />
-            </TouchableOpacity>
-            <Text style={styles.headerTitle}>Fire Alerts</Text>
-            <TouchableOpacity 
-              style={styles.headerButton}
-              accessibilityLabel="Filter alerts"
-            >
-              <Filter size={20} color="white" />
-            </TouchableOpacity>
-          </View>
-        </LinearGradient>
+      <View style={[styles.header, { backgroundColor: theme.primary }]}>
+        <View style={styles.headerContent}>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
+            accessibilityLabel="Go back"
+            onPress={() => router.back()}
+          >
+            <ChevronLeft size={24} color="white" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Fire Alerts</Text>
+          <TouchableOpacity
+            style={[styles.headerButton, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}
+            accessibilityLabel="Filter alerts"
+          >
+            <Filter size={20} color="white" />
+          </TouchableOpacity>
+        </View>
       </View>
-      
+
       {/* Tab Navigation */}
-      <View style={styles.tabContainer}>
-        <TouchableOpacity 
-          style={[styles.tabButton, activeTab === 'active' && styles.activeTabButton]}
+      <View style={[styles.tabContainer, {
+        backgroundColor: theme.surface,
+        borderBottomColor: theme.border,
+        borderBottomWidth: 1,
+      }]}>
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            activeTab === 'active' && { borderBottomColor: theme.primary, borderBottomWidth: 3 }
+          ]}
           onPress={() => setActiveTab('active')}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'active' }}
         >
-          <Text style={[styles.tabText, activeTab === 'active' && styles.activeTabText]}>
+          <Text style={[
+            styles.tabText,
+            { color: theme.textSecondary },
+            activeTab === 'active' && { color: theme.primary }
+          ]}>
             Active Alerts
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity 
-          style={[styles.tabButton, activeTab === 'history' && styles.activeTabButton]}
+        <TouchableOpacity
+          style={[
+            styles.tabButton,
+            activeTab === 'history' && { borderBottomColor: theme.primary, borderBottomWidth: 3 }
+          ]}
           onPress={() => setActiveTab('history')}
           accessibilityRole="tab"
           accessibilityState={{ selected: activeTab === 'history' }}
         >
-          <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
+          <Text style={[
+            styles.tabText,
+            { color: theme.textSecondary },
+            activeTab === 'history' && { color: theme.primary }
+          ]}>
             Alert History
           </Text>
         </TouchableOpacity>
       </View>
-      
+
       {/* Content */}
       <ScrollView style={styles.content} contentContainerStyle={styles.contentContainer}>
         {isLoading ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.loadingText}>Loading alerts...</Text>
+            <Text style={[styles.loadingText, { color: theme.textSecondary }]}>Loading alerts...</Text>
           </View>
         ) : alerts && alerts[activeTab]?.length > 0 ? (
           alerts[activeTab].map(renderAlertCard)
         ) : (
           <View style={styles.emptyContainer}>
-            <AlertTriangle size={40} color="#d1d5db" />
-            <Text style={styles.emptyTitle}>No {activeTab} alerts found</Text>
-            <Text style={styles.emptySubtitle}>
-              {activeTab === 'active' 
-                ? "You're all caught up! No active fire alerts in your area." 
+            <AlertTriangle size={40} color={theme.textSecondary} />
+            <Text style={[styles.emptyTitle, { color: theme.text }]}>No {activeTab} alerts found</Text>
+            <Text style={[styles.emptySubtitle, { color: theme.textSecondary }]}>
+              {activeTab === 'active'
+                ? "You're all caught up! No active fire alerts in your area."
                 : "You don't have any alert history yet."}
             </Text>
           </View>
         )}
       </ScrollView>
-      
+
       {/* Floating Emergency Button */}
       <View style={styles.emergencyButtonContainer}>
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.emergencyButton}
           accessibilityLabel="Emergency call"
         >
-          <LinearGradient
-            colors={['#ef4444', '#b91c1c']} // from-red-500 to-red-700
-            style={styles.emergencyGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
+          <View style={[styles.emergencyGradient, { backgroundColor: theme.primary }]}>
             <Bell size={22} color="white" />
             <Text style={styles.emergencyText}>Emergency Call</Text>
-          </LinearGradient>
+          </View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -249,29 +269,22 @@ const AlertScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f9fafb', // bg-gray-50
   },
   header: {
-    height: 128, // h-32
-    backgroundColor: '#000', // We'll use background image in a real app
-  },
-  headerGradient: {
-    height: '100%',
-    width: '100%',
+    height: 128,
   },
   headerContent: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    height: 56, // h-14
+    height: 56,
     marginTop: 'auto',
   },
   headerButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.15)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -282,30 +295,15 @@ const styles = StyleSheet.create({
   },
   tabContainer: {
     flexDirection: 'row',
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   tabButton: {
     flex: 1,
     paddingVertical: 16,
     alignItems: 'center',
   },
-  activeTabButton: {
-    borderBottomWidth: 3,
-    borderBottomColor: '#ea580c', // border-orange-600
-  },
   tabText: {
-    color: '#4b5563', // text-gray-600
-    fontWeight: '500', // font-medium
+    fontWeight: '500',
     fontSize: 16,
-  },
-  activeTabText: {
-    color: '#ea580c', // text-orange-600
-    fontWeight: '600', // font-semibold
   },
   content: {
     flex: 1,
@@ -314,23 +312,6 @@ const styles = StyleSheet.create({
   contentContainer: {
     paddingTop: 16,
     paddingBottom: 80,
-  },
-  alertCard: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  alertHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
   },
   alertTitleContainer: {
     flexDirection: 'row',
@@ -341,15 +322,19 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: 'rgba(0, 0, 0, 0.05)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 10,
   },
+  alertHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
   alertTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1f2937', // text-gray-800
     flex: 1,
   },
   severityDot: {
@@ -357,22 +342,9 @@ const styles = StyleSheet.create({
     height: 12,
     borderRadius: 6,
   },
-  severityLow: {
-    backgroundColor: '#22c55e', // bg-green-500
-  },
-  severityModerate: {
-    backgroundColor: '#f97316', // bg-orange-500
-  },
-  severityHigh: {
-    backgroundColor: '#ef4444', // bg-red-500
-  },
-  severityDefault: {
-    backgroundColor: '#6b7280', // bg-gray-500
-  },
   alertDescription: {
     fontSize: 14,
     lineHeight: 20,
-    color: '#4b5563', // text-gray-600
     marginBottom: 12,
   },
   alertFooter: {
@@ -385,7 +357,6 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: 12,
-    color: '#6b7280', // text-gray-500
     marginLeft: 4,
   },
   emptyContainer: {
@@ -395,17 +366,14 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 16,
-    color: '#4b5563', // text-gray-600
   },
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#1f2937', // text-gray-800
     marginTop: 16,
   },
   emptySubtitle: {
     fontSize: 14,
-    color: '#4b5563', // text-gray-600
     textAlign: 'center',
     marginTop: 8,
   },
