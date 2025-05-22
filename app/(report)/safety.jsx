@@ -8,7 +8,7 @@ import {
   StatusBar
 } from 'react-native';
 import { router } from 'expo-router';
-import { ArrowLeft, Shield, ChevronDown, ChevronRight, Info, CheckCircle, Home, Layers, Wind } from 'lucide-react-native';
+import { ArrowLeft, Shield, ChevronDown, ChevronRight, Info, CheckCircle, Trees, Flame, Wind, MapPin } from 'lucide-react-native';
 import Animated, { FadeInDown, FadeIn } from 'react-native-reanimated';
 import { useTheme } from '../context/ThemeContext';
 
@@ -26,60 +26,74 @@ export default function SafetyScreen() {
 
   const safetyTips = [
     {
-      title: "Fire Prevention at Home",
-      icon: <Home size={22} color={theme.primary} />,
+      title: "Forest Fire Prevention",
+      icon: <Trees size={22} color={theme.primary} />,
       content: [
-        "Install smoke detectors on every floor and in bedrooms",
-        "Test smoke alarms monthly and replace batteries annually",
-        "Keep fire extinguishers in easily accessible locations",
-        "Never leave cooking unattended in the kitchen",
-        "Keep flammable items away from heat sources"
+        "Always extinguish campfires completely with water and stir ashes",
+        "Never leave a fire unattended, even for a short time",
+        "Clear a 10-foot area around campfires of flammable materials",
+        "Check fire restrictions and weather conditions before starting fires",
+        "Use established fire rings or metal fire pans when available",
+        "Keep water and a shovel nearby when using fire in the forest"
       ]
     },
     {
-      title: "Emergency Preparedness",
+      title: "Forest Emergency Preparedness",
       icon: <Shield size={22} color={theme.primary} />,
       content: [
-        "Create and practice a fire escape plan with your family",
-        "Identify two ways to exit each room",
-        "Establish a family meeting point outside",
-        "Keep emergency contacts readily available",
-        "Store important documents in a fireproof safe",
-        "Have working flashlights and batteries on hand"
+        "Know multiple escape routes from your forest location",
+        "Carry emergency communication devices (satellite phone, GPS beacon)",
+        "Inform others of your forest visit plans and expected return",
+        "Pack emergency supplies including water, first aid, and shelter",
+        "Download offline maps and know your exact location coordinates",
+        "Keep vehicles fueled and parked facing exit routes"
       ]
     },
     {
-      title: "Fire Safety Maintenance",
-      icon: <Layers size={22} color={theme.primary} />,
-      content: [
-        "Regular inspection of electrical cords and outlets",
-        "Clean dryer vents and lint traps regularly",
-        "Have heating systems serviced annually",
-        "Keep chimneys and fireplaces clean",
-        "Maintain proper spacing for portable heaters",
-        "Check fire extinguisher pressure gauges monthly"
-      ]
-    },
-    {
-      title: "During a Fire Emergency",
+      title: "Forest Equipment & Maintenance",
       icon: <Wind size={22} color={theme.primary} />,
       content: [
-        "Get out immediately when you hear a fire alarm",
-        "Crawl low under smoke to escape",
-        "Feel doors for heat before opening them",
-        "Never use elevators during a fire",
-        "Once out, stay out - never go back inside",
-        "Call emergency services from a safe location"
+        "Maintain spark arresters on all motorized equipment",
+        "Check exhaust systems for leaks and proper function",
+        "Keep fire extinguishers in vehicles and equipment",
+        "Use only approved containers for fuel storage",
+        "Perform equipment maintenance away from dry vegetation",
+        "Install and maintain fire suppression systems in forest buildings"
+      ]
+    },
+    {
+      title: "During a Forest Fire Emergency",
+      icon: <Flame size={22} color={theme.primary} />,
+      content: [
+        "Evacuate immediately when advised by forest authorities",
+        "Follow established evacuation routes and forest service directions",
+        "If trapped, move to a clearing away from vegetation",
+        "Cover exposed skin and breathe through cloth to filter smoke",
+        "Never attempt to outrun a fire uphill or through heavy vegetation",
+        "Signal for help using mirrors, bright clothing, or emergency beacons"
+      ]
+    },
+    {
+      title: "Wildlife & Forest Interaction",
+      icon: <MapPin size={22} color={theme.primary} />,
+      content: [
+        "Maintain safe distances from all wildlife during emergencies",
+        "Store food properly to avoid attracting animals to campsites",
+        "Report injured or distressed wildlife to forest authorities",
+        "Avoid using strong scents that may attract wildlife",
+        "Create noise when moving through dense forest areas",
+        "Never feed wildlife or leave food scraps in the forest"
       ]
     }
   ];
 
   const quickChecklist = [
-    "Test smoke detectors monthly",
-    "Keep fire extinguishers accessible",
-    "Clear escape routes of obstacles",
-    "Post emergency numbers visibly",
-    "Practice family escape plan"
+    "Check fire danger ratings before forest visits",
+    "Carry emergency communication devices",
+    "Know your evacuation routes",
+    "Maintain proper fire extinguishing tools",
+    "Follow all forest fire restrictions",
+    "Report smoke or fires immediately"
   ];
 
   return (
@@ -95,7 +109,7 @@ export default function SafetyScreen() {
         >
           <ArrowLeft size={24} color="white" />
         </TouchableOpacity>
-        <Text className="text-2xl font-bold text-white">Safety Tips</Text>
+        <Text className="text-2xl font-bold text-white">Forest Safety</Text>
         <View className="w-10" />
       </View>
 
@@ -105,11 +119,11 @@ export default function SafetyScreen() {
           <Animated.View entering={FadeIn.duration(500)}>
             <View style={{ backgroundColor: theme.primary }} className="p-5">
               <View className="flex-row items-center mb-2">
-                <Shield size={24} color="white" />
-                <Text className="text-xl font-bold text-white ml-2">Fire Safety & Prevention</Text>
+                <Trees size={24} color="white" />
+                <Text className="text-xl font-bold text-white ml-2">Forest Fire Safety & Prevention</Text>
               </View>
               <Text className="text-white/90">
-                Learn how to protect your home and family from fires with these essential safety tips.
+                Essential safety guidelines for preventing and responding to forest fires while protecting our natural reserves.
               </Text>
             </View>
           </Animated.View>
@@ -119,7 +133,7 @@ export default function SafetyScreen() {
             <View style={{ backgroundColor: theme.primaryLight }} className="mx-4 mt-4 p-4 rounded-xl flex-row items-start">
               <Info size={22} color={theme.primary} />
               <Text style={{ color: theme.primary }} className="ml-2 flex-1">
-                Fire safety starts with prevention. Learn these essential tips to protect your home and loved ones from fire hazards.
+                Forest fire safety requires vigilance and preparation. Learn these essential practices to protect our forests and ensure your safety in wilderness areas.
               </Text>
             </View>
           </Animated.View>
@@ -127,7 +141,7 @@ export default function SafetyScreen() {
           {/* Quick Checklist */}
           <Animated.View entering={FadeInDown.delay(200).duration(500)}>
             <View style={{ backgroundColor: theme.primaryLight }} className="mx-4 mt-4 p-4 rounded-xl">
-              <Text style={{ color: theme.text }} className="font-bold text-lg mb-2">Quick Safety Checklist</Text>
+              <Text style={{ color: theme.text }} className="font-bold text-lg mb-2">Forest Safety Checklist</Text>
               {quickChecklist.map((item, index) => (
                 <View key={index} className="flex-row items-center mb-2">
                   <CheckCircle size={18} color={theme.primary} />
@@ -139,7 +153,7 @@ export default function SafetyScreen() {
 
           {/* Safety Tips Accordion */}
           <View className="px-4 py-4">
-            <Text style={{ color: theme.text }} className="font-bold text-xl mb-3">Detailed Safety Guidelines</Text>
+            <Text style={{ color: theme.text }} className="font-bold text-xl mb-3">Detailed Forest Safety Guidelines</Text>
 
             {safetyTips.map((section, index) => (
               <Animated.View
@@ -181,6 +195,16 @@ export default function SafetyScreen() {
               </Animated.View>
             ))}
           </View>
+
+          {/* Emergency Contacts */}
+          <Animated.View entering={FadeInDown.delay(800).duration(500)}>
+            <View style={{ backgroundColor: '#ef4444' }} className="mx-4 mb-4 p-4 rounded-xl">
+              <Text className="text-white font-bold text-lg mb-2">Emergency Contacts</Text>
+              <Text className="text-white/90 mb-1">Forest Fire Emergency: 911</Text>
+              <Text className="text-white/90 mb-1">Forest Service: 1-800-FOREST</Text>
+              <Text className="text-white/90">Local Rangers: Contact your regional forest office</Text>
+            </View>
+          </Animated.View>
 
         </ScrollView>
       </View>
